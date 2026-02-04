@@ -1,0 +1,52 @@
+/* Custom Scrollbar for Dashboard List */
+nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth transitions */
+button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Logo upload button hover effect */
+.relative button:hover {
+  transform: scale(1.1);
+}
+
+/* Dashboard item hover animation */
+nav > button:hover {
+  transform: translateX(4px);
+}
+
+nav > button.justify-center:hover {
+  transform: scale(1.05);
+}
+
+/* Active dashboard glow effect */
+nav > button.bg-blue-600 {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Ripple effect on click */
+button:active {
+  transform: scale(0.98);
+}
+
+/* Smooth overflow scrolling */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
