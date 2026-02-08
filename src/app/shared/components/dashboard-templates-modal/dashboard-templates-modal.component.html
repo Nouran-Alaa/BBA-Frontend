@@ -1,0 +1,87 @@
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center p-4"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+  (click)="onClose()"
+>
+  <div
+    class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-slideUp"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold">Choose a Template</h2>
+          <p class="text-sm text-blue-100 mt-1">
+            Start with a pre-built dashboard or create your own
+          </p>
+        </div>
+        <button
+          (click)="onClose()"
+          class="w-10 h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="border-b border-gray-200 px-6 py-3 bg-gray-50">
+      <div class="flex gap-2 overflow-x-auto">
+        <button
+          *ngFor="let category of categories"
+          (click)="selectedCategory = category"
+          [class.bg-blue-600]="selectedCategory === category"
+          [class.text-white]="selectedCategory === category"
+          [class.bg-white]="selectedCategory !== category"
+          [class.text-gray-700]="selectedCategory !== category"
+          class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all hover:shadow-md"
+        >
+          {{ category }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <button
+          *ngFor="let template of getFilteredTemplates()"
+          (click)="onSelectTemplate(template)"
+          class="text-left p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all group bg-white"
+        >
+          <div class="flex items-start justify-between mb-3">
+            <span class="text-4xl">{{ template.icon }}</span>
+            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              {{ template.category }}
+            </span>
+          </div>
+          <h3 class="font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+            {{ template.name }}
+          </h3>
+          <p class="text-sm text-gray-600">{{ template.description }}</p>
+
+          <!-- Widget Count -->
+          <div class="mt-4 flex items-center gap-2 text-xs text-gray-500">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"
+              ></path>
+            </svg>
+            {{ template.widgets.length }} {{ template.widgets.length === 1 ? 'widget' : 'widgets' }}
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

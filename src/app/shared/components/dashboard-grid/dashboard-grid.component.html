@@ -103,15 +103,35 @@
         <!-- Chart Card -->
         <div *ngIf="item.type === 'chart'" class="h-full flex flex-col">
           <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
               <span class="text-xl">🤖</span>
               <h3 class="text-base font-semibold text-gray-800 truncate">{{ item.title }}</h3>
             </div>
-            <span
-              class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded flex-shrink-0"
-            >
-              AI
-            </span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <!-- Date Range Icon for Chart -->
+              <button
+                (click)="onChartDateRange(item.id, $event)"
+                class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                title="Change date range for this chart"
+              >
+                <svg
+                  class="w-4 h-4 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  ></path>
+                </svg>
+              </button>
+              <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">
+                AI
+              </span>
+            </div>
           </div>
           <div
             class="bg-gray-50 rounded-lg p-3 border border-gray-200 flex-1 overflow-hidden flex flex-col"

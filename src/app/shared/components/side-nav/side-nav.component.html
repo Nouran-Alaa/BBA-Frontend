@@ -75,44 +75,62 @@
 
     <!-- Dashboard List -->
     <nav class="space-y-1 px-2">
-      <button
-        *ngFor="let dashboard of dashboards"
-        (click)="selectDashboard(dashboard.id)"
-        [class.bg-blue-600]="activeDashboardId === dashboard.id"
-        [class.bg-transparent]="activeDashboardId !== dashboard.id"
-        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-gray-700 group relative"
-        [class.justify-center]="collapsed"
-        [title]="collapsed ? dashboard.name : ''"
-      >
-        <!-- Dashboard Icon -->
-        <span class="text-2xl flex-shrink-0" [class.text-xl]="collapsed">
-          {{ dashboard.icon || '📊' }}
-        </span>
-
-        <!-- Dashboard Name -->
-        <span
-          *ngIf="!collapsed"
-          class="text-sm font-medium text-left flex-1 truncate"
-          [class.text-white]="activeDashboardId === dashboard.id"
-          [class.text-gray-300]="activeDashboardId !== dashboard.id"
+      <div *ngFor="let dashboard of dashboards" class="relative group">
+        <button
+          (click)="selectDashboard(dashboard.id)"
+          [class.bg-blue-600]="activeDashboardId === dashboard.id"
+          [class.bg-transparent]="activeDashboardId !== dashboard.id"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-gray-700 relative"
+          [class.justify-center]="collapsed"
+          [title]="collapsed ? dashboard.name : ''"
         >
-          {{ dashboard.name }}
-        </span>
+          <!-- Dashboard Icon -->
+          <span class="text-2xl flex-shrink-0" [class.text-xl]="collapsed">
+            {{ dashboard.icon || '📊' }}
+          </span>
 
-        <!-- Default Badge -->
-        <span
-          *ngIf="dashboard.isDefault && !collapsed"
-          class="px-2 py-0.5 bg-green-600 text-white text-xs rounded-full"
-        >
-          Default
-        </span>
+          <!-- Dashboard Name -->
+          <span
+            *ngIf="!collapsed"
+            class="text-sm font-medium text-left flex-1 truncate"
+            [class.text-white]="activeDashboardId === dashboard.id"
+            [class.text-gray-300]="activeDashboardId !== dashboard.id"
+          >
+            {{ dashboard.name }}
+          </span>
 
-        <!-- Active Indicator (when collapsed) -->
-        <div
-          *ngIf="collapsed && activeDashboardId === dashboard.id"
-          class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-400 rounded-r-full"
-        ></div>
-      </button>
+          <!-- Context Menu Button (Super Admin Only) -->
+          <button
+            *ngIf="isSuperAdmin() && !collapsed"
+            (click)="openDashboardMenu(dashboard, $event)"
+            class="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all"
+            title="Dashboard options"
+          >
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+              ></path>
+            </svg>
+          </button>
+
+          <!-- Default Badge -->
+          <span
+            *ngIf="dashboard.isDefault && !collapsed"
+            class="px-2 py-0.5 bg-green-600 text-white text-xs rounded-full"
+          >
+            Default
+          </span>
+
+          <!-- Active Indicator (when collapsed) -->
+          <div
+            *ngIf="collapsed && activeDashboardId === dashboard.id"
+            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-400 rounded-r-full"
+          ></div>
+        </button>
+      </div>
 
       <!-- Add New Dashboard Button (Super Admin Only) -->
       <button
@@ -138,6 +156,26 @@
         </span>
       </button>
     </nav>
+
+    <!-- Dashboard Templates Modal -->
+    <app-dashboard-templates-modal
+      *ngIf="showTemplatesModal"
+      (close)="showTemplatesModal = false"
+      (selectTemplate)="onTemplateSelected($event)"
+    >
+    </app-dashboard-templates-modal>
+
+    <!-- Dashboard Menu Modal -->
+    <app-dashboard-menu-modal
+      *ngIf="showDashboardMenu && selectedDashboardForMenu"
+      [dashboard]="selectedDashboardForMenu"
+      (close)="showDashboardMenu = false"
+      (rename)="onDashboardRename($event)"
+      (duplicate)="onDashboardDuplicate()"
+      (share)="onDashboardShare()"
+      (delete)="onDashboardDelete()"
+    >
+    </app-dashboard-menu-modal>
   </div>
 
   <!-- Footer Section - Fixed at Bottom -->

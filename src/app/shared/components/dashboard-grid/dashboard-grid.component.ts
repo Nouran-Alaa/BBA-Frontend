@@ -27,6 +27,7 @@ export class DashboardGridComponent {
   @Input() isEditMode: boolean = false;
   @Output() itemsChange = new EventEmitter<GridItem[]>();
   @Output() itemDelete = new EventEmitter<string>();
+  @Output() chartDateRangeClick = new EventEmitter<string>();
 
   resizingItem: GridItem | null = null;
   resizeDirection: string = '';
@@ -62,6 +63,11 @@ export class DashboardGridComponent {
     this.startRowSpan = item.rowSpan;
 
     document.body.style.cursor = this.getCursorStyle(direction);
+  }
+
+  onChartDateRange(itemId: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.chartDateRangeClick.emit(itemId);
   }
 
   @HostListener('document:mousemove', ['$event'])

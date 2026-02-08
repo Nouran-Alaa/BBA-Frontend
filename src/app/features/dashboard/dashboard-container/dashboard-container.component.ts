@@ -25,6 +25,7 @@ export class DashboardContainerComponent implements OnInit {
   isGenerating: boolean = false;
   isEditMode: boolean = false;
   currentDashboardId: string = '';
+  selectedChartForDateRange: string | null = null;
 
   dashboardsData: { [key: string]: GridItem[] } = {
     '1': [
@@ -142,6 +143,13 @@ export class DashboardContainerComponent implements OnInit {
 
   formatDate(date: Date): string {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  onChartDateRangeClick(chartId: string): void {
+    this.selectedChartForDateRange = chartId;
+    this.isDatePickerOpen = true;
+    console.log('Opening date picker for chart:', chartId);
+    // TODO: Store per-chart date ranges
   }
 
   onItemDelete(itemId: string): void {
