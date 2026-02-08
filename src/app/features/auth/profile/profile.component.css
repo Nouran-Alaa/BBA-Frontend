@@ -1,0 +1,15 @@
+/* Smooth transitions */
+input,
+textarea,
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Profile image hover effect */
+img {
+  transition: transform 0.3s ease-in-out;
+}
+
+.group:hover img {
+  transform: scale(1.05);
+}

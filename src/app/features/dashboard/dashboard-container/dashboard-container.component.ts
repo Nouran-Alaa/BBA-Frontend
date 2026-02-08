@@ -26,7 +26,6 @@ export class DashboardContainerComponent implements OnInit {
   isEditMode: boolean = false;
   currentDashboardId: string = '';
 
-  // Mock dashboards storage
   dashboardsData: { [key: string]: GridItem[] } = {
     '1': [
       {
@@ -34,10 +33,8 @@ export class DashboardContainerComponent implements OnInit {
         type: 'summary',
         title: 'AI Executive Summary',
         content: 'No tasks were updated in the last week.',
-        x: 0,
-        y: 0,
-        w: 6,
-        h: 2,
+        colSpan: 6,
+        rowSpan: 2,
       },
       {
         id: '2',
@@ -45,10 +42,8 @@ export class DashboardContainerComponent implements OnInit {
         title: 'Unassigned',
         value: 0,
         label: 'tasks',
-        x: 6,
-        y: 0,
-        w: 2,
-        h: 1,
+        colSpan: 2,
+        rowSpan: 1,
       },
       {
         id: '3',
@@ -56,10 +51,8 @@ export class DashboardContainerComponent implements OnInit {
         title: 'In Progress',
         value: 0,
         label: 'tasks',
-        x: 8,
-        y: 0,
-        w: 2,
-        h: 1,
+        colSpan: 2,
+        rowSpan: 1,
       },
       {
         id: '4',
@@ -67,10 +60,8 @@ export class DashboardContainerComponent implements OnInit {
         title: 'Completed',
         value: 0,
         label: 'tasks',
-        x: 10,
-        y: 0,
-        w: 2,
-        h: 1,
+        colSpan: 2,
+        rowSpan: 1,
       },
     ],
   };
@@ -87,11 +78,9 @@ export class DashboardContainerComponent implements OnInit {
   }
 
   loadDashboard(dashboardId: string): void {
-    // Load dashboard data or create empty one
     if (this.dashboardsData[dashboardId]) {
       this.gridItems = [...this.dashboardsData[dashboardId]];
     } else {
-      // New dashboard - empty
       this.gridItems = [];
       this.dashboardsData[dashboardId] = [];
     }
@@ -122,19 +111,14 @@ export class DashboardContainerComponent implements OnInit {
     this.isGenerating = true;
 
     setTimeout(() => {
-      const maxY =
-        this.gridItems.length > 0 ? Math.max(...this.gridItems.map((item) => item.y + item.h)) : 0;
-
       const newItem: GridItem = {
         id: Date.now().toString(),
         type: 'chart',
         title: 'AI Generated Chart',
         prompt: prompt,
         chartData: {},
-        x: 0,
-        y: maxY,
-        w: 6,
-        h: 3,
+        colSpan: 6,
+        rowSpan: 3,
       };
 
       this.gridItems.push(newItem);
@@ -158,5 +142,10 @@ export class DashboardContainerComponent implements OnInit {
 
   formatDate(date: Date): string {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  onItemDelete(itemId: string): void {
+    this.gridItems = this.gridItems.filter((item) => item.id !== itemId);
+    this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
   }
 }

@@ -1,6 +1,6 @@
-<div class="min-h-full bg-gray-50">
+<div class="h-full bg-gray-50 flex flex-col">
   <!-- Top Action Bar -->
-  <div class="bg-white border-b border-gray-200 px-6 py-4 mb-6">
+  <div class="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
     <div class="flex items-center justify-between">
       <!-- Left: Dashboard Title + Edit Mode Toggle -->
       <div class="flex items-center gap-4">
@@ -66,40 +66,54 @@
     </div>
   </div>
 
-  <!-- Dashboard Grid + Add Card -->
-  <div class="px-6 pb-6 space-y-6">
-    <!-- Dashboard Grid -->
-    <app-dashboard-grid
-      [items]="gridItems"
-      [isEditMode]="isEditMode"
-      (itemsChange)="onGridItemsChange($event)"
-    >
-    </app-dashboard-grid>
-
-    <!-- Add Card Button - Below Grid -->
-    <button
-      (click)="openAiChat()"
-      class="w-full bg-white rounded-lg shadow-sm border-2 border-dashed border-gray-300 p-8 hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-200 group cursor-pointer flex items-center justify-center gap-4"
-    >
-      <div
-        class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200 group-hover:scale-110"
+  <!-- Dashboard Content - NO SCROLL -->
+  <div class="flex-1 px-6 py-6 overflow-y-auto">
+    <div class="space-y-6 max-w-[1800px] mx-auto">
+      <!-- Dashboard Grid -->
+      <app-dashboard-grid
+        [items]="gridItems"
+        [isEditMode]="isEditMode"
+        (itemsChange)="onGridItemsChange($event)"
+        (itemDelete)="onItemDelete($event)"
       >
-        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          ></path>
-        </svg>
+      </app-dashboard-grid>
+
+      <!-- Add Card Button - With Top Margin -->
+      <div class="mt-8">
+        <button
+          (click)="openAiChat()"
+          class="w-full bg-white rounded-lg shadow-sm border-2 border-dashed border-gray-300 p-6 hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-200 group cursor-pointer flex items-center justify-center gap-4"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200 group-hover:scale-110"
+          >
+            <svg
+              class="w-6 h-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              ></path>
+            </svg>
+          </div>
+          <div class="text-left">
+            <p
+              class="text-lg font-semibold text-gray-700 group-hover:text-blue-700 transition-colors"
+            >
+              Add New Card
+            </p>
+            <p class="text-sm text-gray-500 mt-1">
+              Use AI to generate charts and analytics widgets
+            </p>
+          </div>
+        </button>
       </div>
-      <div class="text-left">
-        <p class="text-lg font-semibold text-gray-700 group-hover:text-blue-700 transition-colors">
-          Add New Card
-        </p>
-        <p class="text-sm text-gray-500 mt-1">Use AI to generate charts and analytics widgets</p>
-      </div>
-    </button>
+    </div>
   </div>
 
   <!-- AI Chat Modal -->

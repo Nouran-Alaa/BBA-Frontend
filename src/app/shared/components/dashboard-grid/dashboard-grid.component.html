@@ -1,74 +1,133 @@
-<div class="dashboard-grid">
+<div
+  cdkDropList
+  [cdkDropListData]="items"
+  (cdkDropListDropped)="drop($event)"
+  class="grid grid-cols-1 lg:grid-cols-12 gap-6 auto-rows-[120px]"
+>
   <div
     *ngFor="let item of items"
-    [ngStyle]="getGridStyle(item)"
-    [attr.draggable]="isEditMode"
-    (dragstart)="onDragStart(item, $event)"
-    class="grid-item"
-    [class.edit-mode]="isEditMode"
+    cdkDrag
+    [cdkDragDisabled]="!isEditMode"
+    [style.grid-column]="getGridColSpan(item)"
+    [style.grid-row]="getGridRowSpan(item)"
+    class="relative group"
   >
+    <!-- Drag Handle (Edit Mode Only) -->
+    <div
+      *ngIf="isEditMode"
+      cdkDragHandle
+      class="absolute top-3 left-3 z-20 cursor-move opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600 rounded-lg shadow-lg p-2"
+      title="Drag to reorder"
+    >
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 8h16M4 16h16"
+        ></path>
+      </svg>
+    </div>
+
+    <!-- Delete Button (Edit Mode Only) -->
+    <button
+      *ngIf="isEditMode"
+      (click)="deleteItem(item.id, $event)"
+      class="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 rounded-lg shadow-lg p-2"
+      title="Delete card"
+    >
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        ></path>
+      </svg>
+    </button>
+
     <!-- Resize Handles (Edit Mode Only) -->
     <ng-container *ngIf="isEditMode">
-      <!-- Top -->
-      <div class="resize-handle resize-n" (mousedown)="startResize(item, 'n', $event)"></div>
-      <!-- Right -->
-      <div class="resize-handle resize-e" (mousedown)="startResize(item, 'e', $event)"></div>
-      <!-- Bottom -->
-      <div class="resize-handle resize-s" (mousedown)="startResize(item, 's', $event)"></div>
-      <!-- Left -->
-      <div class="resize-handle resize-w" (mousedown)="startResize(item, 'w', $event)"></div>
-      <!-- Corners -->
-      <div class="resize-handle resize-ne" (mousedown)="startResize(item, 'ne', $event)"></div>
-      <div class="resize-handle resize-se" (mousedown)="startResize(item, 'se', $event)"></div>
-      <div class="resize-handle resize-sw" (mousedown)="startResize(item, 'sw', $event)"></div>
-      <div class="resize-handle resize-nw" (mousedown)="startResize(item, 'nw', $event)"></div>
+      <div class="resize-handle resize-n" (mousedown)="onResizeStart(item, 'n', $event)"></div>
+      <div class="resize-handle resize-e" (mousedown)="onResizeStart(item, 'e', $event)"></div>
+      <div class="resize-handle resize-s" (mousedown)="onResizeStart(item, 's', $event)"></div>
+      <div class="resize-handle resize-w" (mousedown)="onResizeStart(item, 'w', $event)"></div>
+
+      <div
+        class="resize-handle resize-corner resize-ne"
+        (mousedown)="onResizeStart(item, 'ne', $event)"
+      ></div>
+      <div
+        class="resize-handle resize-corner resize-se"
+        (mousedown)="onResizeStart(item, 'se', $event)"
+      ></div>
+      <div
+        class="resize-handle resize-corner resize-sw"
+        (mousedown)="onResizeStart(item, 'sw', $event)"
+      ></div>
+      <div
+        class="resize-handle resize-corner resize-nw"
+        (mousedown)="onResizeStart(item, 'nw', $event)"
+      ></div>
     </ng-container>
 
     <!-- Card Content -->
-    <div class="card-content">
-      <!-- Summary Card -->
-      <div *ngIf="item.type === 'summary'" class="h-full flex flex-col overflow-hidden">
-        <div class="flex items-center gap-2 mb-4">
-          <span class="text-2xl">✨</span>
-          <h3 class="text-lg font-semibold text-gray-800">{{ item.title }}</h3>
-        </div>
-        <div class="space-y-3 overflow-y-auto flex-1">
-          <div>
-            <h4 class="font-semibold text-gray-800 mb-1 text-sm">Executive Summary</h4>
-            <p class="text-gray-600 text-xs">{{ item.content }}</p>
+    <div
+      class="h-full bg-white rounded-lg shadow-sm border-2 transition-all duration-200 overflow-hidden"
+      [class.border-blue-500]="isEditMode"
+      [class.border-gray-200]="!isEditMode"
+      [class.shadow-lg]="isEditMode"
+    >
+      <div class="p-6 h-full overflow-auto">
+        <!-- Summary Card -->
+        <div *ngIf="item.type === 'summary'" class="h-full flex flex-col">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-2xl">✨</span>
+            <h3 class="text-lg font-semibold text-gray-800">{{ item.title }}</h3>
+          </div>
+          <div class="space-y-3 flex-1 overflow-y-auto">
+            <div>
+              <h4 class="font-semibold text-gray-800 mb-1 text-sm">Executive Summary</h4>
+              <p class="text-gray-600 text-xs">{{ item.content }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Count Card -->
-      <div *ngIf="item.type === 'count'" class="h-full flex flex-col justify-center">
-        <h3 class="text-sm font-medium text-gray-600 mb-2">{{ item.title }}</h3>
-        <p class="text-4xl font-bold text-gray-800 mb-1">{{ item.value }}</p>
-        <p class="text-sm text-gray-500">{{ item.label }}</p>
-      </div>
+        <!-- Count Card -->
+        <div *ngIf="item.type === 'count'" class="h-full flex flex-col justify-center">
+          <h3 class="text-sm font-medium text-gray-600 mb-2">{{ item.title }}</h3>
+          <p class="text-4xl font-bold text-gray-800 mb-1">{{ item.value }}</p>
+          <p class="text-sm text-gray-500">{{ item.label }}</p>
+        </div>
 
-      <!-- Chart Card -->
-      <div *ngIf="item.type === 'chart'" class="h-full flex flex-col overflow-hidden">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">🤖</span>
-            <h3 class="text-base font-semibold text-gray-800 truncate">{{ item.title }}</h3>
+        <!-- Chart Card -->
+        <div *ngIf="item.type === 'chart'" class="h-full flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🤖</span>
+              <h3 class="text-base font-semibold text-gray-800 truncate">{{ item.title }}</h3>
+            </div>
+            <span
+              class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded flex-shrink-0"
+            >
+              AI
+            </span>
           </div>
-          <span
-            class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded flex-shrink-0"
+          <div
+            class="bg-gray-50 rounded-lg p-3 border border-gray-200 flex-1 overflow-hidden flex flex-col"
           >
-            AI
-          </span>
-        </div>
-        <div
-          class="bg-gray-50 rounded-lg p-3 border border-gray-200 flex-1 overflow-hidden flex flex-col"
-        >
-          <p class="text-xs text-gray-600 italic mb-2 line-clamp-2">"{{ item.prompt }}"</p>
-          <div class="flex-1 flex items-center justify-center text-gray-400 text-sm">
-            Chart visualization
+            <p class="text-xs text-gray-600 italic mb-2 line-clamp-2">"{{ item.prompt }}"</p>
+            <div class="flex-1 flex items-center justify-center text-gray-400 text-sm">
+              Chart visualization
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <div
+      *cdkDragPlaceholder
+      class="bg-blue-100 border-2 border-dashed border-blue-400 rounded-lg opacity-50"
+    ></div>
   </div>
 </div>

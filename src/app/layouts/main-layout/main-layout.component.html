@@ -3,12 +3,21 @@
   <div
     *ngIf="isSideNavOpen && isMobileView"
     (click)="toggleSideNav()"
-    class="fixed inset-0 z-40 lg:hidden"
+    class="fixed inset-0 z-40 lg:hidden animate-fadeIn"
     style="background-color: rgba(0, 0, 0, 0.5)"
   ></div>
 
-  <!-- Sidebar -->
-  <aside [ngClass]="getSidebarClasses()">
+  <!-- Sidebar - Mobile & Desktop -->
+  <aside
+    *ngIf="isSideNavOpen || !isMobileView"
+    [ngClass]="{
+      'fixed top-0 left-0 h-screen w-64 z-50 lg:relative lg:z-auto': isMobileView,
+      'relative h-full flex-shrink-0': !isMobileView,
+      'w-20': isSideNavCollapsed && !isMobileView,
+      'w-64': !isSideNavCollapsed || isMobileView,
+    }"
+    class="bg-gradient-to-b from-gray-900 to-gray-800 transition-all duration-300 ease-in-out"
+  >
     <app-side-nav [collapsed]="isSideNavCollapsed && !isMobileView" (toggle)="toggleSideNav()">
     </app-side-nav>
   </aside>
@@ -16,12 +25,12 @@
   <!-- Main Content Area -->
   <div class="flex flex-col flex-1 overflow-hidden min-w-0">
     <!-- Top Navigation -->
-    <header class="bg-white shadow-sm z-20 flex-shrink-0">
+    <header class="bg-white shadow-sm z-30 flex-shrink-0">
       <app-top-nav (menuToggle)="toggleSideNav()"></app-top-nav>
     </header>
 
     <!-- Main Dashboard Content -->
-    <main class="flex-1 overflow-y-auto bg-gray-50">
+    <main class="flex-1 overflow-hidden bg-gray-50">
       <router-outlet></router-outlet>
     </main>
   </div>
