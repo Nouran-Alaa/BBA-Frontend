@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Dashboard } from '../../../core/models/dashboard.model';
 import { UserRole } from '../../../core/models/user.model';
+import { CreateDashboardModalComponent } from '../create-dashboard-modal/create-dashboard-modal.component';
 
 @Component({
   selector: 'app-side-nav',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, CreateDashboardModalComponent],
   templateUrl: './side-nav.component.html',
   styleUrls: ['./side-nav.component.css'],
 })
@@ -15,11 +16,12 @@ export class SideNavComponent implements OnInit {
   @Input() collapsed: boolean = false;
   @Output() toggle = new EventEmitter<void>();
 
-  // Mock data - replace with real service later
   companyLogo: string | null = null;
   fallbackLogo: string =
-    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%233b82f6" width="100" height="100"/><text x="50" y="50" font-size="40" fill="white" text-anchor="middle" dy=".3em">BB</text></svg>';
+    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%233b82f6" width="100" height="100"/><text x="50" y="50" font-size="40" fill="white" text-anchor="middle" dy=".3em">MC</text></svg>';
   currentUserRole: UserRole = UserRole.SuperAdmin;
+
+  showCreateDashboardModal: boolean = false;
 
   dashboards: Dashboard[] = [
     {
@@ -61,11 +63,7 @@ export class SideNavComponent implements OnInit {
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {
-    // TODO: Load company logo from service
-    // TODO: Load dashboards from service
-    // TODO: Get current user role from auth service
-  }
+  ngOnInit(): void {}
 
   isSuperAdmin(): boolean {
     return this.currentUserRole === UserRole.SuperAdmin;
@@ -78,9 +76,27 @@ export class SideNavComponent implements OnInit {
 
   addNewDashboard(): void {
     if (this.isSuperAdmin()) {
-      // TODO: Open modal/dialog to create new dashboard
-      console.log('Opening new dashboard dialog...');
+      this.showCreateDashboardModal = true;
     }
+  }
+
+  onDashboardCreated(data: { name: string; description: string; icon: string }): void {
+    const newDashboard: Dashboard = {
+      id: Date.now().toString(),
+      name: data.name,
+      description: data.description,
+      icon: data.icon,
+      companyId: 'company-1',
+      createdBy: 'user-1',
+      widgets: [],
+      isDefault: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.dashboards.push(newDashboard);
+    this.showCreateDashboardModal = false;
+    this.selectDashboard(newDashboard.id);
   }
 
   uploadLogo(event: Event): void {
@@ -94,7 +110,6 @@ export class SideNavComponent implements OnInit {
       reader.onload = (e: ProgressEvent<FileReader>) => {
         if (e.target?.result) {
           this.companyLogo = e.target.result as string;
-          // TODO: Upload to backend
           console.log('Logo uploaded:', file.name);
         }
       };

@@ -20,6 +20,11 @@ export const routes: Routes = [
         component: DashboardContainerComponent,
         title: 'Dashboard',
       },
+      {
+        path: ':id',
+        component: DashboardContainerComponent,
+        title: 'Dashboard',
+      },
     ],
   },
   {

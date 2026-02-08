@@ -2,7 +2,6 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-auto-rows: 100px;
-  grid-auto-flow: dense; /* Fill in gaps automatically */
   gap: 1rem;
   min-height: 400px;
 }
@@ -15,24 +14,19 @@
   border: 2px solid transparent;
   transition: all 0.2s ease;
   overflow: hidden;
-  /* Prevent overlapping */
-  z-index: 1;
 }
 
 .grid-item:hover {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 2;
 }
 
 .grid-item.edit-mode {
   border-color: #3b82f6;
   cursor: move;
-  z-index: 3;
 }
 
 .grid-item.edit-mode:hover {
   box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
-  z-index: 4;
 }
 
 .card-content {
@@ -51,7 +45,7 @@
 .resize-s {
   left: 0;
   right: 0;
-  height: 10px;
+  height: 8px;
   cursor: ns-resize;
 }
 
@@ -59,24 +53,24 @@
 .resize-w {
   top: 0;
   bottom: 0;
-  width: 10px;
+  width: 8px;
   cursor: ew-resize;
 }
 
 .resize-n {
-  top: -5px;
+  top: -4px;
 }
 
 .resize-s {
-  bottom: -5px;
+  bottom: -4px;
 }
 
 .resize-e {
-  right: -5px;
+  right: -4px;
 }
 
 .resize-w {
-  left: -5px;
+  left: -4px;
 }
 
 /* Corner Handles */
@@ -84,14 +78,13 @@
 .resize-se,
 .resize-sw,
 .resize-nw {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   background: #3b82f6;
   border: 2px solid white;
   border-radius: 50%;
   opacity: 0;
   transition: opacity 0.2s;
-  z-index: 15;
 }
 
 .grid-item.edit-mode:hover .resize-ne,
@@ -102,35 +95,35 @@
 }
 
 .resize-ne {
-  top: -7px;
-  right: -7px;
+  top: -6px;
+  right: -6px;
   cursor: ne-resize;
 }
 
 .resize-se {
-  bottom: -7px;
-  right: -7px;
+  bottom: -6px;
+  right: -6px;
   cursor: se-resize;
 }
 
 .resize-sw {
-  bottom: -7px;
-  left: -7px;
+  bottom: -6px;
+  left: -6px;
   cursor: sw-resize;
 }
 
 .resize-nw {
-  top: -7px;
-  left: -7px;
+  top: -6px;
+  left: -6px;
   cursor: nw-resize;
 }
 
-/* Edge Handles - Visible on hover in edit mode */
+/* Edge Handles - Only visible on hover in edit mode */
 .grid-item.edit-mode:hover .resize-n,
 .grid-item.edit-mode:hover .resize-s,
 .grid-item.edit-mode:hover .resize-e,
 .grid-item.edit-mode:hover .resize-w {
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(59, 130, 246, 0.1);
 }
 
 /* Responsive - Single column on mobile */
@@ -142,10 +135,5 @@
   .grid-item {
     grid-column: 1 !important;
     grid-row: auto !important;
-  }
-
-  /* Hide resize handles on mobile */
-  .resize-handle {
-    display: none;
   }
 }

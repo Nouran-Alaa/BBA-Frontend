@@ -1,0 +1,74 @@
+<div class="dashboard-grid">
+  <div
+    *ngFor="let item of items"
+    [ngStyle]="getGridStyle(item)"
+    [attr.draggable]="isEditMode"
+    (dragstart)="onDragStart(item, $event)"
+    class="grid-item"
+    [class.edit-mode]="isEditMode"
+  >
+    <!-- Resize Handles (Edit Mode Only) -->
+    <ng-container *ngIf="isEditMode">
+      <!-- Top -->
+      <div class="resize-handle resize-n" (mousedown)="startResize(item, 'n', $event)"></div>
+      <!-- Right -->
+      <div class="resize-handle resize-e" (mousedown)="startResize(item, 'e', $event)"></div>
+      <!-- Bottom -->
+      <div class="resize-handle resize-s" (mousedown)="startResize(item, 's', $event)"></div>
+      <!-- Left -->
+      <div class="resize-handle resize-w" (mousedown)="startResize(item, 'w', $event)"></div>
+      <!-- Corners -->
+      <div class="resize-handle resize-ne" (mousedown)="startResize(item, 'ne', $event)"></div>
+      <div class="resize-handle resize-se" (mousedown)="startResize(item, 'se', $event)"></div>
+      <div class="resize-handle resize-sw" (mousedown)="startResize(item, 'sw', $event)"></div>
+      <div class="resize-handle resize-nw" (mousedown)="startResize(item, 'nw', $event)"></div>
+    </ng-container>
+
+    <!-- Card Content -->
+    <div class="card-content">
+      <!-- Summary Card -->
+      <div *ngIf="item.type === 'summary'" class="h-full flex flex-col overflow-hidden">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-2xl">✨</span>
+          <h3 class="text-lg font-semibold text-gray-800">{{ item.title }}</h3>
+        </div>
+        <div class="space-y-3 overflow-y-auto flex-1">
+          <div>
+            <h4 class="font-semibold text-gray-800 mb-1 text-sm">Executive Summary</h4>
+            <p class="text-gray-600 text-xs">{{ item.content }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Count Card -->
+      <div *ngIf="item.type === 'count'" class="h-full flex flex-col justify-center">
+        <h3 class="text-sm font-medium text-gray-600 mb-2">{{ item.title }}</h3>
+        <p class="text-4xl font-bold text-gray-800 mb-1">{{ item.value }}</p>
+        <p class="text-sm text-gray-500">{{ item.label }}</p>
+      </div>
+
+      <!-- Chart Card -->
+      <div *ngIf="item.type === 'chart'" class="h-full flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🤖</span>
+            <h3 class="text-base font-semibold text-gray-800 truncate">{{ item.title }}</h3>
+          </div>
+          <span
+            class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded flex-shrink-0"
+          >
+            AI
+          </span>
+        </div>
+        <div
+          class="bg-gray-50 rounded-lg p-3 border border-gray-200 flex-1 overflow-hidden flex flex-col"
+        >
+          <p class="text-xs text-gray-600 italic mb-2 line-clamp-2">"{{ item.prompt }}"</p>
+          <div class="flex-1 flex items-center justify-center text-gray-400 text-sm">
+            Chart visualization
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

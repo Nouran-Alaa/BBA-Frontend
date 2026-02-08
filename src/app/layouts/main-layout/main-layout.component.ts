@@ -29,10 +29,11 @@ export class MainLayoutComponent implements OnInit {
   checkScreenSize(): void {
     this.isMobileView = window.innerWidth < 1024;
 
-    if (this.isMobileView) {
-      this.isSideNavOpen = false;
-    } else {
+    if (!this.isMobileView) {
       this.isSideNavOpen = true;
+      this.isSideNavCollapsed = false;
+    } else {
+      this.isSideNavOpen = false;
     }
   }
 
@@ -45,14 +46,16 @@ export class MainLayoutComponent implements OnInit {
   }
 
   getSidebarClasses(): string {
-    const baseClasses = 'flex flex-col transition-all duration-300 ease-in-out bg-white shadow-lg';
-
     if (this.isMobileView) {
-      return `${baseClasses} fixed top-0 left-0 h-full w-64 z-40 transform ${
-        this.isSideNavOpen ? 'translate-x-0' : '-translate-x-full'
-      }`;
+      // Mobile: fixed overlay sidebar
+      return `fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-gray-900 to-gray-800 
+              z-50 transition-transform duration-300 ease-in-out ${
+                this.isSideNavOpen ? 'translate-x-0' : '-translate-x-full'
+              }`;
     } else {
-      return `${baseClasses} relative ${this.isSideNavCollapsed ? 'w-20' : 'w-64'}`;
+      // Desktop: relative sidebar with collapse
+      return `relative h-full bg-gradient-to-b from-gray-900 to-gray-800 flex-shrink-0
+              transition-all duration-300 ease-in-out ${this.isSideNavCollapsed ? 'w-20' : 'w-64'}`;
     }
   }
 }
