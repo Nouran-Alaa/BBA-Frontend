@@ -20,7 +20,7 @@
         <button
           *ngIf="isSuperAdmin() && !collapsed"
           (click)="logoInput.click()"
-          class="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors duration-200 shadow-lg"
+          class="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors duration-200 shadow-lg cursor-pointer"
           title="Upload Logo"
         >
           <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@
     <!-- Close Button (Mobile Only) -->
     <button
       (click)="toggleSidebar()"
-      class="p-2 rounded-lg hover:bg-gray-700 transition-colors lg:hidden"
+      class="p-2 rounded-lg hover:bg-gray-700 transition-colors lg:hidden cursor-pointer"
       aria-label="Close Sidebar"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +80,7 @@
           (click)="selectDashboard(dashboard.id)"
           [class.bg-blue-600]="activeDashboardId === dashboard.id"
           [class.bg-transparent]="activeDashboardId !== dashboard.id"
-          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-gray-700 relative"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-gray-700 relative cursor-pointer"
           [class.justify-center]="collapsed"
           [title]="collapsed ? dashboard.name : ''"
         >
@@ -103,7 +103,7 @@
           <button
             *ngIf="isSuperAdmin() && !collapsed"
             (click)="openDashboardMenu(dashboard, $event)"
-            class="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all"
+            class="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all cursor-pointer"
             title="Dashboard options"
           >
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +136,7 @@
       <button
         *ngIf="isSuperAdmin()"
         (click)="addNewDashboard()"
-        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 border-2 border-dashed border-gray-600 hover:border-blue-500 hover:bg-gray-700/50 group"
+        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 border-2 border-dashed border-gray-600 hover:border-blue-500 hover:bg-gray-700/50 group cursor-pointer"
         [class.justify-center]="collapsed"
         [title]="collapsed ? 'Add New Dashboard' : ''"
       >
@@ -172,7 +172,6 @@
       (close)="showDashboardMenu = false"
       (rename)="onDashboardRename($event)"
       (duplicate)="onDashboardDuplicate()"
-      (share)="onDashboardShare()"
       (delete)="onDashboardDelete()"
     >
     </app-dashboard-menu-modal>
@@ -181,7 +180,7 @@
   <!-- Footer Section - Fixed at Bottom -->
   <div class="border-t border-gray-700 p-4 flex-shrink-0 mt-auto" [class.px-2]="collapsed">
     <button
-      class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+      class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
       [class.justify-center]="collapsed"
       [title]="collapsed ? 'Settings' : ''"
     >
@@ -202,12 +201,4 @@
       <span *ngIf="!collapsed" class="text-sm text-gray-400"> Settings </span>
     </button>
   </div>
-
-  <!-- Create Dashboard Modal -->
-  <app-create-dashboard-modal
-    *ngIf="showCreateDashboardModal"
-    (close)="showCreateDashboardModal = false"
-    (create)="onDashboardCreated($event)"
-  >
-  </app-create-dashboard-modal>
 </div>

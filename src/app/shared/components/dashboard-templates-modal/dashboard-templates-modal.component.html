@@ -18,7 +18,7 @@
         </div>
         <button
           (click)="onClose()"
-          class="w-10 h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+          class="w-10 h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center cursor-pointer"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -42,7 +42,7 @@
           [class.text-white]="selectedCategory === category"
           [class.bg-white]="selectedCategory !== category"
           [class.text-gray-700]="selectedCategory !== category"
-          class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all hover:shadow-md"
+          class="px-4 py-2 m-1 rounded-lg font-medium text-sm whitespace-nowrap transition-all hover:shadow-md cursor-pointer"
         >
           {{ category }}
         </button>
@@ -55,7 +55,7 @@
         <button
           *ngFor="let template of getFilteredTemplates()"
           (click)="onSelectTemplate(template)"
-          class="text-left p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all group bg-white"
+          class="text-left p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all group bg-white cursor-pointer"
         >
           <div class="flex items-start justify-between mb-3">
             <span class="text-4xl">{{ template.icon }}</span>

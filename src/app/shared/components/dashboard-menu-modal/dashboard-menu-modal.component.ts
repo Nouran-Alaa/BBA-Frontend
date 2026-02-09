@@ -2,11 +2,13 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Dashboard } from '../../../core/models/dashboard.model';
+import { ShareModalComponent } from '../share-modal/share-modal.component';
+import { ConfirmDeleteModalComponent } from '../confirm-delete-modal/confirm-delete-modal.component';
 
 @Component({
   selector: 'app-dashboard-menu-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ShareModalComponent, ConfirmDeleteModalComponent],
   templateUrl: './dashboard-menu-modal.component.html',
   styleUrls: ['./dashboard-menu-modal.component.css'],
 })
@@ -19,6 +21,8 @@ export class DashboardMenuModalComponent {
   @Output() delete = new EventEmitter<void>();
 
   isRenaming: boolean = false;
+  showShareModal: boolean = false;
+  showDeleteModal: boolean = false;
   newName: string = '';
   selectedIcon: string = '';
 
@@ -67,13 +71,30 @@ export class DashboardMenuModalComponent {
   }
 
   onShare(): void {
+    this.showShareModal = true;
+  }
+
+  onShareClose(): void {
+    this.showShareModal = false;
     this.share.emit();
+    this.onClose();
   }
 
   onDelete(): void {
-    if (confirm(`Are you sure you want to delete "${this.dashboard.name}"?`)) {
-      this.delete.emit();
-      this.onClose();
-    }
+    this.showDeleteModal = true;
+  }
+
+  onDeleteConfirm(): void {
+    this.delete.emit();
+    this.showDeleteModal = false;
+    this.onClose();
+  }
+
+  onDeleteCancel(): void {
+    this.showDeleteModal = false;
+  }
+
+  getShareUrl(): string {
+    return `${window.location.origin}/dashboard/${this.dashboard.id}`;
   }
 }

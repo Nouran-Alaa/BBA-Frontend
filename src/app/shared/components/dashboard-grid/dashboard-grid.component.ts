@@ -28,6 +28,7 @@ export class DashboardGridComponent {
   @Output() itemsChange = new EventEmitter<GridItem[]>();
   @Output() itemDelete = new EventEmitter<string>();
   @Output() chartDateRangeClick = new EventEmitter<string>();
+  @Output() widgetClick = new EventEmitter<GridItem>();
 
   resizingItem: GridItem | null = null;
   resizeDirection: string = '';
@@ -68,6 +69,12 @@ export class DashboardGridComponent {
   onChartDateRange(itemId: string, event: MouseEvent): void {
     event.stopPropagation();
     this.chartDateRangeClick.emit(itemId);
+  }
+
+  onWidgetClick(item: GridItem): void {
+    if (!this.isEditMode) {
+      this.widgetClick.emit(item);
+    }
   }
 
   @HostListener('document:mousemove', ['$event'])

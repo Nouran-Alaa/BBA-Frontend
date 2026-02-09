@@ -17,7 +17,7 @@
             />
             <button
               (click)="imageInput.click()"
-              class="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              class="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
             >
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -52,7 +52,7 @@
             [class.text-blue-600]="!isEditing"
             [class.bg-blue-600]="isEditing"
             [class.text-white]="isEditing"
-            class="px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+            class="px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-lg hover:shadow-xl flex items-center gap-2 cursor-pointer"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -194,7 +194,7 @@
           <!-- Save Button -->
           <button
             type="submit"
-            class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer"
           >
             Save Changes
           </button>
@@ -209,7 +209,7 @@
       <!-- Change Password Button -->
       <button
         (click)="togglePasswordChange()"
-        class="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+        class="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -264,14 +264,14 @@
         <div class="flex gap-3">
           <button
             type="submit"
-            class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer"
           >
             Update Password
           </button>
           <button
             type="button"
             (click)="togglePasswordChange()"
-            class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+            class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium cursor-pointer"
           >
             Cancel
           </button>

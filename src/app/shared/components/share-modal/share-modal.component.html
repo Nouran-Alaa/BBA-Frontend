@@ -1,0 +1,122 @@
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center p-4"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+  (click)="onClose()"
+>
+  <div
+    class="bg-white rounded-xl shadow-2xl max-w-md w-full animate-slideUp"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white rounded-t-xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+              ></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold">Share Dashboard</h2>
+            <p class="text-sm text-blue-100">{{ dashboardName }}</p>
+          </div>
+        </div>
+        <button
+          (click)="onClose()"
+          class="w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center cursor-pointer"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6 space-y-4">
+      <p class="text-gray-600 text-sm">
+        Anyone with this link can view this dashboard. Copy and share the link below:
+      </p>
+
+      <!-- Share URL -->
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          [value]="shareUrl"
+          readonly
+          class="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          (click)="copyToClipboard()"
+          [class.bg-green-600]="copied"
+          [class.bg-blue-600]="!copied"
+          class="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-all font-medium text-sm flex items-center gap-2 cursor-pointer"
+        >
+          <svg
+            *ngIf="!copied"
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+            ></path>
+          </svg>
+          <svg *ngIf="copied" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
+          {{ copied ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
+
+      <!-- Info Message -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-3">
+        <svg
+          class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+        <p class="text-sm text-blue-800">
+          This link provides view-only access. Recipients cannot edit the dashboard.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-50 px-6 py-4 flex justify-end rounded-b-xl">
+      <button
+        (click)="onClose()"
+        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium text-sm cursor-pointer"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>

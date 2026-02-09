@@ -30,7 +30,7 @@
         </div>
         <button
           (click)="onClose()"
-          class="w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+          class="w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center cursor-pointer"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -53,7 +53,7 @@
           <button
             *ngFor="let example of examplePrompts"
             (click)="useExamplePrompt(example)"
-            class="text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-lg transition-all duration-200 text-sm text-gray-700 hover:text-blue-700 group"
+            class="text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-lg transition-all duration-200 text-sm text-gray-700 hover:text-blue-700 group cursor-pointer"
           >
             <div class="flex items-start gap-2">
               <svg
@@ -117,7 +117,7 @@
     <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200">
       <button
         (click)="onClose()"
-        class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+        class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm cursor-pointer"
         [disabled]="isGenerating"
       >
         Cancel
@@ -125,7 +125,7 @@
       <button
         (click)="onGenerate()"
         [disabled]="!userPrompt.trim() || isGenerating"
-        class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

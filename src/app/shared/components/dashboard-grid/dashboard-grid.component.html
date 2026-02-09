@@ -72,11 +72,15 @@
     </ng-container>
 
     <!-- Card Content -->
+    <!-- Card Content -->
     <div
+      (click)="onWidgetClick(item)"
+      [class.cursor-pointer]="!isEditMode"
       class="h-full bg-white rounded-lg shadow-sm border-2 transition-all duration-200 overflow-hidden"
       [class.border-blue-500]="isEditMode"
       [class.border-gray-200]="!isEditMode"
       [class.shadow-lg]="isEditMode"
+      [class.hover:shadow-md]="!isEditMode"
     >
       <div class="p-6 h-full overflow-auto">
         <!-- Summary Card -->

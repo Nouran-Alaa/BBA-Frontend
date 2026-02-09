@@ -16,6 +16,7 @@ export interface DateRange {
 })
 export class DateRangePickerComponent {
   @Output() dateRangeChange = new EventEmitter<DateRange>();
+  @Output() clickOutside = new EventEmitter<void>();
 
   startDate: string = '';
   endDate: string = '';

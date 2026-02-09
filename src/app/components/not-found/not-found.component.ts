@@ -13,7 +13,7 @@ import { RouterLink } from '@angular/router';
         <p class="text-xl text-gray-600 mb-8">Page Not Found</p>
         <button
           routerLink="/dashboard"
-          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
         >
           Go to Dashboard
         </button>

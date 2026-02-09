@@ -4,7 +4,7 @@
     <!-- Hamburger Menu for Mobile -->
     <button
       (click)="onMenuToggle()"
-      class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 lg:hidden focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 lg:hidden focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
       aria-label="Toggle Menu"
     >
       <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,7 +18,10 @@
     </button>
 
     <!-- Company Name/Logo (Visible on Mobile when sidebar is closed) -->
-    <div class="flex items-center gap-2 lg:hidden">
+    <div
+      class="flex items-center gap-2 lg:hidden hover:bg-gray-700 cursor-pointer transition-colors"
+      routerLink="/dashboard"
+    >
       <span class="text-xl font-bold text-gray-800">BigBrother</span>
       <span class="text-xs text-gray-500">Analytics</span>
     </div>
@@ -34,7 +37,7 @@
       <!-- Profile Button -->
       <button
         (click)="toggleProfileMenu()"
-        class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
         aria-label="User Menu"
       >
         <!-- User Avatar -->
@@ -100,7 +103,7 @@
         <!-- Logout -->
         <button
           (click)="logout()"
-          class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 w-full text-left"
+          class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 w-full text-left cursor-pointer"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

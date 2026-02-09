@@ -1,0 +1,140 @@
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center p-8 animate-fadeIn"
+  style="background-color: rgba(0, 0, 0, 0.8)"
+  (click)="onClose()"
+>
+  <!-- Close Button -->
+  <button
+    (click)="onClose()"
+    class="absolute top-4 right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all z-10 backdrop-blur-sm cursor-pointer"
+    title="Close (ESC)"
+  >
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M6 18L18 6M6 6l12 12"
+      ></path>
+    </svg>
+  </button>
+
+  <!-- Widget Content -->
+  <div
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-auto animate-scaleUp"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="p-8">
+      <!-- Summary Widget -->
+      <div *ngIf="widget.type === 'summary'" class="space-y-6">
+        <div class="flex items-center gap-4 border-b pb-4">
+          <span class="text-5xl">✨</span>
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800">{{ widget.title }}</h2>
+            <p class="text-gray-500 mt-1">Detailed View</p>
+          </div>
+        </div>
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">Executive Summary</h3>
+            <p class="text-gray-700 text-lg leading-relaxed">{{ widget.content }}</p>
+          </div>
+          <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">Key Insights</h3>
+            <p class="text-gray-600">Detailed analysis and insights would appear here...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Count Widget -->
+      <div *ngIf="widget.type === 'count'" class="text-center py-12">
+        <div class="mb-8">
+          <h2 class="text-2xl font-semibold text-gray-700 mb-6">{{ widget.title }}</h2>
+          <p class="text-9xl font-bold text-blue-600 mb-4">{{ widget.value }}</p>
+          <p class="text-2xl text-gray-500">{{ widget.label }}</p>
+        </div>
+
+        <!-- Trend Visualization Placeholder -->
+        <div class="mt-12 p-8 bg-gray-50 rounded-xl">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Trend Analysis</h3>
+          <div class="h-64 flex items-center justify-center text-gray-400">
+            <div class="text-center">
+              <svg
+                class="w-16 h-16 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+                ></path>
+              </svg>
+              <p class="text-lg">Historical trend chart would appear here</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Widget -->
+      <div *ngIf="widget.type === 'chart'" class="space-y-6">
+        <div class="flex items-center justify-between border-b pb-4">
+          <div class="flex items-center gap-4">
+            <span class="text-4xl">🤖</span>
+            <div>
+              <h2 class="text-3xl font-bold text-gray-800">{{ widget.title }}</h2>
+              <p class="text-sm text-gray-500 mt-1 italic">"{{ widget.prompt }}"</p>
+            </div>
+          </div>
+          <span class="px-4 py-2 bg-purple-100 text-purple-700 text-sm font-medium rounded-lg">
+            AI Generated
+          </span>
+        </div>
+
+        <!-- Chart Visualization Placeholder -->
+        <div class="bg-gray-50 rounded-xl p-8 min-h-[500px] flex items-center justify-center">
+          <div class="text-center text-gray-400">
+            <svg
+              class="w-24 h-24 mx-auto mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
+            </svg>
+            <p class="text-xl font-medium">Chart visualization would appear here</p>
+            <p class="text-sm mt-2">Full-size interactive chart with advanced controls</p>
+          </div>
+        </div>
+
+        <!-- Chart Controls -->
+        <div class="flex items-center justify-between pt-4 border-t">
+          <div class="flex gap-2">
+            <button
+              class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
+            >
+              Export Data
+            </button>
+            <button
+              class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
+            >
+              Download Chart
+            </button>
+          </div>
+          <button
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            Customize View
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

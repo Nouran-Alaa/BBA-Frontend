@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -10,15 +10,23 @@ import {
   DashboardGridComponent,
   GridItem,
 } from '../../../shared/components/dashboard-grid/dashboard-grid.component';
+import { FullscreenWidgetModalComponent } from '../../../shared/components/fullscreen-widget-modal/fullscreen-widget-modal.component';
 
 @Component({
   selector: 'app-dashboard-container',
   standalone: true,
-  imports: [CommonModule, DateRangePickerComponent, AiChatModalComponent, DashboardGridComponent],
+  imports: [
+    CommonModule,
+    DateRangePickerComponent,
+    AiChatModalComponent,
+    DashboardGridComponent,
+    FullscreenWidgetModalComponent,
+  ],
   templateUrl: './dashboard-container.component.html',
   styleUrls: ['./dashboard-container.component.css'],
 })
 export class DashboardContainerComponent implements OnInit {
+  @ViewChild('datePickerContainer') datePickerContainer?: ElementRef;
   currentDateRange: DateRange | null = null;
   isDatePickerOpen: boolean = false;
   isAiChatOpen: boolean = false;
@@ -68,6 +76,17 @@ export class DashboardContainerComponent implements OnInit {
   };
 
   gridItems: GridItem[] = [];
+  fullscreenWidget: GridItem | null = null;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.isDatePickerOpen && this.datePickerContainer) {
+      const clickedInside = this.datePickerContainer.nativeElement.contains(event.target);
+      if (!clickedInside) {
+        this.isDatePickerOpen = false;
+      }
+    }
+  }
 
   constructor(private route: ActivatedRoute) {}
 
@@ -155,5 +174,13 @@ export class DashboardContainerComponent implements OnInit {
   onItemDelete(itemId: string): void {
     this.gridItems = this.gridItems.filter((item) => item.id !== itemId);
     this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+  }
+
+  onWidgetClick(widget: GridItem): void {
+    this.fullscreenWidget = widget;
+  }
+
+  closeFullscreen(): void {
+    this.fullscreenWidget = null;
   }
 }
