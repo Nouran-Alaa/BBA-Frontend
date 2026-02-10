@@ -13,6 +13,8 @@ import { Router } from '@angular/router';
 export class ProfileComponent implements OnInit {
   isEditing: boolean = false;
   isChangingPassword: boolean = false;
+  passwordError: string = '';
+  passwordSuccess: boolean = false;
 
   user = {
     name: 'John Doe',
@@ -88,13 +90,24 @@ export class ProfileComponent implements OnInit {
 
   changePassword(): void {
     if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
-      alert('Passwords do not match!');
+      this.passwordError = 'Passwords do not match!';
+      return;
+    }
+
+    if (this.passwordForm.newPassword.length < 8) {
+      this.passwordError = 'Password must be at least 8 characters long!';
       return;
     }
 
     // TODO: Change password via backend
     console.log('Password changed');
-    this.togglePasswordChange();
+    this.passwordError = '';
+    this.passwordSuccess = true;
+
+    setTimeout(() => {
+      this.togglePasswordChange();
+      this.passwordSuccess = false;
+    }, 2000);
   }
 
   uploadProfileImage(event: Event): void {

@@ -29,6 +29,7 @@ export class DashboardGridComponent {
   @Output() itemDelete = new EventEmitter<string>();
   @Output() chartDateRangeClick = new EventEmitter<string>();
   @Output() widgetClick = new EventEmitter<GridItem>();
+  @Output() itemDuplicate = new EventEmitter<string>();
 
   resizingItem: GridItem | null = null;
   resizeDirection: string = '';
@@ -36,6 +37,7 @@ export class DashboardGridComponent {
   startY: number = 0;
   startColSpan: number = 0;
   startRowSpan: number = 0;
+  activeWidgetMenu: string | null = null;
 
   drop(event: CdkDragDrop<GridItem[]>): void {
     if (!this.isEditMode) return;
@@ -75,6 +77,22 @@ export class DashboardGridComponent {
     if (!this.isEditMode) {
       this.widgetClick.emit(item);
     }
+  }
+
+  duplicateItem(itemId: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.itemDuplicate.emit(itemId);
+  }
+
+  toggleWidgetMenu(itemId: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.activeWidgetMenu = this.activeWidgetMenu === itemId ? null : itemId;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Close widget menu when clicking outside
+    this.activeWidgetMenu = null;
   }
 
   @HostListener('document:mousemove', ['$event'])

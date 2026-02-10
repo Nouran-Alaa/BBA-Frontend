@@ -66,15 +66,26 @@
     </div>
   </div>
 
-  <!-- Dashboard Content - NO SCROLL -->
+  <!-- Dashboard Content -->
   <div class="flex-1 px-6 py-6 overflow-y-auto">
     <div class="space-y-6 max-w-[1800px] mx-auto">
+      <!-- Chart Date Range Picker (Floating) -->
+      <div
+        *ngIf="isChartDatePickerOpen"
+        #chartDatePickerContainer
+        class="fixed top-20 right-6 z-50 animate-fadeIn"
+      >
+        <app-date-range-picker (dateRangeChange)="onChartDateRangeChange($event)">
+        </app-date-range-picker>
+      </div>
+
       <!-- Dashboard Grid -->
       <app-dashboard-grid
         [items]="gridItems"
         [isEditMode]="isEditMode"
         (itemsChange)="onGridItemsChange($event)"
         (itemDelete)="onItemDelete($event)"
+        (itemDuplicate)="onItemDuplicate($event)"
         (chartDateRangeClick)="onChartDateRangeClick($event)"
         (widgetClick)="onWidgetClick($event)"
       >

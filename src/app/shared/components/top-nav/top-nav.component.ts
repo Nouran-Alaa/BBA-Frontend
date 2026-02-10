@@ -1,4 +1,11 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Output,
+  EventEmitter,
+  HostListener,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { ClickOutsideDirective } from '../../directives/click-outside.directive';
@@ -12,6 +19,7 @@ import { ClickOutsideDirective } from '../../directives/click-outside.directive'
 })
 export class TopNavComponent {
   @Output() menuToggle = new EventEmitter<void>();
+  @ViewChild('profileDropdown') profileDropdown?: ElementRef;
 
   isProfileMenuOpen = false;
 
@@ -24,6 +32,16 @@ export class TopNavComponent {
   };
 
   constructor(private router: Router) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.isProfileMenuOpen && this.profileDropdown) {
+      const clickedInside = this.profileDropdown.nativeElement.contains(event.target);
+      if (!clickedInside) {
+        this.closeProfileMenu();
+      }
+    }
+  }
 
   onMenuToggle(): void {
     this.menuToggle.emit();

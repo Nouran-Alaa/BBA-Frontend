@@ -27,13 +27,19 @@ import { FullscreenWidgetModalComponent } from '../../../shared/components/fulls
 })
 export class DashboardContainerComponent implements OnInit {
   @ViewChild('datePickerContainer') datePickerContainer?: ElementRef;
+  @ViewChild('chartDatePickerContainer') chartDatePickerContainer?: ElementRef;
+
   currentDateRange: DateRange | null = null;
   isDatePickerOpen: boolean = false;
+  isChartDatePickerOpen: boolean = false;
   isAiChatOpen: boolean = false;
   isGenerating: boolean = false;
   isEditMode: boolean = false;
   currentDashboardId: string = '';
+  fullscreenWidget: GridItem | null = null;
   selectedChartForDateRange: string | null = null;
+  chartDateRanges: { [chartId: string]: DateRange } = {};
+  gridItems: GridItem[] = [];
 
   dashboardsData: { [key: string]: GridItem[] } = {
     '1': [
@@ -75,15 +81,22 @@ export class DashboardContainerComponent implements OnInit {
     ],
   };
 
-  gridItems: GridItem[] = [];
-  fullscreenWidget: GridItem | null = null;
-
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    // Close main date picker
     if (this.isDatePickerOpen && this.datePickerContainer) {
       const clickedInside = this.datePickerContainer.nativeElement.contains(event.target);
       if (!clickedInside) {
         this.isDatePickerOpen = false;
+      }
+    }
+
+    // Close chart date picker
+    if (this.isChartDatePickerOpen && this.chartDatePickerContainer) {
+      const clickedInside = this.chartDatePickerContainer.nativeElement.contains(event.target);
+      if (!clickedInside) {
+        this.isChartDatePickerOpen = false;
+        this.selectedChartForDateRange = null;
       }
     }
   }
@@ -166,9 +179,31 @@ export class DashboardContainerComponent implements OnInit {
 
   onChartDateRangeClick(chartId: string): void {
     this.selectedChartForDateRange = chartId;
-    this.isDatePickerOpen = true;
+    this.isChartDatePickerOpen = true;
+    this.isDatePickerOpen = false; // Close main date picker
     console.log('Opening date picker for chart:', chartId);
-    // TODO: Store per-chart date ranges
+  }
+
+  onChartDateRangeChange(range: DateRange): void {
+    if (this.selectedChartForDateRange) {
+      this.chartDateRanges[this.selectedChartForDateRange] = range;
+      console.log('Chart date range updated:', this.selectedChartForDateRange, range);
+    }
+    this.isChartDatePickerOpen = false;
+    this.selectedChartForDateRange = null;
+  }
+
+  onItemDuplicate(itemId: string): void {
+    const itemToDuplicate = this.gridItems.find((item) => item.id === itemId);
+    if (itemToDuplicate) {
+      const duplicatedItem: GridItem = {
+        ...itemToDuplicate,
+        id: Date.now().toString(),
+        title: `${itemToDuplicate.title} (Copy)`,
+      };
+      this.gridItems.push(duplicatedItem);
+      this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+    }
   }
 
   onItemDelete(itemId: string): void {
