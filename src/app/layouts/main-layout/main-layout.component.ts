@@ -1,14 +1,14 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-
 import { TopNavComponent } from '../../shared/components/top-nav/top-nav.component';
 import { SideNavComponent } from '../../shared/components/side-nav/side-nav.component';
+import { ToastComponent } from '../../shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, TopNavComponent, SideNavComponent],
+  imports: [CommonModule, RouterOutlet, TopNavComponent, SideNavComponent, ToastComponent],
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.css'],
 })

@@ -47,9 +47,8 @@ export class DashboardGridComponent {
 
   deleteItem(itemId: string, event: MouseEvent): void {
     event.stopPropagation();
-    if (confirm('Are you sure you want to delete this card?')) {
-      this.itemDelete.emit(itemId);
-    }
+    this.itemDelete.emit(itemId);
+    this.activeWidgetMenu = null;
   }
 
   onResizeStart(item: GridItem, direction: string, event: MouseEvent): void {

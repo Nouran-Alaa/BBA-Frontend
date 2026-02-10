@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-profile',
@@ -40,7 +41,10 @@ export class ProfileComponent implements OnInit {
     confirmPassword: '',
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private toastService: ToastService,
+  ) {}
 
   ngOnInit(): void {
     this.resetEditForm();
@@ -102,12 +106,12 @@ export class ProfileComponent implements OnInit {
     // TODO: Change password via backend
     console.log('Password changed');
     this.passwordError = '';
-    this.passwordSuccess = true;
 
-    setTimeout(() => {
-      this.togglePasswordChange();
-      this.passwordSuccess = false;
-    }, 2000);
+    // Close the password form
+    this.togglePasswordChange();
+
+    // Show success toast
+    this.toastService.success('Password changed successfully!');
   }
 
   uploadProfileImage(event: Event): void {

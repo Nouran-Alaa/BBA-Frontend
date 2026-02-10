@@ -40,6 +40,7 @@ export class DashboardContainerComponent implements OnInit {
   selectedChartForDateRange: string | null = null;
   chartDateRanges: { [chartId: string]: DateRange } = {};
   gridItems: GridItem[] = [];
+  chartDatePickerPosition: { top: string; left: string } = { top: '0px', left: '0px' };
 
   dashboardsData: { [key: string]: GridItem[] } = {
     '1': [
@@ -179,9 +180,21 @@ export class DashboardContainerComponent implements OnInit {
 
   onChartDateRangeClick(chartId: string): void {
     this.selectedChartForDateRange = chartId;
+
+    // Calculate position based on the clicked button
+    setTimeout(() => {
+      const button = document.querySelector(`[data-chart-id="${chartId}"]`);
+      if (button) {
+        const rect = button.getBoundingClientRect();
+        this.chartDatePickerPosition = {
+          top: `${rect.bottom + window.scrollY + 8}px`,
+          left: `${rect.left + window.scrollX - 280}px`, // Offset to align properly
+        };
+      }
+    }, 0);
+
     this.isChartDatePickerOpen = true;
-    this.isDatePickerOpen = false; // Close main date picker
-    console.log('Opening date picker for chart:', chartId);
+    this.isDatePickerOpen = false;
   }
 
   onChartDateRangeChange(range: DateRange): void {
