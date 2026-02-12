@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import {
@@ -30,7 +30,7 @@ import { EditAiModalComponent } from '../../../shared/components/edit-ai-modal/e
   templateUrl: './dashboard-container.component.html',
   styleUrls: ['./dashboard-container.component.css'],
 })
-export class DashboardContainerComponent implements OnInit {
+export class DashboardContainerComponent implements OnInit, OnDestroy {
   @ViewChild('datePickerContainer') datePickerContainer?: ElementRef;
   @ViewChild('chartDatePickerContainer') chartDatePickerContainer?: ElementRef;
 
@@ -86,6 +86,10 @@ export class DashboardContainerComponent implements OnInit {
     ],
   };
 
+  private templateSubscription?: Subscription;
+  private routeSubscription?: Subscription;
+  private pendingTemplateData: { dashboardId: string; widgets: any[] } | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -93,24 +97,21 @@ export class DashboardContainerComponent implements OnInit {
     private templateService: DashboardTemplateService,
   ) {}
 
-  private templateSubscription?: Subscription;
-
   ngOnInit(): void {
+    console.log('Dashboard container initialized');
+
     // Subscribe to template data FIRST
     this.templateSubscription = this.templateService.templateData$.subscribe((data) => {
+      console.log('Template data received:', data);
+
       if (data && data.widgets && data.widgets.length > 0) {
+        // Store the pending template data
+        this.pendingTemplateData = data;
         console.log('Received template data for dashboard:', data.dashboardId);
 
-        // Only apply if it's for the current dashboard
+        // If this is the current dashboard, apply immediately
         if (data.dashboardId === this.currentDashboardId) {
-          const widgetsWithIds = data.widgets.map((widget, index) => ({
-            id: `${Date.now()}-${index}`,
-            ...widget,
-          }));
-          this.gridItems = widgetsWithIds;
-          this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-          console.log('Applied template widgets to dashboard:', this.currentDashboardId);
-          this.templateService.clearTemplateWidgets();
+          this.applyTemplateWidgets(data);
         }
       }
     });
@@ -118,22 +119,48 @@ export class DashboardContainerComponent implements OnInit {
     // Subscribe to route params
     this.route.params.subscribe((params) => {
       const newDashboardId = params['id'] || '1';
+      console.log('Route changed to dashboard:', newDashboardId);
 
       if (this.currentDashboardId !== newDashboardId) {
         // Save current dashboard before switching
         if (this.currentDashboardId && this.gridItems.length > 0) {
           this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+          console.log(
+            'Saved dashboard:',
+            this.currentDashboardId,
+            'with',
+            this.gridItems.length,
+            'items',
+          );
         }
 
         this.currentDashboardId = newDashboardId;
-        this.loadDashboard(newDashboardId);
+
+        // Check if we have pending template data for this dashboard
+        if (this.pendingTemplateData && this.pendingTemplateData.dashboardId === newDashboardId) {
+          console.log('Applying pending template data for dashboard:', newDashboardId);
+          this.applyTemplateWidgets(this.pendingTemplateData);
+        } else {
+          // Load existing dashboard data
+          this.loadDashboard(newDashboardId);
+        }
       }
     });
   }
 
   ngOnDestroy(): void {
+    console.log('Dashboard container destroyed');
+
+    // Save current dashboard state
+    if (this.currentDashboardId && this.gridItems.length > 0) {
+      this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+    }
+
     if (this.templateSubscription) {
       this.templateSubscription.unsubscribe();
+    }
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
     }
   }
 
@@ -146,6 +173,29 @@ export class DashboardContainerComponent implements OnInit {
         this.isDatePickerOpen = false;
       }
     }
+  }
+
+  applyTemplateWidgets(data: { dashboardId: string; widgets: any[] }): void {
+    console.log(
+      'Applying template widgets:',
+      data.widgets.length,
+      'widgets to dashboard:',
+      data.dashboardId,
+    );
+
+    const widgetsWithIds = data.widgets.map((widget, index) => ({
+      id: `${Date.now()}-${index}`,
+      ...widget,
+    }));
+
+    this.gridItems = widgetsWithIds;
+    this.dashboardsData[data.dashboardId] = [...this.gridItems];
+
+    console.log('Template applied successfully. Grid items:', this.gridItems.length);
+
+    // Clear the pending data and service
+    this.pendingTemplateData = null;
+    this.templateService.clearTemplateWidgets();
   }
 
   loadTemplateWidgets(templateWidgets: any[]): void {
@@ -162,7 +212,7 @@ export class DashboardContainerComponent implements OnInit {
     if (this.dashboardsData[dashboardId]) {
       // Load existing dashboard data
       this.gridItems = [...this.dashboardsData[dashboardId]];
-      console.log('Loaded existing dashboard with items:', this.gridItems.length);
+      console.log('Loaded existing dashboard with items:', this.gridItems.length, 'items');
     } else {
       // New empty dashboard
       this.gridItems = [];

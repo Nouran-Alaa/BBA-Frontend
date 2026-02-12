@@ -1,3 +1,16 @@
+/* Ensure grid allows overflow for dropdowns */
+:host {
+  display: block;
+  overflow: visible;
+}
+
+/* Resize handles and other existing styles stay the same */
+.resize-handle {
+  position: absolute;
+  background: transparent;
+  z-index: 10;
+}
+
 /* CDK Drag styles */
 .cdk-drag-preview {
   opacity: 0.8;

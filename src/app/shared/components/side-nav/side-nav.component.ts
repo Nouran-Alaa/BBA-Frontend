@@ -138,9 +138,10 @@ export class SideNavComponent implements OnInit {
 
     if (!template) return;
 
-    // Create new dashboard
+    // Create new dashboard with unique ID
+    const dashboardId = Date.now().toString();
     const newDashboard: Dashboard = {
-      id: Date.now().toString(),
+      id: dashboardId,
       name: template.name,
       description: template.description || `Created from ${template.name} template`,
       icon: template.icon,
@@ -152,17 +153,30 @@ export class SideNavComponent implements OnInit {
       updatedAt: new Date(),
     };
 
+    console.log('Creating new dashboard:', dashboardId, 'with template:', template.name);
+
     this.dashboards.push(newDashboard);
-    this.activeDashboardId = newDashboard.id;
+    this.activeDashboardId = dashboardId;
 
-    // Set template widgets with the correct dashboard ID
+    // Set template widgets IMMEDIATELY before navigation
     if (template.widgets && template.widgets.length > 0) {
-      console.log('Setting template widgets for dashboard:', newDashboard.id, template.widgets);
-      this.templateService.setTemplateWidgets(newDashboard.id, template.widgets);
-    }
+      console.log(
+        'Setting template widgets:',
+        template.widgets.length,
+        'widgets for dashboard:',
+        dashboardId,
+      );
+      this.templateService.setTemplateWidgets(dashboardId, template.widgets);
 
-    // Navigate to the new dashboard
-    this.router.navigate(['/dashboard', newDashboard.id]);
+      // Small delay to ensure service updates before navigation
+      setTimeout(() => {
+        console.log('Navigating to dashboard:', dashboardId);
+        this.router.navigate(['/dashboard', dashboardId]);
+      }, 50);
+    } else {
+      // No widgets, navigate immediately
+      this.router.navigate(['/dashboard', dashboardId]);
+    }
   }
 
   openDashboardMenu(dashboard: Dashboard, event: MouseEvent): void {

@@ -41,6 +41,7 @@ export class DashboardGridComponent {
   startRowSpan: number = 0;
   activeWidgetMenu: string | null = null;
   activeChartDateMenu: string | null = null;
+  datePickerPosition: { top: number; left: number } = { top: 0, left: 0 };
 
   drop(event: CdkDragDrop<GridItem[]>): void {
     if (!this.isEditMode) return;
@@ -96,7 +97,52 @@ export class DashboardGridComponent {
 
   toggleChartDateMenu(itemId: string, event: MouseEvent): void {
     event.stopPropagation();
-    this.activeChartDateMenu = this.activeChartDateMenu === itemId ? null : itemId;
+
+    if (this.activeChartDateMenu === itemId) {
+      this.activeChartDateMenu = null;
+      return;
+    }
+
+    this.activeChartDateMenu = itemId;
+
+    // Calculate position for date picker
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+
+    const datePickerWidth = 260;
+    const datePickerHeight = 380;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Calculate vertical position
+    let top: number;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    if (spaceBelow >= datePickerHeight + 10) {
+      // Position below
+      top = rect.bottom + 8;
+    } else if (spaceAbove >= datePickerHeight + 10) {
+      // Position above
+      top = rect.top - datePickerHeight - 8;
+    } else {
+      // Center vertically
+      top = Math.max(10, (viewportHeight - datePickerHeight) / 2);
+    }
+
+    // Calculate horizontal position
+    let left: number;
+    const idealLeft = rect.right - datePickerWidth;
+
+    if (idealLeft < 10) {
+      left = rect.left;
+    } else if (idealLeft + datePickerWidth > viewportWidth - 10) {
+      left = viewportWidth - datePickerWidth - 10;
+    } else {
+      left = idealLeft;
+    }
+
+    this.datePickerPosition = { top, left };
   }
 
   onChartDateRangeSelected(chartId: string, range: any): void {
