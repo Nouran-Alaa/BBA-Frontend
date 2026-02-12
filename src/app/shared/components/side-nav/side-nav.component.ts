@@ -8,6 +8,7 @@ import {
   DashboardTemplate,
 } from '../dashboard-templates-modal/dashboard-templates-modal.component';
 import { DashboardMenuModalComponent } from '../dashboard-menu-modal/dashboard-menu-modal.component';
+import { DashboardTemplateService } from '../../../core/services/dashboard-template.service';
 
 @Component({
   selector: 'app-side-nav',
@@ -74,7 +75,10 @@ export class SideNavComponent implements OnInit {
 
   activeDashboardId: string = '1';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private templateService: DashboardTemplateService,
+  ) {}
 
   ngOnInit(): void {}
 
@@ -143,22 +147,27 @@ export class SideNavComponent implements OnInit {
     const newDashboard: Dashboard = {
       id: Date.now().toString(),
       name: template.name,
-      description: `Created from ${template.name} template`,
+      description: template.description || `Created from ${template.name} template`,
       icon: template.icon,
       companyId: 'company-1',
       createdBy: 'user-1',
-      widgets: template.widgets.map((w, i) => ({
-        widgetId: `widget-${Date.now()}-${i}`,
-        type: w.type as any,
-        ...w,
-      })),
+      widgets: [],
       isDefault: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     this.dashboards.push(newDashboard);
-    this.selectDashboard(newDashboard.id);
+    this.activeDashboardId = newDashboard.id;
+
+    // Set template widgets BEFORE navigation
+    if (template.widgets && template.widgets.length > 0) {
+      console.log('Setting template widgets:', template.widgets);
+      this.templateService.setTemplateWidgets(template.widgets);
+    }
+
+    // Navigate to the new dashboard
+    this.router.navigate(['/dashboard', newDashboard.id]);
   }
 
   openDashboardMenu(dashboard: Dashboard, event: MouseEvent): void {

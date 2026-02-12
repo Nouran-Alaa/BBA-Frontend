@@ -1,16 +1,19 @@
 import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import {
   DateRangePickerComponent,
   DateRange,
 } from '../../../shared/components/date-range-picker/date-range-picker.component';
-import { AiChatModalComponent } from '../../../shared/components/ai-chat-modal/ai-chat-modal.component';
+import { AiChartModalComponent } from '../../../shared/components/ai-chart-modal/ai-chart-modal.component';
 import {
   DashboardGridComponent,
   GridItem,
 } from '../../../shared/components/dashboard-grid/dashboard-grid.component';
 import { FullscreenWidgetModalComponent } from '../../../shared/components/fullscreen-widget-modal/fullscreen-widget-modal.component';
+import { ToastService } from '../../../core/services/toast.service';
+import { DashboardTemplateService } from '../../../core/services/dashboard-template.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-container',
@@ -18,7 +21,7 @@ import { FullscreenWidgetModalComponent } from '../../../shared/components/fulls
   imports: [
     CommonModule,
     DateRangePickerComponent,
-    AiChatModalComponent,
+    AiChartModalComponent,
     DashboardGridComponent,
     FullscreenWidgetModalComponent,
   ],
@@ -31,16 +34,13 @@ export class DashboardContainerComponent implements OnInit {
 
   currentDateRange: DateRange | null = null;
   isDatePickerOpen: boolean = false;
-  isChartDatePickerOpen: boolean = false;
   isAiChatOpen: boolean = false;
   isGenerating: boolean = false;
   isEditMode: boolean = false;
   currentDashboardId: string = '';
   fullscreenWidget: GridItem | null = null;
-  selectedChartForDateRange: string | null = null;
   chartDateRanges: { [chartId: string]: DateRange } = {};
   gridItems: GridItem[] = [];
-  chartDatePickerPosition: { top: string; left: string } = { top: '0px', left: '0px' };
 
   dashboardsData: { [key: string]: GridItem[] } = {
     '1': [
@@ -82,6 +82,53 @@ export class DashboardContainerComponent implements OnInit {
     ],
   };
 
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private toastService: ToastService,
+    private templateService: DashboardTemplateService,
+  ) {}
+
+  private templateSubscription?: Subscription;
+
+  ngOnInit(): void {
+    // Subscribe to route params FIRST
+    this.route.params.subscribe((params) => {
+      const newDashboardId = params['id'] || '1';
+
+      // Check if switching dashboards
+      if (this.currentDashboardId !== newDashboardId) {
+        // Save current dashboard before switching
+        if (this.currentDashboardId && this.gridItems.length > 0) {
+          this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+        }
+
+        this.currentDashboardId = newDashboardId;
+        this.loadDashboard(newDashboardId);
+      }
+    });
+
+    // Subscribe to template widgets
+    this.templateSubscription = this.templateService.templateWidgets$.subscribe((widgets) => {
+      if (widgets && widgets.length > 0) {
+        console.log('Received template widgets for dashboard:', this.currentDashboardId);
+        const widgetsWithIds = widgets.map((widget, index) => ({
+          id: `${Date.now()}-${index}`,
+          ...widget,
+        }));
+        this.gridItems = widgetsWithIds;
+        this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+        this.templateService.clearTemplateWidgets();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.templateSubscription) {
+      this.templateSubscription.unsubscribe();
+    }
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     // Close main date picker
@@ -91,32 +138,28 @@ export class DashboardContainerComponent implements OnInit {
         this.isDatePickerOpen = false;
       }
     }
-
-    // Close chart date picker
-    if (this.isChartDatePickerOpen && this.chartDatePickerContainer) {
-      const clickedInside = this.chartDatePickerContainer.nativeElement.contains(event.target);
-      if (!clickedInside) {
-        this.isChartDatePickerOpen = false;
-        this.selectedChartForDateRange = null;
-      }
-    }
   }
 
-  constructor(private route: ActivatedRoute) {}
-
-  ngOnInit(): void {
-    this.route.params.subscribe((params) => {
-      this.currentDashboardId = params['id'] || '1';
-      this.loadDashboard(this.currentDashboardId);
-    });
+  loadTemplateWidgets(templateWidgets: any[]): void {
+    this.gridItems = templateWidgets.map((widget, index) => ({
+      id: `${Date.now()}-${index}`,
+      ...widget,
+    }));
+    this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
   }
 
   loadDashboard(dashboardId: string): void {
+    console.log('Loading dashboard:', dashboardId);
+
     if (this.dashboardsData[dashboardId]) {
+      // Load existing dashboard data
       this.gridItems = [...this.dashboardsData[dashboardId]];
+      console.log('Loaded existing dashboard with items:', this.gridItems.length);
     } else {
+      // New empty dashboard
       this.gridItems = [];
       this.dashboardsData[dashboardId] = [];
+      console.log('Created new empty dashboard');
     }
   }
 
@@ -178,32 +221,10 @@ export class DashboardContainerComponent implements OnInit {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
-  onChartDateRangeClick(chartId: string): void {
-    this.selectedChartForDateRange = chartId;
-
-    // Calculate position based on the clicked button
-    setTimeout(() => {
-      const button = document.querySelector(`[data-chart-id="${chartId}"]`);
-      if (button) {
-        const rect = button.getBoundingClientRect();
-        this.chartDatePickerPosition = {
-          top: `${rect.bottom + window.scrollY + 8}px`,
-          left: `${rect.left + window.scrollX - 280}px`, // Offset to align properly
-        };
-      }
-    }, 0);
-
-    this.isChartDatePickerOpen = true;
-    this.isDatePickerOpen = false;
-  }
-
-  onChartDateRangeChange(range: DateRange): void {
-    if (this.selectedChartForDateRange) {
-      this.chartDateRanges[this.selectedChartForDateRange] = range;
-      console.log('Chart date range updated:', this.selectedChartForDateRange, range);
-    }
-    this.isChartDatePickerOpen = false;
-    this.selectedChartForDateRange = null;
+  onChartDateRangeClick(data: { chartId: string; range: any }): void {
+    const { chartId, range } = data;
+    this.chartDateRanges[chartId] = range;
+    console.log('Chart date range updated:', chartId, range);
   }
 
   onItemDuplicate(itemId: string): void {

@@ -4,11 +4,12 @@
   (click)="onClose()"
 >
   <div
-    class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-slideUp"
+    class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden animate-slideUp flex flex-col"
+    style="height: 85vh"
     (click)="$event.stopPropagation()"
   >
     <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white">
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white flex-shrink-0">
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-2xl font-bold">Choose a Template</h2>
@@ -18,7 +19,7 @@
         </div>
         <button
           (click)="onClose()"
-          class="w-10 h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center cursor-pointer"
+          class="w-10 h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -33,7 +34,7 @@
     </div>
 
     <!-- Categories -->
-    <div class="border-b border-gray-200 px-6 py-3 bg-gray-50">
+    <div class="border-b border-gray-200 px-6 py-3 bg-gray-50 flex-shrink-0">
       <div class="flex gap-2 overflow-x-auto">
         <button
           *ngFor="let category of categories"
@@ -42,7 +43,7 @@
           [class.text-white]="selectedCategory === category"
           [class.bg-white]="selectedCategory !== category"
           [class.text-gray-700]="selectedCategory !== category"
-          class="px-4 py-2 m-1 rounded-lg font-medium text-sm whitespace-nowrap transition-all hover:shadow-md cursor-pointer"
+          class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all hover:shadow-md"
         >
           {{ category }}
         </button>
@@ -50,37 +51,150 @@
     </div>
 
     <!-- Templates Grid -->
-    <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+    <div class="flex-1 overflow-y-auto p-6">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button
-          *ngFor="let template of getFilteredTemplates()"
-          (click)="onSelectTemplate(template)"
-          class="text-left p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all group bg-white cursor-pointer"
-        >
-          <div class="flex items-start justify-between mb-3">
-            <span class="text-4xl">{{ template.icon }}</span>
-            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-              {{ template.category }}
-            </span>
-          </div>
-          <h3 class="font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
-            {{ template.name }}
-          </h3>
-          <p class="text-sm text-gray-600">{{ template.description }}</p>
+        <div *ngFor="let template of getFilteredTemplates()" class="group relative">
+          <button
+            (click)="template.id === 'blank' ? onSelectTemplate(template) : showPreview(template)"
+            class="text-left p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all bg-white h-full flex flex-col"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <span class="text-4xl">{{ template.icon }}</span>
+              <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                {{ template.category }}
+              </span>
+            </div>
+            <h3
+              class="font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors"
+            >
+              {{ template.name }}
+            </h3>
+            <p class="text-sm text-gray-600 mb-3 flex-1">{{ template.description }}</p>
 
-          <!-- Widget Count -->
-          <div class="mt-4 flex items-center gap-2 text-xs text-gray-500">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Widget Count -->
+            <div
+              class="flex items-center gap-2 text-xs text-gray-500 pt-3 border-t border-gray-100"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"
+                ></path>
+              </svg>
+              {{ template.widgets.length }}
+              {{ template.widgets.length === 1 ? 'widget' : 'widgets' }}
+            </div>
+          </button>
+        </div>
+
+        <!-- Empty State for Blank -->
+        <div *ngIf="getFilteredTemplates().length === 0" class="text-center py-16">
+          <p class="text-gray-500">No templates found</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Template Preview Modal -->
+<div
+  *ngIf="selectedTemplatePreview"
+  class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+  style="background-color: rgba(0, 0, 0, 0.75)"
+  (click)="closePreview()"
+>
+  <div
+    class="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden animate-scaleUp"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Preview Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-4xl">{{ selectedTemplatePreview.icon }}</span>
+          <div>
+            <h2 class="text-2xl font-bold">{{ selectedTemplatePreview.name }}</h2>
+            <p class="text-sm text-blue-100">{{ selectedTemplatePreview.description }}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            (click)="onSelectTemplate(selectedTemplatePreview); closePreview()"
+            class="px-6 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+          >
+            Use Template
+          </button>
+          <button
+            (click)="closePreview()"
+            class="w-10 h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"
+                d="M6 18L18 6M6 6l12 12"
               ></path>
             </svg>
-            {{ template.widgets.length }} {{ template.widgets.length === 1 ? 'widget' : 'widgets' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Content -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)] bg-gray-50">
+      <div class="bg-white rounded-lg p-6">
+        <!-- Simulated Dashboard Grid -->
+        <div class="grid grid-cols-12 gap-4 auto-rows-[120px]">
+          <div
+            *ngFor="let widget of selectedTemplatePreview.widgets"
+            [style.grid-column]="'span ' + widget.colSpan"
+            [style.grid-row]="'span ' + widget.rowSpan"
+            class="bg-white border-2 border-gray-200 rounded-lg p-4 shadow-sm"
+          >
+            <!-- Summary Widget Preview -->
+            <div *ngIf="widget.type === 'summary'" class="h-full flex flex-col">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-2xl">✨</span>
+                <h3 class="font-semibold text-gray-800 text-sm">{{ widget.title }}</h3>
+              </div>
+              <p class="text-xs text-gray-600 line-clamp-3">{{ widget.content }}</p>
+            </div>
+
+            <!-- Count Widget Preview -->
+            <div *ngIf="widget.type === 'count'" class="h-full flex flex-col justify-center">
+              <h3 class="text-xs font-medium text-gray-600 mb-1">{{ widget.title }}</h3>
+              <p class="text-3xl font-bold text-blue-600">{{ widget.value | number }}</p>
+              <p class="text-xs text-gray-500">{{ widget.label }}</p>
+            </div>
+
+            <!-- Chart Widget Preview -->
+            <div *ngIf="widget.type === 'chart'" class="h-full flex flex-col">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-semibold text-gray-800 text-sm truncate">{{ widget.title }}</h3>
+                <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded">AI</span>
+              </div>
+              <div class="flex-1 bg-gray-100 rounded flex items-center justify-center">
+                <svg
+                  class="w-12 h-12 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  ></path>
+                </svg>
+              </div>
+              <p class="text-xs text-gray-500 italic mt-2 line-clamp-1">"{{ widget.prompt }}"</p>
+            </div>
           </div>
-        </button>
+        </div>
       </div>
     </div>
   </div>

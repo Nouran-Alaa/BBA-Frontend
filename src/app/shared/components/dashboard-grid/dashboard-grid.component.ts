@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DateRangePickerComponent } from '../date-range-picker/date-range-picker.component';
 
 export interface GridItem {
   id: string;
@@ -18,7 +19,7 @@ export interface GridItem {
 @Component({
   selector: 'app-dashboard-grid',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [CommonModule, DragDropModule, DateRangePickerComponent],
   templateUrl: './dashboard-grid.component.html',
   styleUrls: ['./dashboard-grid.component.css'],
 })
@@ -27,9 +28,9 @@ export class DashboardGridComponent {
   @Input() isEditMode: boolean = false;
   @Output() itemsChange = new EventEmitter<GridItem[]>();
   @Output() itemDelete = new EventEmitter<string>();
-  @Output() chartDateRangeClick = new EventEmitter<string>();
   @Output() widgetClick = new EventEmitter<GridItem>();
   @Output() itemDuplicate = new EventEmitter<string>();
+  @Output() chartDateRangeClick = new EventEmitter<{ chartId: string; range: any }>();
 
   resizingItem: GridItem | null = null;
   resizeDirection: string = '';
@@ -38,6 +39,7 @@ export class DashboardGridComponent {
   startColSpan: number = 0;
   startRowSpan: number = 0;
   activeWidgetMenu: string | null = null;
+  activeChartDateMenu: string | null = null;
 
   drop(event: CdkDragDrop<GridItem[]>): void {
     if (!this.isEditMode) return;
@@ -67,11 +69,6 @@ export class DashboardGridComponent {
     document.body.style.cursor = this.getCursorStyle(direction);
   }
 
-  onChartDateRange(itemId: string, event: MouseEvent): void {
-    event.stopPropagation();
-    this.chartDateRangeClick.emit(itemId);
-  }
-
   onWidgetClick(item: GridItem): void {
     if (!this.isEditMode) {
       this.widgetClick.emit(item);
@@ -88,10 +85,21 @@ export class DashboardGridComponent {
     this.activeWidgetMenu = this.activeWidgetMenu === itemId ? null : itemId;
   }
 
+  toggleChartDateMenu(itemId: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.activeChartDateMenu = this.activeChartDateMenu === itemId ? null : itemId;
+  }
+
+  onChartDateRangeSelected(chartId: string, range: any): void {
+    this.chartDateRangeClick.emit({ chartId, range });
+    this.activeChartDateMenu = null;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    // Close widget menu when clicking outside
+    // Close widget menu and date menu when clicking outside
     this.activeWidgetMenu = null;
+    this.activeChartDateMenu = null;
   }
 
   @HostListener('document:mousemove', ['$event'])
