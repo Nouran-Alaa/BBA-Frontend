@@ -82,6 +82,7 @@
         (itemDuplicate)="onItemDuplicate($event)"
         (chartDateRangeClick)="onChartDateRangeClick($event)"
         (widgetClick)="onWidgetClick($event)"
+        (editWithAI)="onEditWithAI($event)"
       >
       </app-dashboard-grid>
 
@@ -137,4 +138,13 @@
     (close)="closeFullscreen()"
   >
   </app-fullscreen-widget-modal>
+
+  <!-- Edit AI Modal -->
+  <app-edit-ai-modal
+    *ngIf="showEditAiModal && editingWidget"
+    [widget]="editingWidget"
+    (close)="closeEditAiModal()"
+    (save)="onSaveEditedWidget($event)"
+  >
+  </app-edit-ai-modal>
 </div>

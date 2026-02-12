@@ -8,12 +8,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { ClickOutsideDirective } from '../../directives/click-outside.directive';
 
 @Component({
   selector: 'app-top-nav',
   standalone: true,
-  imports: [CommonModule, RouterLink, ClickOutsideDirective],
+  imports: [CommonModule, RouterLink],
   templateUrl: './top-nav.component.html',
   styleUrls: ['./top-nav.component.css'],
 })

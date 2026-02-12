@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 export interface DashboardTemplate {
   id: string;
@@ -14,7 +15,7 @@ export interface DashboardTemplate {
 @Component({
   selector: 'app-dashboard-templates-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard-templates-modal.component.html',
   styleUrls: ['./dashboard-templates-modal.component.css'],
 })
@@ -23,6 +24,7 @@ export class DashboardTemplatesModalComponent {
   @Output() selectTemplate = new EventEmitter<DashboardTemplate | null>();
 
   selectedTemplatePreview: DashboardTemplate | null = null;
+  searchQuery: string = '';
 
   templates: DashboardTemplate[] = [
     {
@@ -395,9 +397,19 @@ export class DashboardTemplatesModalComponent {
   }
 
   getFilteredTemplates(): DashboardTemplate[] {
-    if (this.selectedCategory === 'All') {
-      return this.templates;
+    let filtered = this.templates;
+
+    if (this.selectedCategory !== 'All') {
+      filtered = filtered.filter((t) => t.category === this.selectedCategory);
     }
-    return this.templates.filter((t) => t.category === this.selectedCategory);
+
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (t) => t.name.toLowerCase().includes(query) || t.description.toLowerCase().includes(query),
+      );
+    }
+
+    return filtered;
   }
 }

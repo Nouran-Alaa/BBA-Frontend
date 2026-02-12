@@ -31,6 +31,7 @@ export class DashboardGridComponent {
   @Output() widgetClick = new EventEmitter<GridItem>();
   @Output() itemDuplicate = new EventEmitter<string>();
   @Output() chartDateRangeClick = new EventEmitter<{ chartId: string; range: any }>();
+  @Output() editWithAI = new EventEmitter<GridItem>();
 
   resizingItem: GridItem | null = null;
   resizeDirection: string = '';
@@ -72,6 +73,14 @@ export class DashboardGridComponent {
   onWidgetClick(item: GridItem): void {
     if (!this.isEditMode) {
       this.widgetClick.emit(item);
+    }
+  }
+
+  onEditWithAI(itemId: string, event: MouseEvent): void {
+    event.stopPropagation();
+    const item = this.items.find((i) => i.id === itemId);
+    if (item) {
+      this.editWithAI.emit(item);
     }
   }
 

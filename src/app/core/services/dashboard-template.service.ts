@@ -1,18 +1,23 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+export interface TemplateData {
+  dashboardId: string;
+  widgets: any[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardTemplateService {
-  private templateWidgetsSubject = new BehaviorSubject<any[] | null>(null);
-  templateWidgets$ = this.templateWidgetsSubject.asObservable();
+  private templateDataSubject = new BehaviorSubject<TemplateData | null>(null);
+  templateData$ = this.templateDataSubject.asObservable();
 
-  setTemplateWidgets(widgets: any[]): void {
-    this.templateWidgetsSubject.next(widgets);
+  setTemplateWidgets(dashboardId: string, widgets: any[]): void {
+    this.templateDataSubject.next({ dashboardId, widgets });
   }
 
   clearTemplateWidgets(): void {
-    this.templateWidgetsSubject.next(null);
+    this.templateDataSubject.next(null);
   }
 }

@@ -14,6 +14,7 @@ import { FullscreenWidgetModalComponent } from '../../../shared/components/fulls
 import { ToastService } from '../../../core/services/toast.service';
 import { DashboardTemplateService } from '../../../core/services/dashboard-template.service';
 import { Subscription } from 'rxjs';
+import { EditAiModalComponent } from '../../../shared/components/edit-ai-modal/edit-ai-modal.component';
 
 @Component({
   selector: 'app-dashboard-container',
@@ -24,6 +25,7 @@ import { Subscription } from 'rxjs';
     AiChartModalComponent,
     DashboardGridComponent,
     FullscreenWidgetModalComponent,
+    EditAiModalComponent,
   ],
   templateUrl: './dashboard-container.component.html',
   styleUrls: ['./dashboard-container.component.css'],
@@ -41,6 +43,8 @@ export class DashboardContainerComponent implements OnInit {
   fullscreenWidget: GridItem | null = null;
   chartDateRanges: { [chartId: string]: DateRange } = {};
   gridItems: GridItem[] = [];
+  editingWidget: GridItem | null = null;
+  showEditAiModal: boolean = false;
 
   dashboardsData: { [key: string]: GridItem[] } = {
     '1': [
@@ -92,11 +96,29 @@ export class DashboardContainerComponent implements OnInit {
   private templateSubscription?: Subscription;
 
   ngOnInit(): void {
-    // Subscribe to route params FIRST
+    // Subscribe to template data FIRST
+    this.templateSubscription = this.templateService.templateData$.subscribe((data) => {
+      if (data && data.widgets && data.widgets.length > 0) {
+        console.log('Received template data for dashboard:', data.dashboardId);
+
+        // Only apply if it's for the current dashboard
+        if (data.dashboardId === this.currentDashboardId) {
+          const widgetsWithIds = data.widgets.map((widget, index) => ({
+            id: `${Date.now()}-${index}`,
+            ...widget,
+          }));
+          this.gridItems = widgetsWithIds;
+          this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+          console.log('Applied template widgets to dashboard:', this.currentDashboardId);
+          this.templateService.clearTemplateWidgets();
+        }
+      }
+    });
+
+    // Subscribe to route params
     this.route.params.subscribe((params) => {
       const newDashboardId = params['id'] || '1';
 
-      // Check if switching dashboards
       if (this.currentDashboardId !== newDashboardId) {
         // Save current dashboard before switching
         if (this.currentDashboardId && this.gridItems.length > 0) {
@@ -105,20 +127,6 @@ export class DashboardContainerComponent implements OnInit {
 
         this.currentDashboardId = newDashboardId;
         this.loadDashboard(newDashboardId);
-      }
-    });
-
-    // Subscribe to template widgets
-    this.templateSubscription = this.templateService.templateWidgets$.subscribe((widgets) => {
-      if (widgets && widgets.length > 0) {
-        console.log('Received template widgets for dashboard:', this.currentDashboardId);
-        const widgetsWithIds = widgets.map((widget, index) => ({
-          id: `${Date.now()}-${index}`,
-          ...widget,
-        }));
-        this.gridItems = widgetsWithIds;
-        this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-        this.templateService.clearTemplateWidgets();
       }
     });
   }
@@ -182,6 +190,27 @@ export class DashboardContainerComponent implements OnInit {
 
   closeAiChat(): void {
     this.isAiChatOpen = false;
+  }
+
+  onEditWithAI(widget: GridItem): void {
+    this.editingWidget = widget;
+    this.showEditAiModal = true;
+  }
+
+  onSaveEditedWidget(updatedWidget: GridItem): void {
+    const index = this.gridItems.findIndex((item) => item.id === updatedWidget.id);
+    if (index !== -1) {
+      this.gridItems[index] = updatedWidget;
+      this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+      this.toastService.success('Widget updated successfully!');
+    }
+    this.showEditAiModal = false;
+    this.editingWidget = null;
+  }
+
+  closeEditAiModal(): void {
+    this.showEditAiModal = false;
+    this.editingWidget = null;
   }
 
   onChartGenerated(prompt: string): void {

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router } from '@angular/router';
 import { Dashboard } from '../../../core/models/dashboard.model';
 import { UserRole } from '../../../core/models/user.model';
 import {
@@ -13,13 +13,7 @@ import { DashboardTemplateService } from '../../../core/services/dashboard-templ
 @Component({
   selector: 'app-side-nav',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    RouterLinkActive,
-    DashboardTemplatesModalComponent,
-    DashboardMenuModalComponent,
-  ],
+  imports: [CommonModule, DashboardTemplatesModalComponent, DashboardMenuModalComponent],
   templateUrl: './side-nav.component.html',
   styleUrls: ['./side-nav.component.css'],
 })
@@ -144,6 +138,7 @@ export class SideNavComponent implements OnInit {
 
     if (!template) return;
 
+    // Create new dashboard
     const newDashboard: Dashboard = {
       id: Date.now().toString(),
       name: template.name,
@@ -160,10 +155,10 @@ export class SideNavComponent implements OnInit {
     this.dashboards.push(newDashboard);
     this.activeDashboardId = newDashboard.id;
 
-    // Set template widgets BEFORE navigation
+    // Set template widgets with the correct dashboard ID
     if (template.widgets && template.widgets.length > 0) {
-      console.log('Setting template widgets:', template.widgets);
-      this.templateService.setTemplateWidgets(template.widgets);
+      console.log('Setting template widgets for dashboard:', newDashboard.id, template.widgets);
+      this.templateService.setTemplateWidgets(newDashboard.id, template.widgets);
     }
 
     // Navigate to the new dashboard

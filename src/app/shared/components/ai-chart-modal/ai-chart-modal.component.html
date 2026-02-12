@@ -4,11 +4,8 @@
   (click)="onClose()"
 >
   <div
-    class="bg-white rounded-2xl shadow-2xl overflow-hidden animate-slideUp flex"
-    [class.w-full]="!showChat"
-    [class.max-w-7xl]="!showChat"
-    [class.max-w-4xl]="showChat"
-    [class.h-[90vh]]="true"
+    class="bg-white rounded-2xl shadow-2xl overflow-hidden animate-slideUp flex w-full max-w-[1080px]"
+    style="height: 85vh"
     (click)="$event.stopPropagation()"
   >
     <!-- Template Selection View -->
@@ -345,19 +342,20 @@
 
       <!-- Chat Input -->
       <div class="border-t border-gray-200 p-3 bg-white flex-shrink-0">
-        <div class="flex gap-2">
+        <div class="flex gap-2 items-end">
           <textarea
             [(ngModel)]="userMessage"
             (keydown.enter)="handleEnterKey($event)"
             placeholder="Describe what you want..."
             rows="1"
-            class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+            class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm max-h-32"
             [disabled]="isGenerating"
+            style="min-height: 42px"
           ></textarea>
           <button
             (click)="sendMessage()"
             [disabled]="!userMessage.trim() || isGenerating"
-            class="px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed self-end"
+            class="h-[42px] px-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -367,6 +365,7 @@
                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
               ></path>
             </svg>
+            <span class="hidden sm:inline">Send</span>
           </button>
         </div>
       </div>

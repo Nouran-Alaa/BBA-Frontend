@@ -130,9 +130,71 @@
       <div class="p-6 h-full overflow-auto">
         <!-- Summary Card -->
         <div *ngIf="item.type === 'summary'" class="h-full flex flex-col">
-          <div class="flex items-center gap-2 mb-4">
-            <span class="text-2xl">✨</span>
-            <h3 class="text-lg font-semibold text-gray-800">{{ item.title }}</h3>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <span class="text-2xl">✨</span>
+              <h3 class="text-lg font-semibold text-gray-800 truncate">{{ item.title }}</h3>
+            </div>
+
+            <!-- Action Icons -->
+            <div class="flex items-center gap-1 flex-shrink-0">
+              <!-- Edit with AI -->
+              <button
+                (click)="onEditWithAI(item.id, $event)"
+                class="p-1.5 rounded-lg hover:bg-purple-50 transition-colors group"
+                title="Edit with AI"
+              >
+                <svg
+                  class="w-4 h-4 text-gray-600 group-hover:text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  ></path>
+                  <circle cx="18" cy="6" r="2" fill="currentColor" />
+                </svg>
+              </button>
+
+              <!-- Date Range -->
+              <div class="relative">
+                <button
+                  (click)="toggleChartDateMenu(item.id, $event)"
+                  class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                  title="Change date range"
+                >
+                  <svg
+                    class="w-4 h-4 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                </button>
+
+                <!-- Date Range Dropdown -->
+                <div
+                  *ngIf="activeChartDateMenu === item.id"
+                  class="absolute right-0 top-full mt-2 z-30 animate-fadeIn"
+                  (click)="$event.stopPropagation()"
+                >
+                  <app-date-range-picker
+                    (dateRangeChange)="onChartDateRangeSelected(item.id, $event)"
+                  >
+                  </app-date-range-picker>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="space-y-3 flex-1 overflow-y-auto">
             <div>
@@ -143,20 +205,103 @@
         </div>
 
         <!-- Count Card -->
-        <div *ngIf="item.type === 'count'" class="h-full flex flex-col justify-center">
-          <h3 class="text-sm font-medium text-gray-600 mb-2">{{ item.title }}</h3>
-          <p class="text-4xl font-bold text-gray-800 mb-1">{{ item.value }}</p>
-          <p class="text-sm text-gray-500">{{ item.label }}</p>
+        <div *ngIf="item.type === 'count'" class="h-full flex flex-col">
+          <div class="flex items-center justify-end gap-1 mb-2 -mt-2">
+            <!-- Edit with AI -->
+            <button
+              (click)="onEditWithAI(item.id, $event)"
+              class="p-1.5 rounded-lg hover:bg-purple-50 transition-colors group"
+              title="Edit with AI"
+            >
+              <svg
+                class="w-4 h-4 text-gray-600 group-hover:text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path>
+                <circle cx="18" cy="6" r="2" fill="currentColor" />
+              </svg>
+            </button>
+
+            <!-- Date Range -->
+            <div class="relative">
+              <button
+                (click)="toggleChartDateMenu(item.id, $event)"
+                class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                title="Change date range"
+              >
+                <svg
+                  class="w-4 h-4 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  ></path>
+                </svg>
+              </button>
+
+              <!-- Date Range Dropdown -->
+              <div
+                *ngIf="activeChartDateMenu === item.id"
+                class="absolute right-0 top-full mt-2 z-30 animate-fadeIn"
+                (click)="$event.stopPropagation()"
+              >
+                <app-date-range-picker
+                  (dateRangeChange)="onChartDateRangeSelected(item.id, $event)"
+                >
+                </app-date-range-picker>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 flex flex-col justify-center">
+            <h3 class="text-sm font-medium text-gray-600 mb-2">{{ item.title }}</h3>
+            <p class="text-4xl font-bold text-gray-800 mb-1">{{ item.value }}</p>
+            <p class="text-sm text-gray-500">{{ item.label }}</p>
+          </div>
         </div>
 
-        <!-- Chart Card -->
+        <!-- Chart Card - Already has the icons, add Edit AI -->
         <div *ngIf="item.type === 'chart'" class="h-full flex flex-col relative">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2 flex-1 min-w-0">
               <span class="text-xl">🤖</span>
               <h3 class="text-base font-semibold text-gray-800 truncate">{{ item.title }}</h3>
             </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="flex items-center gap-1 flex-shrink-0">
+              <!-- Edit with AI -->
+              <button
+                (click)="onEditWithAI(item.id, $event)"
+                class="p-1.5 rounded-lg hover:bg-purple-50 transition-colors group"
+                title="Edit with AI"
+              >
+                <svg
+                  class="w-4 h-4 text-gray-600 group-hover:text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  ></path>
+                  <circle cx="18" cy="6" r="2" fill="currentColor" />
+                </svg>
+              </button>
+
               <!-- Date Range Dropdown for Chart -->
               <div class="relative">
                 <button
