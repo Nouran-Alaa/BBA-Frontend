@@ -13,6 +13,7 @@
     [ngClass]="{
       'fixed top-0 left-0 h-screen w-64 z-50 lg:relative lg:z-auto': isMobileView,
       'relative h-full flex-shrink-0': !isMobileView,
+      'w-full': isSmallScreen,
       'w-20': isSideNavCollapsed && !isMobileView,
       'w-64': !isSideNavCollapsed || isMobileView,
     }"

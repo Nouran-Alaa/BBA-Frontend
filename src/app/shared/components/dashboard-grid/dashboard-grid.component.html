@@ -2,7 +2,7 @@
   cdkDropList
   [cdkDropListData]="items"
   (cdkDropListDropped)="drop($event)"
-  class="grid grid-cols-1 lg:grid-cols-12 gap-6 auto-rows-[120px] overflow-visible"
+  class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6 auto-rows-[120px] overflow-visible"
 >
   <div
     *ngFor="let item of items"
@@ -128,7 +128,7 @@
       [class.hover:shadow-md]="!isEditMode"
     >
       <!-- Action Icons - Positioned Absolutely Outside Padding -->
-      <div class="absolute top-2 right-2 z-20 flex items-center gap-1">
+      <div *ngIf="!isEditMode" class="absolute top-2 right-2 flex items-center gap-1">
         <!-- Edit with AI -->
         <button
           (click)="onEditWithAI(item.id, $event)"
@@ -176,7 +176,7 @@
           <!-- Date Range Dropdown with High Z-Index -->
           <div
             *ngIf="activeChartDateMenu === item.id"
-            class="fixed z-[100] animate-fadeIn"
+            class="fixed z-[200] animate-fadeIn"
             [style.top.px]="datePickerPosition.top"
             [style.left.px]="datePickerPosition.left"
             (click)="$event.stopPropagation()"

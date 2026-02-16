@@ -71,8 +71,8 @@
   </div>
 
   <!-- Dashboard Content -->
-  <div class="flex-1 px-6 py-6 overflow-y-auto overflow-x-visible">
-    <div class="space-y-6 max-w-450 mx-auto">
+  <div class="flex-1 px-3 sm:px-4 md:px-6 py-4 sm:py-6 overflow-y-auto overflow-x-hidden">
+    <div class="space-y-4 sm:space-y-6 w-full max-w-[1800px] mx-auto">
       <!-- Dashboard Grid -->
       <app-dashboard-grid
         [items]="gridItems"
@@ -87,16 +87,16 @@
       </app-dashboard-grid>
 
       <!-- Add Card Button - With Top Margin -->
-      <div class="mt-8">
+      <div class="mt-6 sm:mt-8">
         <button
           (click)="openAiChat()"
-          class="w-full bg-white rounded-lg shadow-sm border-2 border-dashed border-gray-300 p-6 hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-200 group cursor-pointer flex items-center justify-center gap-4"
+          class="w-full bg-white rounded-lg shadow-sm border-2 border-dashed border-gray-300 p-4 sm:p-6 hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-200 group cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
         >
           <div
-            class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200 group-hover:scale-110"
+            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200 group-hover:scale-110 flex-shrink-0"
           >
             <svg
-              class="w-6 h-6 text-blue-600"
+              class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -109,13 +109,13 @@
               ></path>
             </svg>
           </div>
-          <div class="text-left">
+          <div class="text-center sm:text-left">
             <p
-              class="text-lg font-semibold text-gray-700 group-hover:text-blue-700 transition-colors"
+              class="text-base sm:text-lg font-semibold text-gray-700 group-hover:text-blue-700 transition-colors"
             >
               Add New Card
             </p>
-            <p class="text-sm text-gray-500 mt-1">
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">
               Use AI to generate charts and analytics widgets
             </p>
           </div>

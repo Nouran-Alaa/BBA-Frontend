@@ -396,6 +396,44 @@ export class DashboardTemplatesModalComponent {
     this.selectedTemplatePreview = null;
   }
 
+  getWidgetGridClasses(widget: any): string {
+    const colSpan = widget.colSpan;
+    const rowSpan = widget.rowSpan;
+
+    // Mobile: Full width (1 col)
+    // Small: Half width (2 cols max)
+    // Medium: Quarter width (4 cols max)
+    // Large: Original width (12 cols)
+
+    let classes = `row-span-${rowSpan} `;
+
+    // Mobile - always full width
+    classes += 'col-span-1 ';
+
+    // Small screens (sm) - max 2 columns
+    if (colSpan >= 6) {
+      classes += 'sm:col-span-2 ';
+    } else {
+      classes += 'sm:col-span-1 ';
+    }
+
+    // Medium screens (md) - max 4 columns, scale proportionally
+    if (colSpan >= 9) {
+      classes += 'md:col-span-4 ';
+    } else if (colSpan >= 6) {
+      classes += 'md:col-span-3 ';
+    } else if (colSpan >= 3) {
+      classes += 'md:col-span-2 ';
+    } else {
+      classes += 'md:col-span-1 ';
+    }
+
+    // Large screens (lg) - original 12-column layout
+    classes += `lg:col-span-${colSpan}`;
+
+    return classes;
+  }
+
   getFilteredTemplates(): DashboardTemplate[] {
     let filtered = this.templates;
 

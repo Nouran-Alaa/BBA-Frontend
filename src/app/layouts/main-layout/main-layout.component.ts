@@ -16,6 +16,7 @@ export class MainLayoutComponent implements OnInit {
   isSideNavCollapsed: boolean = false;
   isMobileView: boolean = false;
   isSideNavOpen: boolean = false;
+  isSmallScreen: boolean = false;
 
   ngOnInit(): void {
     this.checkScreenSize();
@@ -28,6 +29,7 @@ export class MainLayoutComponent implements OnInit {
 
   checkScreenSize(): void {
     this.isMobileView = window.innerWidth < 1024;
+    this.isSmallScreen = window.innerWidth < 640;
 
     if (!this.isMobileView) {
       this.isSideNavOpen = true;
