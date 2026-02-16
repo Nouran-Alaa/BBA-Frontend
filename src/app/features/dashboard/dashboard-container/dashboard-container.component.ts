@@ -100,6 +100,13 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('Dashboard container initialized');
 
+    // Load from localStorage first
+    const stored = localStorage.getItem('dashboardsData');
+    if (stored) {
+      this.dashboardsData = JSON.parse(stored);
+      console.log('Loaded dashboards from localStorage:', Object.keys(this.dashboardsData));
+    }
+
     // Subscribe to template data FIRST
     this.templateSubscription = this.templateService.templateData$.subscribe((data) => {
       console.log('Template data received:', data);
@@ -125,6 +132,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
         // Save current dashboard before switching
         if (this.currentDashboardId && this.gridItems.length > 0) {
           this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+          this.saveToLocalStorage();
           console.log(
             'Saved dashboard:',
             this.currentDashboardId,
@@ -154,6 +162,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     // Save current dashboard state
     if (this.currentDashboardId && this.gridItems.length > 0) {
       this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+      this.saveToLocalStorage();
     }
 
     if (this.templateSubscription) {
@@ -162,6 +171,11 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
     }
+  }
+
+  saveToLocalStorage(): void {
+    localStorage.setItem('dashboardsData', JSON.stringify(this.dashboardsData));
+    console.log('Saved to localStorage:', Object.keys(this.dashboardsData));
   }
 
   @HostListener('document:click', ['$event'])
@@ -190,6 +204,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
     this.gridItems = widgetsWithIds;
     this.dashboardsData[data.dashboardId] = [...this.gridItems];
+    this.saveToLocalStorage();
 
     console.log('Template applied successfully. Grid items:', this.gridItems.length);
 
@@ -212,7 +227,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     if (this.dashboardsData[dashboardId]) {
       // Load existing dashboard data
       this.gridItems = [...this.dashboardsData[dashboardId]];
-      console.log('Loaded existing dashboard with items:', this.gridItems.length, 'items');
+      console.log('Loaded existing dashboard with items:', this.gridItems.length);
     } else {
       // New empty dashboard
       this.gridItems = [];
@@ -252,6 +267,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     if (index !== -1) {
       this.gridItems[index] = updatedWidget;
       this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+      this.saveToLocalStorage();
       this.toastService.success('Widget updated successfully!');
     }
     this.showEditAiModal = false;
@@ -279,6 +295,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
       this.gridItems.push(newItem);
       this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+      this.saveToLocalStorage();
       this.isGenerating = false;
       this.isAiChatOpen = false;
     }, 3000);
@@ -287,6 +304,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   onGridItemsChange(items: GridItem[]): void {
     this.gridItems = items;
     this.dashboardsData[this.currentDashboardId] = [...items];
+    this.saveToLocalStorage();
   }
 
   getFormattedDateRange(): string {
@@ -316,12 +334,14 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
       };
       this.gridItems.push(duplicatedItem);
       this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+      this.saveToLocalStorage();
     }
   }
 
   onItemDelete(itemId: string): void {
     this.gridItems = this.gridItems.filter((item) => item.id !== itemId);
     this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+    this.saveToLocalStorage();
   }
 
   onWidgetClick(widget: GridItem): void {
