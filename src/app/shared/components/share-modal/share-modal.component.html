@@ -1,6 +1,6 @@
 <div
-  class="fixed inset-0 z-50 flex items-center justify-center p-4"
-  style="background-color: rgba(0, 0, 0, 0.5)"
+  class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+  style="background-color: rgba(0, 0, 0, 0.75)"
   (click)="onClose()"
 >
   <div
@@ -28,7 +28,7 @@
         </div>
         <button
           (click)="onClose()"
-          class="w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center cursor-pointer"
+          class="w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -44,27 +44,86 @@
 
     <!-- Body -->
     <div class="p-6 space-y-4">
-      <p class="text-gray-600 text-sm">
-        Anyone with this link can view this dashboard. Copy and share the link below:
-      </p>
-
-      <!-- Share URL -->
-      <div class="flex items-center gap-2">
-        <input
-          type="text"
-          [value]="shareUrl"
-          readonly
-          class="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      <!-- Share Options Tabs -->
+      <div class="flex gap-2 border-b border-gray-200 pb-3">
         <button
-          (click)="copyToClipboard()"
-          [class.bg-green-600]="copied"
-          [class.bg-blue-600]="!copied"
-          class="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-all font-medium text-sm flex items-center gap-2 cursor-pointer"
+          (click)="showUserShare = false"
+          [class.border-blue-600]="!showUserShare"
+          [class.text-blue-600]="!showUserShare"
+          [class.border-transparent]="showUserShare"
+          [class.text-gray-600]="showUserShare"
+          class="flex-1 pb-2 border-b-2 font-medium text-sm transition-colors"
         >
+          Share Link
+        </button>
+        <button
+          (click)="showUserShare = true"
+          [class.border-blue-600]="showUserShare"
+          [class.text-blue-600]="showUserShare"
+          [class.border-transparent]="!showUserShare"
+          [class.text-gray-600]="!showUserShare"
+          class="flex-1 pb-2 border-b-2 font-medium text-sm transition-colors"
+        >
+          Share with User
+        </button>
+      </div>
+
+      <!-- Share Link Section -->
+      <div *ngIf="!showUserShare" class="space-y-4">
+        <p class="text-gray-600 text-sm">
+          Anyone with this link can view this dashboard. Copy and share the link below:
+        </p>
+
+        <!-- Share URL -->
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            [value]="shareUrl"
+            readonly
+            class="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            (click)="copyToClipboard()"
+            [class.bg-green-600]="copied"
+            [class.bg-blue-600]="!copied"
+            class="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-all font-medium text-sm flex items-center gap-2"
+          >
+            <svg
+              *ngIf="!copied"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              ></path>
+            </svg>
+            <svg
+              *ngIf="copied"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              ></path>
+            </svg>
+            {{ copied ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+
+        <!-- Info Message -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-3">
           <svg
-            *ngIf="!copied"
-            class="w-5 h-5"
+            class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -73,39 +132,110 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path>
           </svg>
-          <svg *ngIf="copied" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7"
-            ></path>
-          </svg>
-          {{ copied ? 'Copied!' : 'Copy' }}
-        </button>
+          <p class="text-sm text-blue-800">
+            This link provides view-only access. Recipients cannot edit the dashboard.
+          </p>
+        </div>
       </div>
 
-      <!-- Info Message -->
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-3">
-        <svg
-          class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <!-- Share with User Section -->
+      <div *ngIf="showUserShare" class="space-y-4">
+        <p class="text-gray-600 text-sm">Invite someone to collaborate on this dashboard:</p>
+
+        <!-- Email Input -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+          <input
+            type="email"
+            [(ngModel)]="userEmail"
+            placeholder="colleague@company.com"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
+
+        <!-- Permission Level -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Permission Level</label>
+          <div class="space-y-2">
+            <label
+              class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+              [class.border-blue-500]="selectedPermission === 'view'"
+              [class.bg-blue-50]="selectedPermission === 'view'"
+            >
+              <input
+                type="radio"
+                [(ngModel)]="selectedPermission"
+                value="view"
+                class="w-4 h-4 text-blue-600"
+              />
+              <div class="flex-1">
+                <p class="font-medium text-sm text-gray-900">Can View</p>
+                <p class="text-xs text-gray-500">Can view dashboard and widgets</p>
+              </div>
+              <svg
+                class="w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                ></path>
+              </svg>
+            </label>
+
+            <label
+              class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+              [class.border-blue-500]="selectedPermission === 'edit'"
+              [class.bg-blue-50]="selectedPermission === 'edit'"
+            >
+              <input
+                type="radio"
+                [(ngModel)]="selectedPermission"
+                value="edit"
+                class="w-4 h-4 text-blue-600"
+              />
+              <div class="flex-1">
+                <p class="font-medium text-sm text-gray-900">Can Edit</p>
+                <p class="text-xs text-gray-500">Can view and modify dashboard</p>
+              </div>
+              <svg
+                class="w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path>
+              </svg>
+            </label>
+          </div>
+        </div>
+
+        <!-- Share Button -->
+        <button
+          (click)="onShareWithUser()"
+          [disabled]="!userEmail.trim()"
+          class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          ></path>
-        </svg>
-        <p class="text-sm text-blue-800">
-          This link provides view-only access. Recipients cannot edit the dashboard.
-        </p>
+          Send Invitation
+        </button>
       </div>
     </div>
 
@@ -113,7 +243,7 @@
     <div class="bg-gray-50 px-6 py-4 flex justify-end rounded-b-xl">
       <button
         (click)="onClose()"
-        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium text-sm cursor-pointer"
+        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
       >
         Close
       </button>

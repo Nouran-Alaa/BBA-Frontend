@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Dashboard } from '../../../core/models/dashboard.model';
 import { ShareModalComponent } from '../share-modal/share-modal.component';
 import { ConfirmDeleteModalComponent } from '../confirm-delete-modal/confirm-delete-modal.component';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-dashboard-menu-modal',
@@ -12,7 +13,7 @@ import { ConfirmDeleteModalComponent } from '../confirm-delete-modal/confirm-del
   templateUrl: './dashboard-menu-modal.component.html',
   styleUrls: ['./dashboard-menu-modal.component.css'],
 })
-export class DashboardMenuModalComponent {
+export class DashboardMenuModalComponent implements OnInit {
   @Input() dashboard!: Dashboard;
   @Output() close = new EventEmitter<void>();
   @Output() rename = new EventEmitter<{ name: string; icon: string }>();
@@ -45,6 +46,8 @@ export class DashboardMenuModalComponent {
     '📕',
   ];
 
+  constructor(private toastService: ToastService) {}
+
   ngOnInit(): void {
     this.newName = this.dashboard.name;
     this.selectedIcon = this.dashboard.icon || '📊';
@@ -72,6 +75,12 @@ export class DashboardMenuModalComponent {
 
   onShare(): void {
     this.showShareModal = true;
+  }
+
+  onShareWithUser(data: { email: string; permission: string }): void {
+    console.log('Sharing dashboard with user:', data);
+    // TODO: Implement backend API call to share dashboard
+    this.toastService.success(`Dashboard shared with ${data.email}`);
   }
 
   onShareClose(): void {

@@ -171,7 +171,7 @@
       [dashboard]="selectedDashboardForMenu"
       (close)="showDashboardMenu = false"
       (rename)="onDashboardRename($event)"
-      (duplicate)="onDashboardDuplicate()"
+      (duplicate)="onDashboardDuplicate(selectedDashboardForMenu)"
       (delete)="onDashboardDelete()"
     >
     </app-dashboard-menu-modal>

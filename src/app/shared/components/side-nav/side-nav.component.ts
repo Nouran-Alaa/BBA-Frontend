@@ -25,6 +25,7 @@ export class SideNavComponent implements OnInit {
   showDashboardMenu: boolean = false;
   selectedDashboardForMenu: Dashboard | null = null;
   companyLogo: string | null = null;
+  activeMenu: string | null = null;
   fallbackLogo: string =
     'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%233b82f6" width="100" height="100"/><text x="50" y="50" font-size="40" fill="white" text-anchor="middle" dy=".3em">BB</text></svg>';
   currentUserRole: UserRole = UserRole.SuperAdmin;
@@ -194,19 +195,44 @@ export class SideNavComponent implements OnInit {
     this.showDashboardMenu = false;
   }
 
-  onDashboardDuplicate(): void {
-    if (this.selectedDashboardForMenu) {
-      const duplicated: Dashboard = {
-        ...this.selectedDashboardForMenu,
-        id: Date.now().toString(),
-        name: `${this.selectedDashboardForMenu.name} (Copy)`,
-        isDefault: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      this.dashboards.push(duplicated);
-      this.selectDashboard(duplicated.id);
+  onDashboardDuplicate(dashboard: Dashboard): void {
+    this.onDuplicateDashboard(dashboard);
+    this.activeMenu = null; // This will now work
+    this.showDashboardMenu = false;
+  }
+
+  onDuplicateDashboard(dashboard: Dashboard): void {
+    const duplicatedDashboard: Dashboard = {
+      ...dashboard,
+      id: Date.now().toString(),
+      name: `${dashboard.name} (Copy)`,
+      isDefault: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.dashboards.push(duplicatedDashboard);
+    this.activeDashboardId = duplicatedDashboard.id;
+
+    // Copy the widgets from the original dashboard
+    const originalWidgets = this.getDashboardWidgets(dashboard.id);
+    if (originalWidgets && originalWidgets.length > 0) {
+      console.log('Duplicating dashboard widgets:', originalWidgets);
+      this.templateService.setTemplateWidgets(duplicatedDashboard.id, originalWidgets);
     }
+
+    this.router.navigate(['/dashboard', duplicatedDashboard.id]);
+  }
+
+  getDashboardWidgets(dashboardId: string): any[] {
+    // Get widgets from dashboard container's storage
+    // This assumes the dashboard container stores widgets in localStorage or a service
+    const storedData = localStorage.getItem('dashboardsData');
+    if (storedData) {
+      const dashboardsData = JSON.parse(storedData);
+      return dashboardsData[dashboardId] || [];
+    }
+    return [];
   }
 
   onDashboardDelete(): void {
@@ -219,5 +245,7 @@ export class SideNavComponent implements OnInit {
         this.selectDashboard(this.dashboards[0].id);
       }
     }
+    this.showDashboardMenu = false;
+    this.activeMenu = null;
   }
 }
