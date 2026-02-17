@@ -71,6 +71,62 @@ export class DashboardGridComponent {
     document.body.style.cursor = this.getCursorStyle(direction);
   }
 
+  getCursorStyle(direction: string): string {
+    const cursors: { [key: string]: string } = {
+      n: 'ns-resize',
+      s: 'ns-resize',
+      e: 'ew-resize',
+      w: 'ew-resize',
+      ne: 'nesw-resize',
+      nw: 'nwse-resize',
+      se: 'nwse-resize',
+      sw: 'nesw-resize',
+    };
+    return cursors[direction] || 'default';
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent): void {
+    if (!this.resizingItem || !this.isEditMode) return;
+
+    const deltaX = event.clientX - this.startX;
+    const deltaY = event.clientY - this.startY;
+
+    const colWidth = 100;
+    const rowHeight = 120;
+
+    const colDelta = Math.round(deltaX / colWidth);
+    const rowDelta = Math.round(deltaY / rowHeight);
+
+    if (this.resizeDirection.includes('e')) {
+      this.resizingItem.colSpan = Math.max(1, Math.min(12, this.startColSpan + colDelta));
+    }
+    if (this.resizeDirection.includes('s')) {
+      this.resizingItem.rowSpan = Math.max(1, Math.min(6, this.startRowSpan + rowDelta));
+    }
+    if (this.resizeDirection.includes('w')) {
+      this.resizingItem.colSpan = Math.max(1, Math.min(12, this.startColSpan - colDelta));
+    }
+    if (this.resizeDirection.includes('n')) {
+      this.resizingItem.rowSpan = Math.max(1, Math.min(6, this.startRowSpan - rowDelta));
+    }
+  }
+
+  @HostListener('document:mouseup')
+  onMouseUp(): void {
+    if (this.resizingItem) {
+      this.itemsChange.emit(this.items);
+      this.resizingItem = null;
+      this.resizeDirection = '';
+      document.body.style.cursor = 'default';
+    }
+  }
+
+  toggleWidgetMenu(itemId: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.activeWidgetMenu = this.activeWidgetMenu === itemId ? null : itemId;
+  }
+
   onWidgetClick(item: GridItem): void {
     if (!this.isEditMode) {
       this.widgetClick.emit(item);
@@ -88,11 +144,6 @@ export class DashboardGridComponent {
   duplicateItem(itemId: string, event: MouseEvent): void {
     event.stopPropagation();
     this.itemDuplicate.emit(itemId);
-  }
-
-  toggleWidgetMenu(itemId: string, event: MouseEvent): void {
-    event.stopPropagation();
-    this.activeWidgetMenu = this.activeWidgetMenu === itemId ? null : itemId;
   }
 
   toggleChartDateMenu(itemId: string, event: MouseEvent): void {
@@ -155,57 +206,6 @@ export class DashboardGridComponent {
     // Close widget menu and date menu when clicking outside
     this.activeWidgetMenu = null;
     this.activeChartDateMenu = null;
-  }
-
-  @HostListener('document:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent): void {
-    if (!this.resizingItem || !this.isEditMode) return;
-
-    const deltaX = event.clientX - this.startX;
-    const deltaY = event.clientY - this.startY;
-
-    const colWidth = 100;
-    const rowHeight = 120;
-
-    const colDelta = Math.round(deltaX / colWidth);
-    const rowDelta = Math.round(deltaY / rowHeight);
-
-    if (this.resizeDirection.includes('e')) {
-      this.resizingItem.colSpan = Math.max(1, Math.min(12, this.startColSpan + colDelta));
-    }
-    if (this.resizeDirection.includes('s')) {
-      this.resizingItem.rowSpan = Math.max(1, Math.min(6, this.startRowSpan + rowDelta));
-    }
-    if (this.resizeDirection.includes('w')) {
-      this.resizingItem.colSpan = Math.max(1, Math.min(12, this.startColSpan - colDelta));
-    }
-    if (this.resizeDirection.includes('n')) {
-      this.resizingItem.rowSpan = Math.max(1, Math.min(6, this.startRowSpan - rowDelta));
-    }
-  }
-
-  @HostListener('document:mouseup')
-  onMouseUp(): void {
-    if (this.resizingItem) {
-      this.itemsChange.emit(this.items);
-      this.resizingItem = null;
-      this.resizeDirection = '';
-      document.body.style.cursor = 'default';
-    }
-  }
-
-  getCursorStyle(direction: string): string {
-    const cursors: { [key: string]: string } = {
-      n: 'ns-resize',
-      s: 'ns-resize',
-      e: 'ew-resize',
-      w: 'ew-resize',
-      ne: 'nesw-resize',
-      nw: 'nwse-resize',
-      se: 'nwse-resize',
-      sw: 'nesw-resize',
-    };
-    return cursors[direction] || 'default';
   }
 
   getGridColSpan(item: GridItem): string {
