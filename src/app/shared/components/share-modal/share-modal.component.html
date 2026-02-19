@@ -1,14 +1,18 @@
 <div
   class="fixed inset-0 z-[60] flex items-center justify-center p-4"
-  style="background-color: rgba(0, 0, 0, 0.75)"
+  style="background-color: rgba(0, 0, 0, 0.3)"
   (click)="onClose()"
 >
   <div
-    class="bg-white rounded-xl shadow-2xl max-w-md w-full animate-slideUp"
+    class="rounded-xl shadow-2xl max-w-md w-full animate-slideUp overflow-hidden"
+    style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
     (click)="$event.stopPropagation()"
   >
     <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white rounded-t-xl">
+    <div
+      class="px-6 py-4 text-white rounded-t-xl flex-shrink-0"
+      style="background: var(--accent-gradient)"
+    >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
@@ -23,12 +27,12 @@
           </div>
           <div>
             <h2 class="text-xl font-bold">Share Dashboard</h2>
-            <p class="text-sm text-blue-100">{{ dashboardName }}</p>
+            <p class="text-sm opacity-90">{{ dashboardName }}</p>
           </div>
         </div>
         <button
           (click)="onClose()"
-          class="w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+          class="w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center cursor-pointer"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -45,24 +49,20 @@
     <!-- Body -->
     <div class="p-6 space-y-4">
       <!-- Share Options Tabs -->
-      <div class="flex gap-2 border-b border-gray-200 pb-3">
+      <div class="flex gap-2 pb-0.5" style="border-bottom: 1px solid var(--border-subtle)">
         <button
           (click)="showUserShare = false"
-          [class.border-blue-600]="!showUserShare"
-          [class.text-blue-600]="!showUserShare"
-          [class.border-transparent]="showUserShare"
-          [class.text-gray-600]="showUserShare"
-          class="flex-1 pb-2 border-b-2 font-medium text-sm transition-colors"
+          class="flex-1 pb-2 border-b-2 font-medium text-sm transition-colors cursor-pointer"
+          [style.border-color]="!showUserShare ? 'var(--accent-primary)' : 'transparent'"
+          [style.color]="!showUserShare ? 'var(--accent-primary)' : 'var(--text-muted)'"
         >
           Share Link
         </button>
         <button
           (click)="showUserShare = true"
-          [class.border-blue-600]="showUserShare"
-          [class.text-blue-600]="showUserShare"
-          [class.border-transparent]="!showUserShare"
-          [class.text-gray-600]="!showUserShare"
-          class="flex-1 pb-2 border-b-2 font-medium text-sm transition-colors"
+          class="flex-1 pb-2 border-b-2 font-medium text-sm transition-colors cursor-pointer"
+          [style.border-color]="showUserShare ? 'var(--accent-primary)' : 'transparent'"
+          [style.color]="showUserShare ? 'var(--accent-primary)' : 'var(--text-muted)'"
         >
           Share with User
         </button>
@@ -70,7 +70,7 @@
 
       <!-- Share Link Section -->
       <div *ngIf="!showUserShare" class="space-y-4">
-        <p class="text-gray-600 text-sm">
+        <p class="text-sm" style="color: var(--text-secondary)">
           Anyone with this link can view this dashboard. Copy and share the link below:
         </p>
 
@@ -80,17 +80,21 @@
             type="text"
             [value]="shareUrl"
             readonly
-            class="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="flex-1 px-4 py-2 rounded-lg text-sm font-mono"
+            style="
+              background: var(--bg-input);
+              border: 1px solid var(--border-subtle);
+              color: var(--text-primary);
+            "
           />
           <button
             (click)="copyToClipboard()"
-            [class.bg-green-600]="copied"
-            [class.bg-blue-600]="!copied"
-            class="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-all font-medium text-sm flex items-center gap-2"
+            class="px-4 py-2 text-white rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-90"
+            [style.background]="copied ? '#4caf50' : 'var(--accent-gradient)'"
           >
             <svg
               *ngIf="!copied"
-              class="w-5 h-5"
+              class="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -121,9 +125,13 @@
         </div>
 
         <!-- Info Message -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-3">
+        <div
+          class="flex items-start gap-3 p-3 rounded-lg"
+          style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
+        >
           <svg
-            class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
+            class="w-5 h-5 flex-shrink-0 mt-0.5"
+            style="color: var(--accent-primary)"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -135,95 +143,69 @@
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path>
           </svg>
-          <p class="text-sm text-blue-800">
-            This link provides view-only access. Recipients cannot edit the dashboard.
+          <p class="text-sm" style="color: var(--text-secondary)">
+            View-only access. Recipients cannot edit.
           </p>
         </div>
       </div>
 
       <!-- Share with User Section -->
       <div *ngIf="showUserShare" class="space-y-4">
-        <p class="text-gray-600 text-sm">Invite someone to collaborate on this dashboard:</p>
+        <p class="text-sm" style="color: var(--text-secondary)">
+          Invite someone to collaborate on this dashboard:
+        </p>
 
         <!-- Email Input -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary)"
+            >Email Address</label
+          >
           <input
             type="email"
             [(ngModel)]="userEmail"
             placeholder="colleague@company.com"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            class="w-full px-4 py-2 rounded-lg text-sm"
+            style="
+              background: var(--bg-input);
+              border: 1px solid var(--border-subtle);
+              color: var(--text-primary);
+            "
           />
         </div>
 
         <!-- Permission Level -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Permission Level</label>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary)"
+            >Permission Level</label
+          >
           <div class="space-y-2">
             <label
-              class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-              [class.border-blue-500]="selectedPermission === 'view'"
-              [class.bg-blue-50]="selectedPermission === 'view'"
+              *ngFor="
+                let perm of [
+                  { value: 'view', label: 'Can View', desc: 'View dashboard and widgets' },
+                  { value: 'edit', label: 'Can Edit', desc: 'View and modify dashboard' },
+                ]
+              "
+              class="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors"
+              [style.border]="
+                '1px solid ' +
+                (selectedPermission === perm.value
+                  ? 'var(--accent-primary)'
+                  : 'var(--border-subtle)')
+              "
             >
               <input
                 type="radio"
                 [(ngModel)]="selectedPermission"
-                value="view"
-                class="w-4 h-4 text-blue-600"
+                [value]="perm.value"
+                class="w-4 h-4"
               />
-              <div class="flex-1">
-                <p class="font-medium text-sm text-gray-900">Can View</p>
-                <p class="text-xs text-gray-500">Can view dashboard and widgets</p>
+              <div class="flex-1 transition-opacity hover:opacity-90">
+                <p class="font-medium text-sm" style="color: var(--text-primary)">
+                  {{ perm.label }}
+                </p>
+                <p class="text-xs" style="color: var(--text-muted)">{{ perm.desc }}</p>
               </div>
-              <svg
-                class="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                ></path>
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                ></path>
-              </svg>
-            </label>
-
-            <label
-              class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-              [class.border-blue-500]="selectedPermission === 'edit'"
-              [class.bg-blue-50]="selectedPermission === 'edit'"
-            >
-              <input
-                type="radio"
-                [(ngModel)]="selectedPermission"
-                value="edit"
-                class="w-4 h-4 text-blue-600"
-              />
-              <div class="flex-1">
-                <p class="font-medium text-sm text-gray-900">Can Edit</p>
-                <p class="text-xs text-gray-500">Can view and modify dashboard</p>
-              </div>
-              <svg
-                class="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                ></path>
-              </svg>
             </label>
           </div>
         </div>
@@ -232,7 +214,8 @@
         <button
           (click)="onShareWithUser()"
           [disabled]="!userEmail.trim()"
-          class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full px-4 py-2 text-white rounded-lg font-medium cursor-pointer disabled:opacity-50 transition-opacity hover:opacity-90"
+          style="background: var(--accent-gradient)"
         >
           Send Invitation
         </button>
@@ -240,10 +223,18 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-gray-50 px-6 py-4 flex justify-end rounded-b-xl">
+    <div
+      class="px-6 py-4 flex justify-end rounded-b-xl"
+      style="border-top: 1px solid var(--border-subtle)"
+    >
       <button
         (click)="onClose()"
-        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+        class="px-6 py-2 rounded-lg font-medium cursor-pointer hover-glass transition-colors"
+        style="
+          background: var(--bg-overlay);
+          color: var(--text-secondary);
+          border: 1px solid var(--border-subtle);
+        "
       >
         Close
       </button>

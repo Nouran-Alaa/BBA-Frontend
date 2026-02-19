@@ -1,9 +1,10 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { TopNavComponent } from '../../shared/components/top-nav/top-nav.component';
 import { SideNavComponent } from '../../shared/components/side-nav/side-nav.component';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -17,6 +18,8 @@ export class MainLayoutComponent implements OnInit {
   isMobileView: boolean = false;
   isSideNavOpen: boolean = false;
   isSmallScreen: boolean = false;
+
+  constructor(public themeService: ThemeService) {}
 
   ngOnInit(): void {
     this.checkScreenSize();

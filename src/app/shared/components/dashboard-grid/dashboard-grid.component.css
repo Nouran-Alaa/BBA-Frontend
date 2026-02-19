@@ -23,7 +23,7 @@
 .resize-handle {
   position: absolute;
   background: transparent;
-  z-index: 15;
+  z-index: 10;
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -50,43 +50,30 @@
 }
 
 .resize-n {
-  top: -6px;
+  top: -2px;
+  border-top: 2px solid var(--accent-primary);
 }
 
 .resize-s {
-  bottom: -6px;
+  bottom: -2px;
+  border-bottom: 2px solid var(--accent-primary);
 }
 
 .resize-e {
-  right: -6px;
+  right: -2px;
+  border-right: 2px solid var(--accent-primary);
 }
 
 .resize-w {
-  left: -6px;
-}
-
-/* Show visual indicator on hover */
-.group:hover .resize-n,
-.group:hover .resize-s {
-  background: linear-gradient(
-    to bottom,
-    transparent 45%,
-    #3b82f6 45%,
-    #3b82f6 55%,
-    transparent 55%
-  );
-}
-
-.group:hover .resize-e,
-.group:hover .resize-w {
-  background: linear-gradient(to right, transparent 45%, #3b82f6 45%, #3b82f6 55%, transparent 55%);
+  left: -2px;
+  border-left: 2px solid var(--accent-primary);
 }
 
 /* Corner Handles */
 .resize-corner {
   width: 16px;
   height: 16px;
-  background: #3b82f6;
+  background: var(--accent-primary);
   border: 2px solid white;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);

@@ -4,3 +4,359 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================
+   THEME SYSTEM - Light + Dark
+   ============================================ */
+
+/* ---- LIGHT THEME ---- */
+:root,
+[data-theme='light'] {
+  --bg-primary: #e8f2f8;
+  --bg-card: rgba(255, 255, 255, 0.5);
+  --bg-card-hover: rgba(255, 255, 255, 0.75);
+  --bg-sidebar: rgb(215, 235, 248);
+  --bg-topnav: rgba(232, 244, 252, 0.6);
+  --bg-modal: rgb(240, 250, 255);
+  --bg-dropdown: rgba(245, 252, 255, 0.97);
+  --bg-input: rgba(255, 255, 255, 0.65);
+  --bg-overlay: rgba(200, 225, 245, 0.35);
+  --bg-hover: rgba(0, 153, 204, 0.08);
+
+  --border-glass: rgba(255, 255, 255, 0.65);
+  --border-subtle: rgba(0, 140, 190, 0.18);
+  --border-card: rgba(255, 255, 255, 0.6);
+
+  --accent-primary: #0099cc;
+  --accent-primary-hover: #007aaa;
+  --accent-secondary: #00bcd4;
+  --accent-tertiary: #4caf50;
+  --accent-warning: #f5a623;
+  --accent-danger: #e53935;
+  --accent-gradient: linear-gradient(135deg, #0099cc, #00bcd4);
+
+  --text-primary: #1a2e44;
+  --text-secondary: #2d4a63;
+  --text-muted: #4a6a85;
+  --text-on-accent: #ffffff;
+
+  --shadow-sm: 0 2px 8px rgba(0, 80, 140, 0.08);
+  --shadow-md: 0 4px 20px rgba(0, 80, 140, 0.13);
+  --shadow-lg: 0 8px 40px rgba(0, 80, 140, 0.2);
+  --shadow-card: 0 4px 20px rgba(0, 80, 140, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --shadow-dropdown: 0 8px 32px rgba(0, 80, 140, 0.18);
+
+  --glass-blur: blur(18px);
+  --glass-blur-heavy: blur(28px);
+  --glass-saturation: saturate(160%);
+}
+
+/* ---- DARK THEME ---- */
+[data-theme='dark'] {
+  --bg-primary: #080e1f;
+  --bg-card: rgba(15, 28, 65, 0.58);
+  --bg-card-hover: rgba(22, 40, 88, 0.72);
+  --bg-sidebar: rgb(8, 14, 38);
+  --bg-topnav: rgba(10, 16, 36, 0.75);
+  --bg-modal: rgb(10, 20, 55);
+  --bg-dropdown: rgba(12, 22, 58, 0.97);
+  --bg-input: rgba(255, 255, 255, 0.07);
+  --bg-overlay: rgba(0, 180, 255, 0.06);
+  --bg-hover: rgba(0, 200, 255, 0.08);
+
+  --border-glass: rgba(0, 200, 255, 0.16);
+  --border-subtle: rgba(0, 200, 255, 0.1);
+  --border-card: rgba(60, 140, 220, 0.16);
+
+  --accent-primary: #00c8ff;
+  --accent-primary-hover: #00aadd;
+  --accent-secondary: #00e5cc;
+  --accent-tertiary: #ff4d6d;
+  --accent-warning: #f5a623;
+  --accent-danger: #ff4d6d;
+  --accent-gradient: linear-gradient(135deg, #00c8ff, #00e5cc);
+
+  --text-primary: #e2f0ff;
+  --text-secondary: #a8c8e8;
+  --text-muted: #6a90b0;
+  --text-on-accent: #080e1f;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(0, 200, 255, 0.07);
+  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 200, 255, 0.12);
+
+  --glass-blur: blur(20px);
+  --glass-blur-heavy: blur(32px);
+  --glass-saturation: saturate(200%);
+}
+
+/* ============================================
+   BASE
+   ============================================ */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  color: var(--text-primary);
+  /* Scroll must work on body */
+  overflow: visible;
+}
+
+/* Single unified background - no double color */
+[data-theme='light'] body,
+body[data-theme='light'] {
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 20%, rgba(0, 188, 212, 0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 75%, rgba(76, 175, 80, 0.09) 0%, transparent 55%),
+    #e8f2f8;
+}
+
+[data-theme='dark'] body,
+body[data-theme='dark'] {
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 20%, rgba(0, 200, 255, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 85% 75%, rgba(0, 229, 204, 0.08) 0%, transparent 55%),
+    #080e1f;
+}
+
+/* ============================================
+   GLASS UTILITIES
+   ============================================ */
+.glass,
+.glass-nofilter {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-card) !important;
+  box-shadow: var(--shadow-card) !important;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s !important;
+}
+
+.glass {
+  backdrop-filter: var(--glass-blur) var(--glass-saturation) !important;
+  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation) !important;
+}
+
+.glass:hover,
+.glass-nofilter:hover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--border-glass) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.glass-heavy {
+  background: var(--bg-modal) !important;
+  backdrop-filter: var(--glass-blur-heavy) var(--glass-saturation) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) var(--glass-saturation) !important;
+  border: 1px solid var(--border-glass) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.glass-sidebar {
+  background: var(--bg-sidebar) !important;
+  border-right: 1px solid var(--border-glass) !important;
+}
+
+.glass-topnav {
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-glass) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Dropdowns - more opaque so they're visible */
+.glass-dropdown {
+  background: var(--bg-dropdown) !important;
+  backdrop-filter: var(--glass-blur-heavy) var(--glass-saturation) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) var(--glass-saturation) !important;
+  border: 1px solid var(--border-glass) !important;
+  box-shadow: var(--shadow-dropdown) !important;
+}
+
+/* ============================================
+   HOVER STATES - restore cursor and effects
+   ============================================ */
+button {
+  cursor: pointer;
+}
+
+.hover-glass:hover {
+  background: var(--bg-hover) !important;
+}
+
+/* ============================================
+   SCROLLBARS
+   ============================================ */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* ============================================
+   THEME TRANSITIONS (only colors, no layout)
+   ============================================ */
+body,
+body * {
+  transition-property: background-color, border-color, color, box-shadow, opacity;
+  transition-duration: 0.22s;
+  transition-timing-function: ease;
+}
+
+/* Exclude layout/transform transitions from being overridden */
+[cdkDrag],
+[cdkDragHandle],
+.resize-handle,
+.transition-transform,
+[class*='translate'],
+[class*='rotate'],
+[class*='scale'] {
+  transition-property: transform, opacity !important;
+}
+
+/* ============================================
+   COLOR OVERRIDES - Fix Tailwind conflicts
+   ============================================ */
+
+/* Background colors */
+.bg-white {
+  background: var(--bg-card) !important;
+}
+.bg-gray-50 {
+  background: var(--bg-secondary) !important;
+}
+.bg-gray-100 {
+  background: var(--bg-overlay) !important;
+}
+
+/* Text colors */
+.text-gray-800,
+.text-gray-900 {
+  color: var(--text-primary) !important;
+}
+.text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+.text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+.text-gray-500 {
+  color: var(--text-muted) !important;
+}
+.text-gray-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Border colors */
+.border-gray-200 {
+  border-color: var(--border-subtle) !important;
+}
+.border-gray-300 {
+  border-color: var(--border-glass) !important;
+}
+
+/* White bg components - make them glass */
+.bg-white.rounded-lg,
+.bg-white.rounded-xl {
+  background: var(--bg-card) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+}
+
+/* Only allow opacity/visibility transitions for dropdown open/close */
+.profile-dropdown {
+  transition: opacity 0.15s ease !important;
+}
+
+/* ============================================
+   DATE RANGE PICKER - ensure fixed position
+   ============================================ */
+app-date-range-picker {
+  display: block;
+}
+
+/* ============================================
+   DARK MODE - Chart/visualization backgrounds
+   ============================================ */
+[data-theme='dark'] .bg-gray-50.rounded-lg {
+  background: rgba(5, 10, 30, 0.7) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+/* ============================================
+   MODAL THEMED BACKGROUNDS
+   ============================================ */
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+[data-theme='dark'] .modal-backdrop {
+  background: rgba(0, 5, 20, 0.7);
+}
+
+/* ============================================
+   INPUTS THEMED
+   ============================================ */
+input,
+textarea,
+select {
+  background: var(--bg-input) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(0, 153, 204, 0.2) !important;
+}
+
+[data-theme='dark'] input:focus,
+[data-theme='dark'] textarea:focus {
+  box-shadow: 0 0 0 2px rgba(0, 200, 255, 0.2) !important;
+}
+
+/* ============================================
+   THEME SMOOTH TRANSITION (colors only, no layout)
+   ============================================ */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+}
+
+/* EXCLUDE things that should not animate */
+.no-theme-transition,
+.no-theme-transition *,
+[cdkDrag],
+[cdkDragHandle],
+.resize-handle {
+  transition-property: none !important;
+}

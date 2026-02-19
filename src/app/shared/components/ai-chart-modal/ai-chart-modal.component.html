@@ -1,20 +1,23 @@
 <div
   class="fixed inset-0 z-50 flex items-center justify-center p-4"
-  style="background-color: rgba(0, 0, 0, 0.5)"
+  style="background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px)"
   (click)="onClose()"
 >
   <div
-    class="bg-white rounded-2xl shadow-2xl overflow-hidden animate-slideUp flex w-full max-w-[1080px]"
-    style="height: 85vh"
+    class="rounded-2xl shadow-2xl overflow-hidden animate-slideUp flex w-full max-w-[1080px] h-[86vh]"
+    style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
     (click)="$event.stopPropagation()"
   >
     <!-- Template Selection View -->
     <div *ngIf="!showChat" class="flex-1 flex flex-col">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white flex-shrink-0">
+      <div class="px-6 py-4 text-white flex-shrink-0" style="background: var(--accent-gradient)">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+            <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center"
+              style="background: rgba(255, 255, 255, 0.2)"
+            >
               <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -26,12 +29,13 @@
             </div>
             <div>
               <h2 class="text-2xl font-bold">Add Card</h2>
-              <p class="text-sm text-blue-100">Choose a template or create custom</p>
+              <p class="text-sm opacity-90">Choose a template or create custom</p>
             </div>
           </div>
           <button
             (click)="onClose()"
-            class="w-10 h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+            class="w-10 h-10 rounded-lg transition-colors flex items-center justify-center cursor-pointer hover:bg-white/20"
+            style="background: rgba(255, 255, 255, 0.1)"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -44,11 +48,11 @@
           </button>
         </div>
 
-        <!-- Search and Categories -->
-        <div class="mt-4 space-y-3">
+        <!-- Search Bar -->
+        <div class="mt-4">
           <div class="relative">
             <svg
-              class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/60"
+              class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -64,50 +68,68 @@
               type="text"
               [(ngModel)]="searchQuery"
               placeholder="Search templates..."
-              class="w-full pl-10 pr-4 py-2.5 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:bg-white/30 transition-all"
+              class="w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-white/70 focus:outline-none transition-all font-medium"
+              style="
+                background: rgba(255, 255, 255, 0.25);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+              "
             />
-          </div>
-          <div class="flex gap-2 flex-wrap">
-            <button
-              *ngFor="let cat of categories"
-              (click)="selectedCategory = cat"
-              [class.bg-white]="selectedCategory === cat"
-              [class.text-blue-600]="selectedCategory === cat"
-              [class.bg-white/20]="selectedCategory !== cat"
-              class="px-4 py-2 rounded-lg font-medium text-sm transition-all"
-            >
-              {{ cat }}
-            </button>
           </div>
         </div>
       </div>
 
-      <!-- Templates Grid - 3 Per Row -->
-      <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
+      <!-- Categories - Outside Header -->
+      <div
+        class="px-6 py-3 flex-shrink-0"
+        style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-card)"
+      >
+        <div class="flex gap-2 overflow-x-auto">
+          <button
+            *ngFor="let cat of categories"
+            (click)="selectedCategory = cat"
+            class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all cursor-pointer"
+            [style.background]="
+              selectedCategory === cat ? 'var(--accent-gradient)' : 'var(--bg-overlay)'
+            "
+            [style.color]="
+              selectedCategory === cat ? 'var(--text-on-accent)' : 'var(--text-primary)'
+            "
+            [style.border]="
+              '1px solid ' + (selectedCategory === cat ? 'transparent' : 'var(--border-subtle)')
+            "
+          >
+            {{ cat }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Templates Grid -->
+      <div class="flex-1 overflow-y-auto p-6" style="background: var(--bg-secondary)">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           <button
             *ngFor="let template of getFilteredTemplates()"
             (click)="selectTemplate(template)"
-            class="bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:border-blue-400 hover:shadow-xl transition-all text-left group flex flex-col h-full"
+            class="glass rounded-xl overflow-hidden transition-all text-left group flex flex-col h-full cursor-pointer"
+            style="border: 2px solid var(--border-subtle)"
+            onmouseover="
+              this.style.borderColor = 'var(--accent-primary)';
+              this.style.transform = 'translateY(-4px)';
+              this.style.boxShadow = 'var(--shadow-lg)';
+            "
+            onmouseout="
+              this.style.borderColor = 'var(--border-subtle)';
+              this.style.transform = 'translateY(0)';
+              this.style.boxShadow = 'none';
+            "
           >
-            <!-- Chart Preview Image -->
+            <!-- Chart Preview -->
             <div
-              class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 flex items-center justify-center relative"
-              style="height: 200px"
+              class="p-6 flex items-center justify-center relative"
+              style="height: 180px; background: var(--bg-overlay)"
             >
-              <img
-                *ngIf="template.preview !== 'custom'"
-                [src]="'/assets/chart-previews/' + template.preview + '.png'"
-                [alt]="template.title"
-                class="max-w-full max-h-full object-contain"
-                onerror="
-                  this.style.display = 'none';
-                  this.nextElementSibling.style.display = 'flex';
-                "
-              />
-              <!-- Fallback SVG -->
               <svg
-                class="w-24 h-24 text-blue-600 hidden"
+                class="w-24 h-24 transition-transform group-hover:scale-110"
+                style="color: var(--accent-primary)"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -119,10 +141,9 @@
                   [attr.d]="getPreviewSVG(template.preview)"
                 ></path>
               </svg>
-
-              <!-- Chart Type Badge -->
               <span
-                class="absolute top-3 right-3 px-2 py-1 bg-purple-600 text-white text-[10px] font-semibold rounded shadow"
+                class="absolute top-3 right-3 px-2 py-1 text-[10px] font-semibold rounded shadow text-white"
+                style="background: var(--accent-gradient)"
               >
                 {{ template.chartType }}
               </span>
@@ -134,29 +155,37 @@
                 <span class="text-3xl flex-shrink-0">{{ template.icon }}</span>
                 <div class="flex-1 min-w-0">
                   <h3
-                    class="font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors"
+                    class="font-semibold mb-1 group-hover:text-blue-600 transition-colors"
+                    style="color: var(--text-primary)"
                   >
                     {{ template.title }}
                   </h3>
-                  <p class="text-xs text-gray-600 line-clamp-2">{{ template.description }}</p>
+                  <p class="text-xs line-clamp-2" style="color: var(--text-secondary)">
+                    {{ template.description }}
+                  </p>
                 </div>
               </div>
 
-              <!-- Example Prompt -->
-              <div class="mt-auto pt-3 border-t border-gray-100">
-                <p class="text-[10px] text-gray-500 italic line-clamp-1">
+              <div class="mt-auto pt-3" style="border-top: 1px solid var(--border-subtle)">
+                <p class="text-[10px] italic line-clamp-1" style="color: var(--text-muted)">
                   "{{ template.examplePrompts[0] }}"
                 </p>
               </div>
 
-              <!-- Category Badge -->
               <div class="mt-2">
-                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-medium rounded">
+                <span
+                  class="px-2 py-1 text-[10px] font-medium rounded"
+                  style="background: var(--bg-overlay); color: var(--text-muted)"
+                >
                   {{ template.category }}
                 </span>
               </div>
             </div>
           </button>
+        </div>
+
+        <div *ngIf="getFilteredTemplates().length === 0" class="text-center py-16">
+          <p style="color: var(--text-muted)">No templates found</p>
         </div>
       </div>
     </div>
@@ -164,11 +193,12 @@
     <!-- Chat View -->
     <div *ngIf="showChat" class="flex-1 flex flex-col">
       <!-- Chat Header -->
-      <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-white flex-shrink-0">
+      <div class="px-4 py-3 text-white flex-shrink-0" style="background: var(--accent-gradient)">
         <div class="flex items-center gap-3">
           <button
             (click)="backToTemplates()"
-            class="w-9 h-9 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+            class="w-9 h-9 rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+            style="background: rgba(255, 255, 255, 0.15)"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -183,12 +213,13 @@
             <span class="text-2xl">{{ selectedTemplate?.icon }}</span>
             <div class="min-w-0">
               <h2 class="text-lg font-bold truncate">{{ selectedTemplate?.title }}</h2>
-              <p class="text-xs text-blue-100">{{ selectedTemplate?.chartType }}</p>
+              <p class="text-xs opacity-90">{{ selectedTemplate?.chartType }}</p>
             </div>
           </div>
           <button
             (click)="onClose()"
-            class="w-9 h-9 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center flex-shrink-0"
+            class="w-9 h-9 rounded-lg transition-colors flex items-center justify-center flex-shrink-0 cursor-pointer"
+            style="background: rgba(255, 255, 255, 0.15)"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -202,19 +233,20 @@
         </div>
       </div>
 
-      <!-- Chat Messages Area -->
-      <div class="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-4">
-        <div *ngFor="let message of chatMessages; let i = index">
-          <!-- User or Assistant Message -->
+      <!-- Chat Messages -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-4" style="background: var(--bg-secondary)">
+        <div *ngFor="let message of chatMessages">
           <div [class.flex-row-reverse]="message.role === 'user'" class="flex gap-3">
             <div
               class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-              [class.bg-blue-600]="message.role === 'user'"
-              [class.bg-white]="message.role === 'assistant'"
+              [style.background]="
+                message.role === 'user' ? 'var(--accent-gradient)' : 'var(--bg-card)'
+              "
             >
               <svg
                 *ngIf="message.role === 'assistant'"
-                class="w-5 h-5 text-gray-600"
+                class="w-5 h-5"
+                style="color: var(--text-muted)"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -243,44 +275,42 @@
             </div>
             <div class="flex-1 max-w-[85%]">
               <div
-                [class.bg-blue-600]="message.role === 'user'"
-                [class.text-white]="message.role === 'user'"
-                [class.bg-white]="message.role === 'assistant'"
-                [class.shadow]="message.role === 'assistant'"
-                class="px-4 py-2.5 rounded-2xl"
+                class="px-4 py-2.5 rounded-2xl shadow-sm"
+                [style.background]="
+                  message.role === 'user' ? 'var(--accent-gradient)' : 'var(--bg-card)'
+                "
+                [style.color]="
+                  message.role === 'user' ? 'var(--text-on-accent)' : 'var(--text-primary)'
+                "
               >
                 <p class="text-sm">{{ message.content }}</p>
               </div>
 
-              <!-- Chart Preview After Assistant Message -->
+              <!-- Chart Preview -->
               <div
                 *ngIf="message.role === 'assistant' && message.preview"
-                class="mt-3 bg-white rounded-xl shadow-lg p-4 border-2 border-gray-200"
+                class="mt-3 glass rounded-xl p-4"
+                style="border: 2px solid var(--border-subtle)"
               >
                 <div class="flex items-center justify-between mb-3">
-                  <h4 class="font-semibold text-sm text-gray-800">Chart Preview</h4>
+                  <h4 class="font-semibold text-sm" style="color: var(--text-primary)">
+                    Chart Preview
+                  </h4>
                   <button
                     (click)="addPreviewToDashboard(message.preview)"
-                    class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer text-white"
+                    style="background: var(--accent-gradient); box-shadow: var(--shadow-sm)"
                   >
                     Add to Dashboard
                   </button>
                 </div>
                 <div
-                  class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6 flex items-center justify-center"
-                  style="height: 200px"
+                  class="rounded-lg p-6 flex items-center justify-center"
+                  style="height: 200px; background: var(--bg-overlay)"
                 >
-                  <img
-                    [src]="'/assets/chart-previews/' + message.preview.type + '.png'"
-                    [alt]="message.preview.title"
-                    class="max-w-full max-h-full object-contain"
-                    onerror="
-                      this.style.display = 'none';
-                      this.nextElementSibling.style.display = 'flex';
-                    "
-                  />
                   <svg
-                    class="w-20 h-20 text-blue-600 hidden"
+                    class="w-20 h-20"
+                    style="color: var(--accent-primary)"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -300,10 +330,14 @@
 
         <!-- Loading -->
         <div *ngIf="isGenerating" class="flex gap-3">
-          <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow">
+          <div
+            class="w-8 h-8 rounded-full flex items-center justify-center shadow"
+            style="background: var(--bg-card)"
+          >
             <div class="animate-spin">
               <svg
-                class="w-4 h-4 text-gray-600"
+                class="w-4 h-4"
+                style="color: var(--text-muted)"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -317,23 +351,39 @@
               </svg>
             </div>
           </div>
-          <div class="bg-white px-4 py-2.5 rounded-2xl shadow">
-            <p class="text-sm text-gray-600">Generating chart...</p>
+          <div class="px-4 py-2.5 rounded-2xl shadow" style="background: var(--bg-card)">
+            <p class="text-sm" style="color: var(--text-secondary)">Generating chart...</p>
           </div>
         </div>
       </div>
 
-      <!-- Quick Examples (First Message) -->
+      <!-- Quick Examples -->
       <div
         *ngIf="chatMessages.length === 1 && selectedTemplate"
-        class="px-4 py-2 bg-white border-t border-gray-200 flex-shrink-0"
+        class="px-4 py-2 flex-shrink-0"
+        style="background: var(--bg-card); border-top: 1px solid var(--border-subtle)"
       >
-        <p class="text-xs font-medium text-gray-600 mb-2">Quick examples:</p>
+        <p class="text-xs font-medium mb-2" style="color: var(--text-secondary)">Quick examples:</p>
         <div class="flex gap-2 flex-wrap">
           <button
             *ngFor="let prompt of selectedTemplate.examplePrompts.slice(0, 3)"
             (click)="useExamplePrompt(prompt)"
-            class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs hover:bg-blue-100 transition-colors"
+            class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer"
+            style="
+              background: var(--bg-overlay);
+              color: var(--text-primary);
+              border: 1px solid var(--border-subtle);
+            "
+            onmouseover="
+              this.style.background = 'var(--accent-gradient)';
+              this.style.color = 'var(--text-on-accent)';
+              this.style.borderColor = 'transparent';
+            "
+            onmouseout="
+              this.style.background = 'var(--bg-overlay)';
+              this.style.color = 'var(--text-primary)';
+              this.style.borderColor = 'var(--border-subtle)';
+            "
           >
             {{ prompt }}
           </button>
@@ -341,21 +391,30 @@
       </div>
 
       <!-- Chat Input -->
-      <div class="border-t border-gray-200 p-3 bg-white flex-shrink-0">
+      <div
+        class="p-3 flex-shrink-0"
+        style="border-top: 1px solid var(--border-subtle); background: var(--bg-card)"
+      >
         <div class="flex gap-2 items-end">
           <textarea
             [(ngModel)]="userMessage"
             (keydown.enter)="handleEnterKey($event)"
             placeholder="Describe what you want..."
             rows="1"
-            class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm max-h-32"
             [disabled]="isGenerating"
-            style="min-height: 42px"
+            class="flex-1 px-3 py-2 rounded-xl focus:outline-none resize-none text-sm max-h-32"
+            style="
+              min-height: 42px;
+              background: var(--bg-input);
+              border: 1px solid var(--border-subtle);
+              color: var(--text-primary);
+            "
           ></textarea>
           <button
             (click)="sendMessage()"
             [disabled]="!userMessage.trim() || isGenerating"
-            class="h-[42px] px-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            class="h-[42px] px-5 rounded-xl font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer text-white"
+            style="background: var(--accent-gradient)"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path

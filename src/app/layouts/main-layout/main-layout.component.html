@@ -1,10 +1,14 @@
-<div class="flex h-screen overflow-hidden bg-gray-50">
+<div class="flex h-screen overflow-hidden" [attr.data-theme]="themeService.theme$ | async">
   <!-- Mobile Backdrop Overlay -->
   <div
     *ngIf="isSideNavOpen && isMobileView"
     (click)="toggleSideNav()"
     class="fixed inset-0 z-40 lg:hidden animate-fadeIn"
-    style="background-color: rgba(0, 0, 0, 0.5)"
+    style="
+      background-color: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    "
   ></div>
 
   <!-- Sidebar - Mobile & Desktop -->
@@ -17,7 +21,7 @@
       'w-20': isSideNavCollapsed && !isMobileView,
       'w-64': !isSideNavCollapsed || isMobileView,
     }"
-    class="bg-gradient-to-b from-gray-900 to-gray-800 transition-all duration-300 ease-in-out"
+    class="glass-sidebar transition-all duration-300 ease-in-out overflow-visible"
   >
     <app-side-nav [collapsed]="isSideNavCollapsed && !isMobileView" (toggle)="toggleSideNav()">
     </app-side-nav>
@@ -26,12 +30,12 @@
   <!-- Main Content Area -->
   <div class="flex flex-col flex-1 overflow-hidden min-w-0">
     <!-- Top Navigation -->
-    <header class="bg-white shadow-sm z-30 flex-shrink-0">
+    <header class="glass-topnav z-30 flex-shrink-0">
       <app-top-nav (menuToggle)="toggleSideNav()"></app-top-nav>
     </header>
 
     <!-- Main Dashboard Content -->
-    <main class="flex-1 overflow-hidden bg-gray-50">
+    <main class="flex-1 overflow-hidden" style="background: transparent">
       <router-outlet></router-outlet>
     </main>
   </div>

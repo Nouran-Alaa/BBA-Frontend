@@ -1,19 +1,20 @@
-<div class="h-full bg-gray-50 flex flex-col">
+<div class="h-full flex flex-col" style="background: transparent">
   <!-- Top Action Bar -->
-  <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-4 flex-shrink-0">
+  <div class="glass-topnav px-4 md:px-6 py-4 flex-shrink-0">
     <div class="flex items-center justify-between gap-3">
       <!-- Left: Dashboard Title + Edit Mode Toggle -->
       <div class="flex items-center gap-3 flex-1 min-w-0">
-        <h1 class="text-xl md:text-2xl font-bold text-gray-800 truncate">Dashboard</h1>
+        <h1 class="text-xl md:text-2xl font-bold truncate" style="color: var(--text-primary)">
+          Dashboard
+        </h1>
 
         <!-- Edit Mode Toggle -->
         <button
           (click)="toggleEditMode()"
-          [class.bg-blue-600]="isEditMode"
-          [class.text-white]="isEditMode"
-          [class.bg-gray-100]="!isEditMode"
-          [class.text-gray-700]="!isEditMode"
-          class="px-3 md:px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 hover:shadow-md flex items-center gap-2 flex-shrink-0"
+          class="px-3 md:px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 hover:shadow-md flex items-center gap-2 flex-shrink-0 cursor-pointer"
+          [style.background]="isEditMode ? 'var(--accent-gradient)' : 'var(--bg-overlay)'"
+          [style.color]="isEditMode ? 'var(--text-on-accent)' : 'var(--text-primary)'"
+          [style.border]="'1px solid ' + (isEditMode ? 'transparent' : 'var(--border-subtle)')"
           [title]="isEditMode ? 'Done' : 'Edit Layout'"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,10 +33,21 @@
       <div class="relative flex-shrink-0" #datePickerContainer>
         <button
           (click)="toggleDatePicker()"
-          class="flex items-center gap-2 px-3 md:px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none cursor-pointer hover-glass"
+          style="
+            background: var(--bg-overlay);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+          "
           [title]="getFormattedDateRange()"
         >
-          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5"
+            style="color: var(--accent-primary)"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -43,15 +55,14 @@
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             ></path>
           </svg>
-          <span class="text-sm font-medium text-gray-700 hidden md:inline">{{
-            getFormattedDateRange()
-          }}</span>
+          <span class="text-sm font-medium hidden md:inline">{{ getFormattedDateRange() }}</span>
           <svg
-            class="w-4 h-4 text-gray-500 transition-transform hidden md:inline"
+            class="w-4 h-4 transition-transform hidden md:inline"
             [class.rotate-180]="isDatePickerOpen"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            style="color: var(--text-muted)"
           >
             <path
               stroke-linecap="round"
@@ -62,7 +73,10 @@
           </svg>
         </button>
 
-        <div *ngIf="isDatePickerOpen" class="absolute right-0 mt-2 z-50 animate-fadeIn">
+        <div
+          *ngIf="isDatePickerOpen"
+          class="absolute right-0 mt-2 z-50 glass-dropdown rounded-xl overflow-hidden animate-fadeIn"
+        >
           <app-date-range-picker (dateRangeChange)="onDateRangeChange($event)">
           </app-date-range-picker>
         </div>
@@ -86,17 +100,19 @@
       >
       </app-dashboard-grid>
 
-      <!-- Add Card Button - With Top Margin -->
-      <div class="mt-6 sm:mt-8">
+      <!-- Add Card Button -->
+      <div class="mt-6 sm:mt-8 pb-6">
         <button
           (click)="openAiChat()"
-          class="w-full bg-white rounded-lg shadow-sm border-2 border-dashed border-gray-300 p-4 sm:p-6 hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-200 group cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
+          class="w-full glass rounded-xl p-4 sm:p-6 transition-all duration-200 group cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
+          style="border: 2px dashed var(--border-subtle) !important"
         >
           <div
-            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200 group-hover:scale-110 flex-shrink-0"
+            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-110"
+            style="background: var(--accent-gradient); box-shadow: var(--shadow-md)"
           >
             <svg
-              class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
+              class="w-5 h-5 sm:w-6 sm:h-6 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -111,11 +127,12 @@
           </div>
           <div class="text-center sm:text-left">
             <p
-              class="text-base sm:text-lg font-semibold text-gray-700 group-hover:text-blue-700 transition-colors"
+              class="text-base sm:text-lg font-semibold transition-colors"
+              style="color: var(--text-primary)"
             >
               Add New Card
             </p>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">
+            <p class="text-xs sm:text-sm mt-1" style="color: var(--text-muted)">
               Use AI to generate charts and analytics widgets
             </p>
           </div>

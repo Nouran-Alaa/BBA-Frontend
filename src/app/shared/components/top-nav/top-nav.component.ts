@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-top-nav',
@@ -27,10 +28,13 @@ export class TopNavComponent {
     name: 'John Doe',
     email: 'john.doe@example.com',
     role: 'SuperAdmin',
-    profileImage: 'https://ui-avatars.com/api/?name=John+Doe&background=3b82f6&color=fff',
+    profileImage: 'https://ui-avatars.com/api/?name=John+Doe&background=0099cc&color=fff',
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    public themeService: ThemeService,
+  ) {}
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {

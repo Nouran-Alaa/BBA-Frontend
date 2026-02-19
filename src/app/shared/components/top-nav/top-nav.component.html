@@ -18,26 +18,67 @@
     </button>
 
     <!-- Company Name/Logo (Visible on Mobile when sidebar is closed) -->
-    <div
-      class="flex items-center gap-2 lg:hidden hover:bg-gray-700 cursor-pointer transition-colors"
-      routerLink="/dashboard"
-    >
-      <span class="text-xl font-bold text-gray-800">BigBrother</span>
-      <span class="text-xs text-gray-500">Analytics</span>
+    <div class="flex items-center gap-2 cursor-pointer" routerLink="/dashboard">
+      <span
+        class="text-xl lg:text-2xl font-bold"
+        style="color: var(--text-primary); text-shadow: var(--shadow-sm)"
+        >BigBrother</span
+      >
+      <span class="text-sm lg:text-base mt-1" style="color: var(--text-muted)">Analytics</span>
     </div>
-
-    <!-- Page Title (Desktop Only) -->
-    <h1 class="text-xl font-semibold text-gray-800 hidden lg:block">BigBrother Analytics</h1>
   </div>
 
   <!-- Right Section: User Profile & Actions -->
   <div class="flex items-center gap-4">
+    <!-- Theme Toggle -->
+    <button
+      (click)="themeService.toggleTheme()"
+      class="btn-ghost w-9 h-9 rounded-lg flex items-center justify-center transition-all"
+      [title]="
+        (themeService.theme$ | async) === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'
+      "
+    >
+      <!-- Sun icon (show in dark mode) -->
+      <svg
+        *ngIf="(themeService.theme$ | async) === 'dark'"
+        class="w-5 h-5"
+        style="color: var(--accent-primary)"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+        ></path>
+      </svg>
+      <!-- Moon icon (show in light mode) -->
+      <svg
+        *ngIf="(themeService.theme$ | async) !== 'dark'"
+        class="w-5 h-5"
+        style="color: var(--accent-primary)"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+        ></path>
+      </svg>
+    </button>
+
     <!-- User Profile Dropdown -->
     <div class="relative" #profileDropdown>
       <!-- Profile Button -->
       <button
         (click)="toggleProfileMenu()"
-        class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+        class="flex items-center gap-3 p-2 rounded-lg transition-colors cursor-pointer hover-glass"
+        style="color: var(--text-primary)"
         aria-label="User Menu"
       >
         <!-- User Avatar -->
@@ -49,8 +90,13 @@
 
         <!-- User Info (Hidden on mobile) -->
         <div class="hidden md:block text-left">
-          <p class="text-sm font-medium text-gray-800">{{ currentUser.name }}</p>
-          <p class="text-xs text-gray-500">{{ currentUser.role }}</p>
+          <p
+            class="text-sm font-medium"
+            style="color: var(--text-primary); text-shadow: var(--shadow-sm)"
+          >
+            {{ currentUser.name }}
+          </p>
+          <p class="text-xs" style="color: var(--text-muted)">{{ currentUser.role }}</p>
         </div>
 
         <!-- Dropdown Arrow -->
@@ -73,20 +119,31 @@
       <!-- Dropdown Menu -->
       <div
         *ngIf="isProfileMenuOpen"
-        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 animate-fadeIn"
+        class="absolute right-0 mt-2 w-56 glass-dropdown rounded-xl z-50 animate-fadeIn"
       >
         <!-- User Info in Dropdown (Mobile View) -->
-        <div class="px-4 py-3 border-b border-gray-100 md:hidden">
-          <p class="text-sm font-medium text-gray-800">{{ currentUser.name }}</p>
-          <p class="text-xs text-gray-500">{{ currentUser.email }}</p>
+        <div class="px-4 py-3 border-b border-gray-200 md:hidden">
+          <p
+            class="text-sm font-medium"
+            style="color: var(--text-primary); text-shadow: var(--shadow-sm)"
+          >
+            {{ currentUser.name }}
+          </p>
+          <p class="text-xs" style="color: var(--text-muted)">{{ currentUser.email }}</p>
         </div>
 
         <!-- Menu Items -->
         <a
           (click)="goToProfile()"
-          class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+          class="flex items-center gap-3 px-4 py-4 text-sm text-gray-700 hover-glass transition-colors duration-150 cursor-pointer"
         >
-          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5"
+            style="color: var(--text-muted)"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -98,12 +155,12 @@
         </a>
 
         <!-- Divider -->
-        <div class="border-t border-gray-100 my-2"></div>
+        <div class="border-t border-gray-200"></div>
 
         <!-- Logout -->
         <button
           (click)="logout()"
-          class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 w-full text-left cursor-pointer"
+          class="flex items-center gap-3 px-4 py-4 text-sm text-red-600 rounded-b-xl hover:bg-red-100/20 transition-colors duration-150 w-full text-left cursor-pointer"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

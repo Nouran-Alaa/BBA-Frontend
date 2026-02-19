@@ -4,23 +4,26 @@
   (click)="onClose()"
 >
   <div
-    class="bg-white rounded-none sm:rounded-xl shadow-2xl w-full max-w-6xl h-screen sm:max-h-[90vh] overflow-hidden animate-slideUp flex flex-col"
+    class="rounded-none sm:rounded-xl shadow-2xl w-full max-w-6xl h-screen sm:max-h-[90vh] overflow-hidden animate-slideUp flex flex-col"
+    style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
     (click)="$event.stopPropagation()"
   >
     <!-- Header -->
     <div
-      class="bg-gradient-to-r from-blue-600 to-purple-600 px-4 sm:px-6 py-4 text-white flex-shrink-0"
+      class="px-4 sm:px-6 py-4 text-white flex-shrink-0"
+      style="background: var(--accent-gradient)"
     >
       <div class="flex items-center justify-between mb-3">
         <div>
           <h2 class="text-xl sm:text-2xl font-bold">Choose a Template</h2>
-          <p class="text-xs sm:text-sm text-blue-100 mt-1">
+          <p class="text-xs sm:text-sm opacity-90 mt-1">
             Start with a pre-built dashboard or create your own
           </p>
         </div>
         <button
           (click)="onClose()"
-          class="w-10 h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+          class="w-10 h-10 rounded-lg transition-colors flex items-center justify-center cursor-pointer hover-glass"
+          style="background: rgba(255, 255, 255, 0.15)"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -36,7 +39,7 @@
       <!-- Search Bar -->
       <div class="relative">
         <svg
-          class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/60"
+          class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 opacity-70"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -52,22 +55,31 @@
           type="text"
           [(ngModel)]="searchQuery"
           placeholder="Search templates..."
-          class="w-full pl-10 pr-4 py-2.5 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:bg-white/30 transition-all"
+          class="w-full pl-10 pr-4 py-2.5 rounded-lg text-white placeholder-white/60 focus:outline-none transition-all"
+          style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2)"
         />
       </div>
     </div>
 
     <!-- Categories -->
-    <div class="border-b border-gray-200 px-4 sm:px-6 py-3 bg-gray-50 flex-shrink-0">
+    <div
+      class="px-4 sm:px-6 py-3 flex-shrink-0"
+      style="border-bottom: 1px solid var(--border-subtle)"
+    >
       <div class="flex gap-2 overflow-x-auto">
         <button
           *ngFor="let category of categories"
           (click)="selectedCategory = category"
-          [class.bg-blue-600]="selectedCategory === category"
-          [class.text-white]="selectedCategory === category"
-          [class.bg-white]="selectedCategory !== category"
-          [class.text-gray-700]="selectedCategory !== category"
-          class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all hover:shadow-md"
+          class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all cursor-pointer"
+          [style.background]="
+            selectedCategory === category ? 'var(--accent-gradient)' : 'var(--bg-overlay)'
+          "
+          [style.color]="
+            selectedCategory === category ? 'var(--text-on-accent)' : 'var(--text-primary)'
+          "
+          [style.border]="
+            '1px solid ' + (selectedCategory === category ? 'transparent' : 'var(--border-subtle)')
+          "
         >
           {{ category }}
         </button>
@@ -80,21 +92,36 @@
         <button
           *ngFor="let template of getFilteredTemplates()"
           (click)="template.id === 'blank' ? onSelectTemplate(template) : showPreview(template)"
-          class="text-left p-4 sm:p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all bg-white flex flex-col h-full"
+          class="text-left p-4 sm:p-6 rounded-lg transition-all cursor-pointer flex flex-col h-full"
+          style="background: var(--bg-card); border: 2px solid var(--border-subtle)"
+          onmouseover="
+            this.style.borderColor = 'var(--accent-primary)';
+            this.style.boxShadow = 'var(--shadow-md)';
+          "
+          onmouseout="
+            this.style.borderColor = 'var(--border-subtle)';
+            this.style.boxShadow = 'none';
+          "
         >
           <div class="flex items-start justify-between mb-3">
             <span class="text-3xl sm:text-4xl">{{ template.icon }}</span>
-            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+            <span
+              class="px-2 py-1 text-xs rounded-full"
+              style="background: var(--bg-overlay); color: var(--text-muted)"
+            >
               {{ template.category }}
             </span>
           </div>
-          <h3 class="font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
-            {{ template.name }}
-          </h3>
-          <p class="text-sm text-gray-600 mb-3 flex-1">{{ template.description }}</p>
+          <h3 class="font-semibold mb-2" style="color: var(--text-primary)">{{ template.name }}</h3>
+          <p class="text-sm mb-3 flex-1" style="color: var(--text-secondary)">
+            {{ template.description }}
+          </p>
 
           <!-- Widget Count -->
-          <div class="flex items-center gap-2 text-xs text-gray-500 pt-3 border-t border-gray-100">
+          <div
+            class="flex items-center gap-2 text-xs pt-3"
+            style="border-top: 1px solid var(--border-subtle); color: var(--text-muted)"
+          >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -113,7 +140,7 @@
 
       <!-- Empty State -->
       <div *ngIf="getFilteredTemplates().length === 0" class="text-center py-16">
-        <p class="text-gray-500">No templates found</p>
+        <p style="color: var(--text-muted)">No templates found</p>
       </div>
     </div>
   </div>
@@ -127,12 +154,14 @@
   (click)="closePreview()"
 >
   <div
-    class="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[95vh] overflow-hidden animate-scaleUp flex flex-col"
+    class="rounded-xl shadow-2xl w-full max-w-7xl max-h-[95vh] overflow-hidden animate-scaleUp flex flex-col"
+    style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
     (click)="$event.stopPropagation()"
   >
     <!-- Preview Header -->
     <div
-      class="bg-gradient-to-r from-blue-600 to-purple-600 px-3 sm:px-6 py-3 sm:py-4 text-white flex-shrink-0"
+      class="px-3 sm:px-6 py-3 sm:py-4 text-white flex-shrink-0"
+      style="background: var(--accent-gradient)"
     >
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
@@ -141,7 +170,7 @@
             <h2 class="text-lg sm:text-2xl font-bold truncate">
               {{ selectedTemplatePreview.name }}
             </h2>
-            <p class="text-xs sm:text-sm text-blue-100 hidden sm:block">
+            <p class="text-xs sm:text-sm opacity-90 hidden sm:block">
               {{ selectedTemplatePreview.description }}
             </p>
           </div>
@@ -149,14 +178,18 @@
         <div class="flex items-center gap-2 flex-shrink-0">
           <button
             (click)="onSelectTemplate(selectedTemplatePreview); closePreview()"
-            class="px-3 sm:px-6 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium text-xs sm:text-base whitespace-nowrap"
+            class="px-3 sm:px-6 py-2 rounded-lg font-medium text-xs sm:text-base whitespace-nowrap cursor-pointer transition-all"
+            style="background: white; color: var(--accent-primary)"
+            onmouseover="this.style.background = 'rgba(255,255,255,0.9)'"
+            onmouseout="this.style.background = 'white'"
           >
             <span class="hidden sm:inline">Use Template</span>
             <span class="sm:hidden">Use</span>
           </button>
           <button
             (click)="closePreview()"
-            class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center flex-shrink-0"
+            class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg transition-colors flex items-center justify-center flex-shrink-0 cursor-pointer"
+            style="background: rgba(255, 255, 255, 0.15)"
           >
             <svg
               class="w-5 h-5 sm:w-6 sm:h-6"
@@ -177,8 +210,8 @@
     </div>
 
     <!-- Preview Content -->
-    <div class="flex-1 overflow-y-auto p-3 sm:p-6 bg-gray-50">
-      <div class="bg-white rounded-lg p-3 sm:p-6 max-w-[1800px] mx-auto">
+    <div class="flex-1 overflow-y-auto p-3 sm:p-6" style="background: var(--bg-secondary)">
+      <div class="rounded-lg p-3 sm:p-6 max-w-[1800px] mx-auto" style="background: var(--bg-card)">
         <!-- Simulated Dashboard Grid - 1 col mobile, 2 cols tablet, 12 cols desktop -->
         <div
           class="grid gap-3 sm:gap-4 md:gap-6 auto-rows-[100px] sm:auto-rows-[120px] grid-cols-1 sm:grid-cols-2 lg:grid-cols-12"
@@ -197,19 +230,25 @@
               'lg:col-span-12': widget.colSpan === 12,
             }"
             [style.grid-row]="'span ' + widget.rowSpan"
-            class="bg-white border-2 border-gray-200 rounded-lg p-3 sm:p-4 shadow-sm"
+            class="rounded-lg p-3 sm:p-4 shadow-sm"
+            style="background: var(--bg-card); border: 1px solid var(--border-subtle)"
           >
             <!-- Summary Widget Preview -->
             <div *ngIf="widget.type === 'summary'" class="h-full flex flex-col">
               <div class="flex items-center gap-2 mb-2">
                 <span class="text-xl sm:text-2xl flex-shrink-0">✨</span>
-                <h3 class="font-semibold text-gray-800 text-xs sm:text-sm truncate flex-1">
+                <h3
+                  class="font-semibold text-xs sm:text-sm truncate flex-1"
+                  style="color: var(--text-primary)"
+                >
                   {{ widget.title }}
                 </h3>
               </div>
               <div class="flex-1 overflow-hidden">
-                <h4 class="font-semibold text-gray-800 mb-1 text-xs">Executive Summary</h4>
-                <p class="text-[10px] sm:text-xs text-gray-600 line-clamp-3">
+                <h4 class="font-semibold mb-1 text-xs" style="color: var(--text-secondary)">
+                  Executive Summary
+                </h4>
+                <p class="text-[10px] sm:text-xs line-clamp-3" style="color: var(--text-muted)">
                   {{ widget.content }}
                 </p>
               </div>
@@ -217,11 +256,16 @@
 
             <!-- Count Widget Preview -->
             <div *ngIf="widget.type === 'count'" class="h-full flex flex-col justify-center">
-              <h3 class="text-xs font-medium text-gray-600 mb-1 truncate">{{ widget.title }}</h3>
-              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-600 mb-1">
+              <h3 class="text-xs font-medium mb-1 truncate" style="color: var(--text-secondary)">
+                {{ widget.title }}
+              </h3>
+              <p
+                class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1"
+                style="color: var(--accent-primary)"
+              >
                 {{ widget.value | number }}
               </p>
-              <p class="text-xs text-gray-500">{{ widget.label }}</p>
+              <p class="text-xs" style="color: var(--text-muted)">{{ widget.label }}</p>
             </div>
 
             <!-- Chart Widget Preview -->
@@ -229,18 +273,26 @@
               <div class="flex items-center justify-between gap-2 mb-2">
                 <div class="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
                   <span class="text-base sm:text-xl flex-shrink-0">🤖</span>
-                  <h3 class="font-semibold text-gray-800 text-xs sm:text-sm truncate">
+                  <h3
+                    class="font-semibold text-xs sm:text-sm truncate"
+                    style="color: var(--text-primary)"
+                  >
                     {{ widget.title }}
                   </h3>
                 </div>
                 <span
-                  class="px-1.5 sm:px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] sm:text-xs rounded flex-shrink-0"
+                  class="px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs rounded flex-shrink-0"
+                  style="background: var(--accent-gradient); color: var(--text-on-accent)"
                   >AI</span
                 >
               </div>
-              <div class="flex-1 bg-gray-100 rounded flex items-center justify-center min-h-[50px]">
+              <div
+                class="flex-1 rounded flex items-center justify-center min-h-[50px]"
+                style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
+              >
                 <svg
-                  class="w-8 h-8 sm:w-12 sm:h-12 text-gray-400"
+                  class="w-8 h-8 sm:w-12 sm:h-12"
+                  style="color: var(--text-muted)"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -253,7 +305,10 @@
                   ></path>
                 </svg>
               </div>
-              <p class="text-[10px] sm:text-xs text-gray-500 italic mt-1 sm:mt-2 line-clamp-1">
+              <p
+                class="text-[10px] sm:text-xs italic mt-1 sm:mt-2 line-clamp-1"
+                style="color: var(--text-muted)"
+              >
                 "{{ widget.prompt }}"
               </p>
             </div>

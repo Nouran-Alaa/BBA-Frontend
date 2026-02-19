@@ -164,31 +164,32 @@ export class DashboardGridComponent {
     const datePickerHeight = 380;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    const margin = 12;
 
     // Calculate vertical position
     let top: number;
     const spaceBelow = viewportHeight - rect.bottom;
     const spaceAbove = rect.top;
 
-    if (spaceBelow >= datePickerHeight + 10) {
+    if (spaceBelow >= datePickerHeight + margin) {
       // Position below
-      top = rect.bottom + 8;
-    } else if (spaceAbove >= datePickerHeight + 10) {
+      top = rect.bottom + margin;
+    } else if (spaceAbove >= datePickerHeight + margin) {
       // Position above
-      top = rect.top - datePickerHeight - 8;
+      top = rect.top - datePickerHeight - margin;
     } else {
       // Center vertically
-      top = Math.max(10, (viewportHeight - datePickerHeight) / 2);
+      top = Math.max(margin, (viewportHeight - datePickerHeight) / 2);
     }
 
     // Calculate horizontal position
     let left: number;
     const idealLeft = rect.right - datePickerWidth;
 
-    if (idealLeft < 10) {
+    if (idealLeft < margin) {
       left = rect.left;
-    } else if (idealLeft + datePickerWidth > viewportWidth - 10) {
-      left = viewportWidth - datePickerWidth - 10;
+    } else if (idealLeft + datePickerWidth > viewportWidth - margin) {
+      left = viewportWidth - datePickerWidth - margin;
     } else {
       left = idealLeft;
     }
