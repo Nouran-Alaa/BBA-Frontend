@@ -157,13 +157,24 @@
       <button
         *ngIf="isSuperAdmin()"
         (click)="addNewDashboard()"
-        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 border-2 border-dashed cursor-pointer hover-glass"
+        class="group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 border-2 border-dashed cursor-pointer hover-glass justify-center"
         style="border-color: var(--border-glass); color: var(--text-muted)"
-        [class.justify-center]="collapsed"
         [title]="collapsed ? 'Add New Dashboard' : ''"
       >
         <!-- Plus Icon -->
-        <span class="text-2xl flex-shrink-0"> ➕ </span>
+        <div
+          class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-110"
+          style="background: var(--accent-gradient); box-shadow: var(--shadow-md)"
+        >
+          <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            ></path>
+          </svg>
+        </div>
 
         <!-- Add Text -->
         <span *ngIf="!collapsed" class="text-sm font-medium"> Add Dashboard </span>

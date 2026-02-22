@@ -49,18 +49,4 @@ export class MainLayoutComponent implements OnInit {
       this.isSideNavCollapsed = !this.isSideNavCollapsed;
     }
   }
-
-  getSidebarClasses(): string {
-    if (this.isMobileView) {
-      // Mobile: fixed overlay sidebar
-      return `fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-gray-900 to-gray-800 
-              z-50 transition-transform duration-300 ease-in-out ${
-                this.isSideNavOpen ? 'translate-x-0' : '-translate-x-full'
-              }`;
-    } else {
-      // Desktop: relative sidebar with collapse
-      return `relative h-full bg-gradient-to-b from-gray-900 to-gray-800 flex-shrink-0
-              transition-all duration-300 ease-in-out ${this.isSideNavCollapsed ? 'w-20' : 'w-64'}`;
-    }
-  }
 }

@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Dashboard } from '../../../core/models/dashboard.model';
 import { UserRole } from '../../../core/models/user.model';
-import {
-  DashboardTemplatesModalComponent,
-  DashboardTemplate,
-} from '../dashboard-templates-modal/dashboard-templates-modal.component';
+import { DashboardTemplatesModalComponent } from '../dashboard-templates-modal/dashboard-templates-modal.component';
 import { DashboardMenuModalComponent } from '../dashboard-menu-modal/dashboard-menu-modal.component';
-import { DashboardTemplateService } from '../../../core/services/dashboard-template.service';
+import {
+  DashboardTemplateService,
+  DashboardTemplate,
+} from '../../../core/services/dashboard-template.service';
 
 @Component({
   selector: 'app-side-nav',
@@ -197,7 +197,7 @@ export class SideNavComponent implements OnInit {
 
   onDashboardDuplicate(dashboard: Dashboard): void {
     this.onDuplicateDashboard(dashboard);
-    this.activeMenu = null; // This will now work
+    this.activeMenu = null;
     this.showDashboardMenu = false;
   }
 

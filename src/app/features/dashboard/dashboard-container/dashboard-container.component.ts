@@ -12,10 +12,18 @@ import {
 } from '../../../shared/components/dashboard-grid/dashboard-grid.component';
 import { FullscreenWidgetModalComponent } from '../../../shared/components/fullscreen-widget-modal/fullscreen-widget-modal.component';
 import { ToastService } from '../../../core/services/toast.service';
-import { DashboardTemplateService } from '../../../core/services/dashboard-template.service';
+import {
+  DashboardTemplateService,
+  DashboardTemplate,
+} from '../../../core/services/dashboard-template.service';
 import { Subscription } from 'rxjs';
 import { EditAiModalComponent } from '../../../shared/components/edit-ai-modal/edit-ai-modal.component';
 import { UndoRedoService } from '../../../core/services/undo-redo.service';
+import {
+  ChatbotComponent,
+  DashboardInfo,
+} from '../../../shared/components/chatbot/chatbot.component';
+import { ChatService } from '../../../core/services/chat.service';
 
 @Component({
   selector: 'app-dashboard-container',
@@ -27,6 +35,7 @@ import { UndoRedoService } from '../../../core/services/undo-redo.service';
     DashboardGridComponent,
     FullscreenWidgetModalComponent,
     EditAiModalComponent,
+    ChatbotComponent,
   ],
   templateUrl: './dashboard-container.component.html',
   styleUrls: ['./dashboard-container.component.css'],
@@ -38,6 +47,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   currentDateRange: DateRange | null = null;
   isDatePickerOpen: boolean = false;
   isAiChatOpen: boolean = false;
+  isChatbotOpen: boolean = false;
   isGenerating: boolean = false;
   isEditMode: boolean = false;
   currentDashboardId: string = '';
@@ -102,8 +112,9 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   private readonly UNDO_REDO_COOLDOWN = 100; // ms
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
+    private route: ActivatedRoute,
+    private chatService: ChatService,
     private toastService: ToastService,
     private undoRedoService: UndoRedoService,
     private templateService: DashboardTemplateService,
@@ -172,6 +183,11 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
     // Listen for keyboard shortcuts
     this.setupKeyboardShortcuts();
+
+    // Set chat context when dashboard changes
+    this.chatService.setContext({
+      currentDashboardId: this.currentDashboardId,
+    });
   }
 
   ngOnDestroy(): void {
@@ -367,6 +383,17 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     this.isEditMode = !this.isEditMode;
   }
 
+  toggleChatbot(): void {
+    this.isChatbotOpen = !this.isChatbotOpen;
+
+    // Update context when opening
+    if (this.isChatbotOpen) {
+      this.chatService.setContext({
+        currentDashboardId: this.currentDashboardId,
+      });
+    }
+  }
+
   openAiChat(): void {
     this.isAiChatOpen = true;
   }
@@ -428,6 +455,33 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     this.gridItems = items;
     this.dashboardsData[this.currentDashboardId] = [...items];
     this.saveToLocalStorage();
+  }
+
+  onCreateDashboardFromChat(data: { templateId: string; name: string }): void {
+    // Navigate to new dashboard
+    const newDashboardId = (Object.keys(this.dashboardsData).length + 1).toString();
+
+    // Get template from service
+    const template: DashboardTemplate | undefined = this.templateService.getTemplateById(
+      data.templateId,
+    );
+
+    if (template) {
+      // Apply template to new dashboard
+      this.templateService.setTemplateWidgets(newDashboardId, template.widgets);
+
+      // Navigate to new dashboard
+      this.router.navigate(['/dashboard', newDashboardId]);
+
+      this.toastService.success(`Created ${data.name} dashboard!`);
+    }
+  }
+
+  getDashboardsList(): DashboardInfo[] {
+    return Object.keys(this.dashboardsData).map((id) => ({
+      id,
+      name: `Dashboard ${id}`,
+    }));
   }
 
   getFormattedDateRange(): string {
