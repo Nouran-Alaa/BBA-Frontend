@@ -15,6 +15,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { DashboardTemplateService } from '../../../core/services/dashboard-template.service';
 import { Subscription } from 'rxjs';
 import { EditAiModalComponent } from '../../../shared/components/edit-ai-modal/edit-ai-modal.component';
+import { UndoRedoService } from '../../../core/services/undo-redo.service';
 
 @Component({
   selector: 'app-dashboard-container',
@@ -97,11 +98,14 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   private templateSubscription?: Subscription;
   private routeSubscription?: Subscription;
   private pendingTemplateData: { dashboardId: string; widgets: any[] } | null = null;
+  private lastUndoRedoTime = 0;
+  private readonly UNDO_REDO_COOLDOWN = 100; // ms
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private toastService: ToastService,
+    private undoRedoService: UndoRedoService,
     private templateService: DashboardTemplateService,
   ) {}
 
@@ -162,6 +166,12 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
         }
       }
     });
+
+    // Initialize undo/redo with current state
+    this.undoRedoService.reset(this.gridItems);
+
+    // Listen for keyboard shortcuts
+    this.setupKeyboardShortcuts();
   }
 
   ngOnDestroy(): void {
@@ -179,11 +189,17 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
     }
+
+    document.removeEventListener('keydown', this.handleKeyboardShortcut.bind(this));
   }
 
   saveToLocalStorage(): void {
     localStorage.setItem('dashboardsData', JSON.stringify(this.dashboardsData));
     console.log('Saved to localStorage:', Object.keys(this.dashboardsData));
+  }
+
+  setupKeyboardShortcuts(): void {
+    document.addEventListener('keydown', this.handleKeyboardShortcut.bind(this));
   }
 
   @HostListener('document:click', ['$event'])
@@ -194,6 +210,69 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
       if (!clickedInside) {
         this.isDatePickerOpen = false;
       }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardShortcut(event: KeyboardEvent): void {
+    // Ignore repeated keydown events
+    if (event.repeat) return;
+
+    // Throttle to prevent rapid-fire (additional safety)
+    const now = Date.now();
+    if (now - this.lastUndoRedoTime < this.UNDO_REDO_COOLDOWN) {
+      return;
+    }
+
+    // Ctrl+Z or Cmd+Z (Mac) - Undo
+    if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+      event.preventDefault();
+      this.lastUndoRedoTime = now;
+      this.undo();
+    }
+
+    // Ctrl+Shift+Z or Cmd+Shift+Z (Mac) - Redo
+    else if ((event.ctrlKey || event.metaKey) && event.key === 'z' && event.shiftKey) {
+      event.preventDefault();
+      this.lastUndoRedoTime = now;
+      this.redo();
+    }
+
+    // Alternative: Ctrl+Y (Windows redo)
+    else if ((event.ctrlKey || event.metaKey) && event.key === 'y') {
+      event.preventDefault();
+      this.lastUndoRedoTime = now;
+      this.redo();
+    }
+  }
+
+  undo(): void {
+    if (!this.undoRedoService.canUndo()) {
+      this.toastService.info('Nothing to undo');
+      return;
+    }
+
+    const previousState = this.undoRedoService.undo();
+    if (previousState) {
+      this.gridItems = previousState;
+      this.dashboardsData[this.currentDashboardId] = [...previousState];
+      this.saveToLocalStorage();
+      this.toastService.success('Undo successful');
+    }
+  }
+
+  redo(): void {
+    if (!this.undoRedoService.canRedo()) {
+      this.toastService.info('Nothing to redo');
+      return;
+    }
+
+    const nextState = this.undoRedoService.redo();
+    if (nextState) {
+      this.gridItems = nextState;
+      this.dashboardsData[this.currentDashboardId] = [...nextState];
+      this.saveToLocalStorage();
+      this.toastService.success('Redo successful');
     }
   }
 
@@ -264,11 +343,13 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     if (this.dashboardsData[dashboardId]) {
       // Load existing dashboard data
       this.gridItems = [...this.dashboardsData[dashboardId]];
+      this.undoRedoService.reset(this.gridItems);
       console.log('Loaded existing dashboard with items:', this.gridItems.length);
     } else {
       // New empty dashboard
       this.gridItems = [];
       this.dashboardsData[dashboardId] = [];
+      this.undoRedoService.reset([]);
       console.log('Created new empty dashboard');
     }
   }
@@ -320,6 +401,8 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     this.isGenerating = true;
 
     setTimeout(() => {
+      this.undoRedoService.saveState(this.gridItems, 'Widget added');
+
       const newItem: GridItem = {
         id: Date.now().toString(),
         type: 'chart',
@@ -341,6 +424,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   }
 
   onGridItemsChange(items: GridItem[]): void {
+    this.undoRedoService.saveState(this.gridItems, 'Layout changed'); // Save BEFORE change
     this.gridItems = items;
     this.dashboardsData[this.currentDashboardId] = [...items];
     this.saveToLocalStorage();
@@ -366,6 +450,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   onItemDuplicate(itemId: string): void {
     const itemToDuplicate = this.gridItems.find((item) => item.id === itemId);
     if (itemToDuplicate) {
+      this.undoRedoService.saveState(this.gridItems, 'Widget duplicated');
       const duplicatedItem: GridItem = {
         ...itemToDuplicate,
         id: Date.now().toString(),
@@ -374,13 +459,16 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
       this.gridItems.push(duplicatedItem);
       this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
       this.saveToLocalStorage();
+      this.toastService.success('Widget duplicated');
     }
   }
 
   onItemDelete(itemId: string): void {
+    this.undoRedoService.saveState(this.gridItems, 'Widget deleted');
     this.gridItems = this.gridItems.filter((item) => item.id !== itemId);
     this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
     this.saveToLocalStorage();
+    this.toastService.success('Widget deleted');
   }
 
   onWidgetClick(widget: GridItem): void {
@@ -389,5 +477,9 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
   closeFullscreen(): void {
     this.fullscreenWidget = null;
+  }
+
+  getUndoRedoStatus() {
+    return this.undoRedoService.getHistoryInfo();
   }
 }

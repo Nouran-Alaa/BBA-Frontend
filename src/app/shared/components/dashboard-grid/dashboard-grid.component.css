@@ -7,19 +7,28 @@
 .cdk-drag {
   cursor: grab;
   will-change: auto;
-  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 200ms ease-out,
+    grid-column 400ms cubic-bezier(0.4, 0, 0.2, 1),
+    grid-row 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cdk-drag:active {
   cursor: grabbing;
 }
 
+/* Smooth transition for grid position changes (undo/redo) */
+.cdk-drag:not(.cdk-drag-dragging) {
+  transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .cdk-drag-animating {
-  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
-  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Drag Placeholder - Exact size match */
@@ -196,6 +205,34 @@
   background: var(--bg-card) !important;
   border: 1px solid var(--border-card) !important;
   box-shadow: var(--shadow-card) !important;
+}
+
+/* Smooth fade in/out for adding/removing cards */
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cardFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Apply to new cards */
+.cdk-drag {
+  animation: cardFadeIn 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Scrollbar */
