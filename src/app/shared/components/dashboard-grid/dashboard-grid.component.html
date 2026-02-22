@@ -1,8 +1,16 @@
 <div
   cdkDropList
+  cdkDropListSortingDisabled
   [cdkDropListData]="items"
   (cdkDropListDropped)="drop($event)"
-  class="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 xl:grid-cols-12"
+  class="grid gap-3 sm:gap-4 md:gap-6"
+  [ngClass]="{
+    'grid-cols-1': true,
+    'sm:grid-cols-2': true,
+    'md:grid-cols-4': true,
+    'lg:grid-cols-8': true,
+    'xl:grid-cols-12': true,
+  }"
   [ngStyle]="{
     'grid-auto-rows': isEditMode ? '120px' : 'minmax(140px, auto)',
   }"
@@ -10,30 +18,32 @@
   <div
     *ngFor="let item of items"
     cdkDrag
+    [cdkDragData]="item"
     [cdkDragDisabled]="!isEditMode"
-    [ngClass]="{
-      'col-span-1': true,
-      'sm:col-span-1': item.colSpan <= 6,
-      'sm:col-span-2': item.colSpan > 6,
-      'md:col-span-1': item.colSpan <= 3,
-      'md:col-span-2': item.colSpan > 3 && item.colSpan <= 6,
-      'md:col-span-3': item.colSpan > 6 && item.colSpan <= 9,
-      'md:col-span-4': item.colSpan > 9,
-      'lg:col-span-2': item.colSpan === 2,
-      'lg:col-span-3': item.colSpan === 3,
-      'lg:col-span-4': item.colSpan === 4,
-      'lg:col-span-6': item.colSpan === 6,
-      'lg:col-span-8': item.colSpan === 8,
-      'lg:col-span-12': item.colSpan === 12,
-    }"
-    [style.grid-row]="'span ' + item.rowSpan"
+    (cdkDragStarted)="onDragStarted($event)"
+    (cdkDragMoved)="onDragMoved($event)"
+    (cdkDragEnded)="onDragEnded()"
+    [style.grid-column]="(item.colStart ?? 0) + 1 + ' / span ' + item.colSpan"
+    [style.grid-row]="(item.rowStart ?? 0) + 1 + ' / span ' + item.rowSpan"
     class="relative group"
   >
+    <ng-template cdkDragPreview>
+      <div
+        class="glass rounded-xl p-4 shadow-2xl opacity-90"
+        [style.width.px]="item.colSpan * 100"
+        [style.height.px]="item.rowSpan * 120"
+        style="background: var(--bg-card); border: 2px solid var(--accent-primary)"
+      >
+        <h3 class="font-semibold text-sm" style="color: var(--text-primary)">{{ item.title }}</h3>
+      </div>
+    </ng-template>
+
     <!-- Drag Handle (Edit Mode Only) -->
     <div
       *ngIf="isEditMode"
       cdkDragHandle
-      class="absolute top-3 left-3 z-20 cursor-move opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600 rounded-lg shadow-lg p-2"
+      class="absolute top-3 left-3 z-20 cursor-move opacity-0 group-hover:opacity-100 transition-opacity rounded-lg shadow-lg p-2"
+      style="background: var(--accent-gradient); color: var(--text-on-accent)"
       title="Drag to reorder"
     >
       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,6 +304,7 @@
       </div>
     </div>
 
+    <!-- Drag Placeholder - Correct sizing -->
     <div
       *cdkDragPlaceholder
       class="bg-blue-100 border-2 border-dashed border-blue-400 rounded-lg opacity-50"

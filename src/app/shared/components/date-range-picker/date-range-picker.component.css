@@ -1,3 +1,10 @@
+:host {
+  display: block;
+  position: relative;
+  /* Force it to escape stacking context */
+  isolation: isolate;
+}
+
 .animate-slideDown {
   animation: slideDown 0.3s ease-out;
 }

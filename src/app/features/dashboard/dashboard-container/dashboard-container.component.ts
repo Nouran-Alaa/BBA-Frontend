@@ -55,6 +55,8 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
         content: 'No tasks were updated in the last week.',
         colSpan: 6,
         rowSpan: 2,
+        colStart: 0,
+        rowStart: 0,
       },
       {
         id: '2',
@@ -64,6 +66,8 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
         label: 'tasks',
         colSpan: 2,
         rowSpan: 1,
+        colStart: 6,
+        rowStart: 0,
       },
       {
         id: '3',
@@ -73,6 +77,8 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
         label: 'tasks',
         colSpan: 2,
         rowSpan: 1,
+        colStart: 8,
+        rowStart: 0,
       },
       {
         id: '4',
@@ -82,6 +88,8 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
         label: 'tasks',
         colSpan: 2,
         rowSpan: 1,
+        colStart: 10,
+        rowStart: 0,
       },
     ],
   };
@@ -197,10 +205,39 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
       data.dashboardId,
     );
 
+    // Map widgets with IDs and ensure positions are set
     const widgetsWithIds = data.widgets.map((widget, index) => ({
       id: `${Date.now()}-${index}`,
       ...widget,
+      colStart: widget.colStart ?? 0,
+      rowStart: widget.rowStart ?? index,
     }));
+
+    // Verify no overlaps in template
+    for (let i = 0; i < widgetsWithIds.length; i++) {
+      for (let j = i + 1; j < widgetsWithIds.length; j++) {
+        const a = widgetsWithIds[i];
+        const b = widgetsWithIds[j];
+
+        const aCol = a.colStart ?? 0;
+        const bCol = b.colStart ?? 0;
+        const aRow = a.rowStart ?? 0;
+        const bRow = b.rowStart ?? 0;
+
+        const overlaps = !(
+          aCol + a.colSpan <= bCol ||
+          aCol >= bCol + b.colSpan ||
+          aRow + a.rowSpan <= bRow ||
+          aRow >= bRow + b.rowSpan
+        );
+
+        if (overlaps) {
+          console.warn('Template has overlapping widgets:', a.title, 'and', b.title);
+          // Fix by moving second widget down
+          widgetsWithIds[j].rowStart = (a.rowStart ?? 0) + a.rowSpan;
+        }
+      }
+    }
 
     this.gridItems = widgetsWithIds;
     this.dashboardsData[data.dashboardId] = [...this.gridItems];
@@ -291,6 +328,8 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
         chartData: {},
         colSpan: 6,
         rowSpan: 3,
+        colStart: 0,
+        rowStart: this.gridItems.length,
       };
 
       this.gridItems.push(newItem);
