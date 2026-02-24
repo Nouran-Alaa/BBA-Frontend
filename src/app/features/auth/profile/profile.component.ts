@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
@@ -46,10 +45,7 @@ export class ProfileComponent implements OnInit {
     confirmPassword: '',
   };
 
-  constructor(
-    private router: Router,
-    private toastService: ToastService,
-  ) {}
+  constructor(private toastService: ToastService) {}
 
   ngOnInit(): void {
     this.resetEditForm();

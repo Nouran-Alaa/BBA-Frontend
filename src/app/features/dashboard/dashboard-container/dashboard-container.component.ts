@@ -1,38 +1,38 @@
-import { Component, OnInit, HostListener, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import {
-  DateRangePickerComponent,
-  DateRange,
-} from '../../../shared/components/action_menus/date-range-picker/date-range-picker.component';
-import { AiChartModalComponent } from '../../../shared/components/modals/ai-chart-modal/ai-chart-modal.component';
-import {
-  DashboardGridComponent,
-  GridItem,
-} from '../../../shared/components/dashboard-grid/dashboard-grid.component';
-import { FullscreenWidgetModalComponent } from '../../../shared/components/modals/fullscreen-widget-modal/fullscreen-widget-modal.component';
+import { Subscription } from 'rxjs';
+
+import { DashboardStateService } from '../../../core/services/dashboard-state.service';
+import { UndoRedoService } from '../../../core/services/undo-redo.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { ChatService } from '../../../core/services/chat.service';
 import {
   DashboardTemplateService,
   DashboardTemplate,
 } from '../../../core/services/dashboard-template.service';
-import { Subscription } from 'rxjs';
+
+import { GridItem } from '../../../core/models/grid-item.model';
+import { DateRange } from '../../../shared/components/action_menus/date-range-picker/date-range-picker.component';
+
+import { DashboardToolbarComponent } from '../dashboard-toolbar/dashboard-toolbar.component';
+import { DashboardGridComponent } from '../../../shared/components/dashboard-grid/dashboard-grid.component';
+import { AiChartModalComponent } from '../../../shared/components/modals/ai-chart-modal/ai-chart-modal.component';
+import { FullscreenWidgetModalComponent } from '../../../shared/components/modals/fullscreen-widget-modal/fullscreen-widget-modal.component';
 import { EditAiModalComponent } from '../../../shared/components/modals/edit-ai-modal/edit-ai-modal.component';
-import { UndoRedoService } from '../../../core/services/undo-redo.service';
 import {
   ChatbotComponent,
   DashboardInfo,
 } from '../../../shared/components/layout/chatbot/chatbot.component';
-import { ChatService } from '../../../core/services/chat.service';
 
 @Component({
   selector: 'app-dashboard-container',
   standalone: true,
   imports: [
     CommonModule,
-    DateRangePickerComponent,
-    AiChartModalComponent,
+    DashboardToolbarComponent,
     DashboardGridComponent,
+    AiChartModalComponent,
     FullscreenWidgetModalComponent,
     EditAiModalComponent,
     ChatbotComponent,
@@ -41,72 +41,25 @@ import { ChatService } from '../../../core/services/chat.service';
   styleUrls: ['./dashboard-container.component.css'],
 })
 export class DashboardContainerComponent implements OnInit, OnDestroy {
-  @ViewChild('datePickerContainer') datePickerContainer?: ElementRef;
-  @ViewChild('chartDatePickerContainer') chartDatePickerContainer?: ElementRef;
+  // ─── State exposed to template ────────────────────────────────────────────────
+  gridItems: GridItem[] = [];
+  currentDashboardId: string = '';
+  isEditMode: boolean = false;
 
-  currentDateRange: DateRange | null = null;
-  isDatePickerOpen: boolean = false;
+  // Modal visibility flags
   isAiChatOpen: boolean = false;
   isChatbotOpen: boolean = false;
   isGenerating: boolean = false;
-  isEditMode: boolean = false;
-  currentDashboardId: string = '';
   fullscreenWidget: GridItem | null = null;
-  chartDateRanges: { [chartId: string]: DateRange } = {};
-  gridItems: GridItem[] = [];
   editingWidget: GridItem | null = null;
   showEditAiModal: boolean = false;
 
-  dashboardsData: { [key: string]: GridItem[] } = {
-    '1': [
-      {
-        id: '1',
-        type: 'summary',
-        title: 'AI Executive Summary',
-        content: 'No tasks were updated in the last week.',
-        colSpan: 6,
-        rowSpan: 2,
-        colStart: 0,
-        rowStart: 0,
-      },
-      {
-        id: '2',
-        type: 'count',
-        title: 'Unassigned',
-        value: 0,
-        label: 'tasks',
-        colSpan: 2,
-        rowSpan: 1,
-        colStart: 6,
-        rowStart: 0,
-      },
-      {
-        id: '3',
-        type: 'count',
-        title: 'In Progress',
-        value: 0,
-        label: 'tasks',
-        colSpan: 2,
-        rowSpan: 1,
-        colStart: 8,
-        rowStart: 0,
-      },
-      {
-        id: '4',
-        type: 'count',
-        title: 'Completed',
-        value: 0,
-        label: 'tasks',
-        colSpan: 2,
-        rowSpan: 1,
-        colStart: 10,
-        rowStart: 0,
-      },
-    ],
-  };
+  // Chart date ranges (per chart widget)
+  chartDateRanges: { [chartId: string]: DateRange } = {};
 
+  // ─── Private ──────────────────────────────────────────────────────────────────
   private templateSubscription?: Subscription;
-  private routeSubscription?: Subscription;
+  private gridItemsSubscription?: Subscription;
   private pendingTemplateData: { dashboardId: string; widgets: any[] } | null = null;
   private lastUndoRedoTime = 0;
   private readonly UNDO_REDO_COOLDOWN = 100; // ms
@@ -114,23 +67,22 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private chatService: ChatService,
-    private toastService: ToastService,
+    private dashboardState: DashboardStateService,
     private undoRedoService: UndoRedoService,
+    private toastService: ToastService,
+    private chatService: ChatService,
     private templateService: DashboardTemplateService,
   ) {}
 
   ngOnInit(): void {
     console.log('Dashboard container initialized');
 
-    // Load from localStorage first
-    const stored = localStorage.getItem('dashboardsData');
-    if (stored) {
-      this.dashboardsData = JSON.parse(stored);
-      console.log('Loaded dashboards from localStorage:', Object.keys(this.dashboardsData));
-    }
+    // Keep local gridItems in sync with service
+    this.gridItemsSubscription = this.dashboardState.gridItems$.subscribe((items) => {
+      this.gridItems = items;
+    });
 
-    // Subscribe to template data FIRST
+    // Subscribe to template data FIRST (before route params)
     this.templateSubscription = this.templateService.templateData$.subscribe((data) => {
       console.log('Template data received:', data);
 
@@ -141,7 +93,8 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
         // If this is the current dashboard, apply immediately
         if (data.dashboardId === this.currentDashboardId) {
-          this.applyTemplateWidgets(data);
+          this.undoRedoService.saveState(this.gridItems, 'Template applied');
+          this.dashboardState.applyTemplateWidgets(data);
         }
       }
     });
@@ -152,81 +105,44 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
       console.log('Route changed to dashboard:', newDashboardId);
 
       if (this.currentDashboardId !== newDashboardId) {
-        // Save current dashboard before switching
-        if (this.currentDashboardId && this.gridItems.length > 0) {
-          this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-          this.saveToLocalStorage();
-          console.log(
-            'Saved dashboard:',
-            this.currentDashboardId,
-            'with',
-            this.gridItems.length,
-            'items',
-          );
-        }
-
         this.currentDashboardId = newDashboardId;
 
         // Check if we have pending template data for this dashboard
         if (this.pendingTemplateData && this.pendingTemplateData.dashboardId === newDashboardId) {
           console.log('Applying pending template data for dashboard:', newDashboardId);
-          this.applyTemplateWidgets(this.pendingTemplateData);
+          this.dashboardState.switchDashboard(newDashboardId);
+          this.undoRedoService.saveState([], 'Template applied');
+          this.dashboardState.applyTemplateWidgets(this.pendingTemplateData);
+          this.pendingTemplateData = null;
         } else {
-          // Load existing dashboard data
-          this.loadDashboard(newDashboardId);
+          this.dashboardState.switchDashboard(newDashboardId);
+          this.undoRedoService.reset(this.dashboardState.gridItems);
         }
+
+        // Update chatbot context when dashboard changes
+        this.chatService.setContext({ currentDashboardId: newDashboardId });
       }
     });
 
-    // Initialize undo/redo with current state
-    this.undoRedoService.reset(this.gridItems);
-
     // Listen for keyboard shortcuts
     this.setupKeyboardShortcuts();
-
-    // Set chat context when dashboard changes
-    this.chatService.setContext({
-      currentDashboardId: this.currentDashboardId,
-    });
   }
 
   ngOnDestroy(): void {
     console.log('Dashboard container destroyed');
 
-    // Save current dashboard state
-    if (this.currentDashboardId && this.gridItems.length > 0) {
-      this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-      this.saveToLocalStorage();
-    }
+    // Final save on destroy
+    this.dashboardState.saveToLocalStorage();
 
-    if (this.templateSubscription) {
-      this.templateSubscription.unsubscribe();
-    }
-    if (this.routeSubscription) {
-      this.routeSubscription.unsubscribe();
-    }
-
+    this.templateSubscription?.unsubscribe();
+    this.gridItemsSubscription?.unsubscribe();
     document.removeEventListener('keydown', this.handleKeyboardShortcut.bind(this));
   }
 
-  saveToLocalStorage(): void {
-    localStorage.setItem('dashboardsData', JSON.stringify(this.dashboardsData));
-    console.log('Saved to localStorage:', Object.keys(this.dashboardsData));
-  }
+  // ─── Keyboard Shortcuts ───────────────────────────────────────────────────────
 
   setupKeyboardShortcuts(): void {
     document.addEventListener('keydown', this.handleKeyboardShortcut.bind(this));
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    // Close main date picker
-    if (this.isDatePickerOpen && this.datePickerContainer) {
-      const clickedInside = this.datePickerContainer.nativeElement.contains(event.target);
-      if (!clickedInside) {
-        this.isDatePickerOpen = false;
-      }
-    }
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -262,6 +178,12 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ─── Edit Mode & Undo/Redo ────────────────────────────────────────────────────
+
+  toggleEditMode(): void {
+    this.isEditMode = !this.isEditMode;
+  }
+
   undo(): void {
     if (!this.undoRedoService.canUndo()) {
       this.toastService.info('Nothing to undo');
@@ -270,9 +192,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
     const previousState = this.undoRedoService.undo();
     if (previousState) {
-      this.gridItems = previousState;
-      this.dashboardsData[this.currentDashboardId] = [...previousState];
-      this.saveToLocalStorage();
+      this.dashboardState.setGridItems(previousState);
       this.toastService.success('Undo successful');
     }
   }
@@ -285,114 +205,45 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
     const nextState = this.undoRedoService.redo();
     if (nextState) {
-      this.gridItems = nextState;
-      this.dashboardsData[this.currentDashboardId] = [...nextState];
-      this.saveToLocalStorage();
+      this.dashboardState.setGridItems(nextState);
       this.toastService.success('Redo successful');
     }
   }
 
-  applyTemplateWidgets(data: { dashboardId: string; widgets: any[] }): void {
-    console.log(
-      'Applying template widgets:',
-      data.widgets.length,
-      'widgets to dashboard:',
-      data.dashboardId,
-    );
-
-    // Map widgets with IDs and ensure positions are set
-    const widgetsWithIds = data.widgets.map((widget, index) => ({
-      id: `${Date.now()}-${index}`,
-      ...widget,
-      colStart: widget.colStart ?? 0,
-      rowStart: widget.rowStart ?? index,
-    }));
-
-    // Verify no overlaps in template
-    for (let i = 0; i < widgetsWithIds.length; i++) {
-      for (let j = i + 1; j < widgetsWithIds.length; j++) {
-        const a = widgetsWithIds[i];
-        const b = widgetsWithIds[j];
-
-        const aCol = a.colStart ?? 0;
-        const bCol = b.colStart ?? 0;
-        const aRow = a.rowStart ?? 0;
-        const bRow = b.rowStart ?? 0;
-
-        const overlaps = !(
-          aCol + a.colSpan <= bCol ||
-          aCol >= bCol + b.colSpan ||
-          aRow + a.rowSpan <= bRow ||
-          aRow >= bRow + b.rowSpan
-        );
-
-        if (overlaps) {
-          console.warn('Template has overlapping widgets:', a.title, 'and', b.title);
-          // Fix by moving second widget down
-          widgetsWithIds[j].rowStart = (a.rowStart ?? 0) + a.rowSpan;
-        }
-      }
-    }
-
-    this.gridItems = widgetsWithIds;
-    this.dashboardsData[data.dashboardId] = [...this.gridItems];
-    this.saveToLocalStorage();
-
-    console.log('Template applied successfully. Grid items:', this.gridItems.length);
-
-    // Clear the pending data and service
-    this.pendingTemplateData = null;
-    this.templateService.clearTemplateWidgets();
+  getUndoRedoStatus() {
+    return this.undoRedoService.getHistoryInfo();
   }
 
-  loadTemplateWidgets(templateWidgets: any[]): void {
-    this.gridItems = templateWidgets.map((widget, index) => ({
-      id: `${Date.now()}-${index}`,
-      ...widget,
-    }));
-    this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+  // ─── Grid Events ──────────────────────────────────────────────────────────────
+
+  onGridItemsChange(items: GridItem[]): void {
+    this.undoRedoService.saveState(this.gridItems, 'Layout changed'); // Save BEFORE change
+    this.dashboardState.setGridItems(items);
   }
 
-  loadDashboard(dashboardId: string): void {
-    console.log('Loading dashboard:', dashboardId);
-
-    if (this.dashboardsData[dashboardId]) {
-      // Load existing dashboard data
-      this.gridItems = [...this.dashboardsData[dashboardId]];
-      this.undoRedoService.reset(this.gridItems);
-      console.log('Loaded existing dashboard with items:', this.gridItems.length);
-    } else {
-      // New empty dashboard
-      this.gridItems = [];
-      this.dashboardsData[dashboardId] = [];
-      this.undoRedoService.reset([]);
-      console.log('Created new empty dashboard');
-    }
+  onItemDelete(itemId: string): void {
+    this.undoRedoService.saveState(this.gridItems, 'Widget deleted');
+    this.dashboardState.deleteWidget(itemId);
+    this.toastService.success('Widget deleted');
   }
 
-  onDateRangeChange(range: DateRange): void {
-    this.currentDateRange = range;
-    this.isDatePickerOpen = false;
+  onItemDuplicate(itemId: string): void {
+    this.undoRedoService.saveState(this.gridItems, 'Widget duplicated');
+    this.dashboardState.duplicateWidget(itemId);
+    this.toastService.success('Widget duplicated');
   }
 
-  toggleDatePicker(): void {
-    this.isDatePickerOpen = !this.isDatePickerOpen;
+  onWidgetClick(widget: GridItem): void {
+    this.fullscreenWidget = widget;
   }
 
-  toggleEditMode(): void {
-    this.isEditMode = !this.isEditMode;
+  onChartDateRangeClick(data: { chartId: string; range: any }): void {
+    const { chartId, range } = data;
+    this.chartDateRanges[chartId] = range;
+    console.log('Chart date range updated:', chartId, range);
   }
 
-  toggleChatbot(): void {
-    this.isChatbotOpen = !this.isChatbotOpen;
-
-    // Update context when opening
-    if (this.isChatbotOpen) {
-      this.chatService.setContext({
-        currentDashboardId: this.currentDashboardId,
-      });
-    }
-  }
+  // ─── AI Chart Modal ───────────────────────────────────────────────────────────
 
   openAiChat(): void {
     this.isAiChatOpen = true;
@@ -400,28 +251,6 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
   closeAiChat(): void {
     this.isAiChatOpen = false;
-  }
-
-  onEditWithAI(widget: GridItem): void {
-    this.editingWidget = widget;
-    this.showEditAiModal = true;
-  }
-
-  onSaveEditedWidget(updatedWidget: GridItem): void {
-    const index = this.gridItems.findIndex((item) => item.id === updatedWidget.id);
-    if (index !== -1) {
-      this.gridItems[index] = updatedWidget;
-      this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-      this.saveToLocalStorage();
-      this.toastService.success('Widget updated successfully!');
-    }
-    this.showEditAiModal = false;
-    this.editingWidget = null;
-  }
-
-  closeEditAiModal(): void {
-    this.showEditAiModal = false;
-    this.editingWidget = null;
   }
 
   onChartGenerated(prompt: string): void {
@@ -442,57 +271,68 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
         rowStart: this.gridItems.length,
       };
 
-      this.gridItems.push(newItem);
-      this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-      this.saveToLocalStorage();
+      this.dashboardState.addWidget(newItem);
       this.isGenerating = false;
       this.isAiChatOpen = false;
     }, 3000);
   }
 
-  onGridItemsChange(items: GridItem[]): void {
-    this.undoRedoService.saveState(this.gridItems, 'Layout changed'); // Save BEFORE change
-    this.gridItems = items;
-    this.dashboardsData[this.currentDashboardId] = [...items];
-    this.saveToLocalStorage();
+  // ─── Edit AI Modal ────────────────────────────────────────────────────────────
+
+  onEditWithAI(widget: GridItem): void {
+    this.editingWidget = widget;
+    this.showEditAiModal = true;
+  }
+
+  onSaveEditedWidget(updatedWidget: GridItem): void {
+    this.dashboardState.updateWidget(updatedWidget);
+    this.toastService.success('Widget updated successfully!');
+    this.showEditAiModal = false;
+    this.editingWidget = null;
+  }
+
+  closeEditAiModal(): void {
+    this.showEditAiModal = false;
+    this.editingWidget = null;
+  }
+
+  // ─── Fullscreen ───────────────────────────────────────────────────────────────
+
+  closeFullscreen(): void {
+    this.fullscreenWidget = null;
+  }
+
+  // ─── Chatbot ──────────────────────────────────────────────────────────────────
+
+  toggleChatbot(): void {
+    this.isChatbotOpen = !this.isChatbotOpen;
+
+    // Update context when opening
+    if (this.isChatbotOpen) {
+      this.chatService.setContext({ currentDashboardId: this.currentDashboardId });
+    }
   }
 
   onCreateDashboardFromChat(data: { templateId: string; name: string }): void {
-    // Generate sequential dashboard ID
-    const allDashboardIds = Object.keys(this.dashboardsData)
-      .map((id) => parseInt(id))
-      .filter((id) => !isNaN(id));
-    const maxId = allDashboardIds.length > 0 ? Math.max(...allDashboardIds) : 0;
-    const newDashboardId = (maxId + 1).toString();
-
-    console.log('Creating new dashboard with ID:', newDashboardId);
-
     // Get template from service
     const template: DashboardTemplate | undefined = this.templateService.getTemplateById(
       data.templateId,
     );
 
     if (template && template.widgets) {
-      // IMPORTANT: Don't modify current dashboard
-      // Create a completely new entry in dashboardsData
-
       // Map widgets with unique IDs for the new dashboard
-      const newWidgets = template.widgets.map((widget, index) => ({
+      const newWidgets: GridItem[] = template.widgets.map((widget, index) => ({
         ...widget,
-        id: `${newDashboardId}-${Date.now()}-${index}`,
+        id: `new-${Date.now()}-${index}`,
         colStart: widget.colStart ?? 0,
         rowStart: widget.rowStart ?? index,
       }));
 
-      // Create the new dashboard entry
-      this.dashboardsData[newDashboardId] = newWidgets;
-      this.saveToLocalStorage();
-
+      const newDashboardId = this.dashboardState.createDashboard(newWidgets);
       console.log('New dashboard created:', newDashboardId, 'with', newWidgets.length, 'widgets');
 
       // Navigate to the new dashboard
       this.router.navigate(['/dashboard', newDashboardId]);
-
       this.toastService.success(`Created ${data.name} dashboard!`);
     }
   }
@@ -502,7 +342,6 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     chartPrompt: string;
     chartTitle: string;
   }): void {
-    // Create new chart widget
     const newChart: GridItem = {
       id: Date.now().toString(),
       type: 'chart',
@@ -517,115 +356,30 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
 
     // If dashboardId is null, create a new dashboard with just this chart
     if (data.dashboardId === null) {
-      const allDashboardIds = Object.keys(this.dashboardsData)
-        .map((id) => parseInt(id))
-        .filter((id) => !isNaN(id));
-      const maxId = allDashboardIds.length > 0 ? Math.max(...allDashboardIds) : 0;
-      const newDashboardId = (maxId + 1).toString();
-
-      // Create new dashboard with this chart
-      this.dashboardsData[newDashboardId] = [newChart];
-      this.saveToLocalStorage();
-
+      const newDashboardId = this.dashboardState.createDashboard([newChart]);
       console.log('Created new dashboard with chart:', newDashboardId);
-
-      // Navigate to the new dashboard
       this.router.navigate(['/dashboard', newDashboardId]);
-
       this.toastService.success(`Created new dashboard with "${data.chartTitle}" chart!`);
+    } else if (data.dashboardId === this.currentDashboardId) {
+      // Add to current dashboard
+      this.undoRedoService.saveState(this.gridItems, 'Chart added');
+
+      // Set proper row position
+      newChart.rowStart =
+        this.gridItems.length > 0
+          ? Math.max(...this.gridItems.map((i) => (i.rowStart ?? 0) + i.rowSpan))
+          : 0;
+
+      this.dashboardState.addWidget(newChart);
+      this.toastService.success(`Added "${data.chartTitle}" to dashboard!`);
     } else {
-      // Add to existing dashboard
-      if (data.dashboardId === this.currentDashboardId) {
-        // Current dashboard - add to grid
-        this.undoRedoService.saveState(this.gridItems, 'Chart added');
-
-        // Set proper position
-        newChart.rowStart =
-          this.gridItems.length > 0
-            ? Math.max(...this.gridItems.map((i) => (i.rowStart ?? 0) + i.rowSpan))
-            : 0;
-
-        this.gridItems.push(newChart);
-        this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-        this.saveToLocalStorage();
-      } else {
-        // Different dashboard
-        if (!this.dashboardsData[data.dashboardId]) {
-          this.dashboardsData[data.dashboardId] = [];
-        }
-
-        // Set proper position
-        const existingWidgets = this.dashboardsData[data.dashboardId];
-        newChart.rowStart =
-          existingWidgets.length > 0
-            ? Math.max(...existingWidgets.map((i) => (i.rowStart ?? 0) + i.rowSpan))
-            : 0;
-
-        this.dashboardsData[data.dashboardId].push(newChart);
-        this.saveToLocalStorage();
-      }
-
+      // Add to a different (non-active) dashboard
+      this.dashboardState.addWidgetToDashboard(data.dashboardId, newChart);
       this.toastService.success(`Added "${data.chartTitle}" to dashboard!`);
     }
   }
 
   getDashboardsList(): DashboardInfo[] {
-    return Object.keys(this.dashboardsData).map((id) => ({
-      id,
-      name: `Dashboard ${id}`,
-    }));
-  }
-
-  getFormattedDateRange(): string {
-    if (!this.currentDateRange) return 'Select Date Range';
-    const start = new Date(this.currentDateRange.startDate);
-    const end = new Date(this.currentDateRange.endDate);
-    return `${this.formatDate(start)} - ${this.formatDate(end)}`;
-  }
-
-  formatDate(date: Date): string {
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
-
-  onChartDateRangeClick(data: { chartId: string; range: any }): void {
-    const { chartId, range } = data;
-    this.chartDateRanges[chartId] = range;
-    console.log('Chart date range updated:', chartId, range);
-  }
-
-  onItemDuplicate(itemId: string): void {
-    const itemToDuplicate = this.gridItems.find((item) => item.id === itemId);
-    if (itemToDuplicate) {
-      this.undoRedoService.saveState(this.gridItems, 'Widget duplicated');
-      const duplicatedItem: GridItem = {
-        ...itemToDuplicate,
-        id: Date.now().toString(),
-        title: `${itemToDuplicate.title} (Copy)`,
-      };
-      this.gridItems.push(duplicatedItem);
-      this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-      this.saveToLocalStorage();
-      this.toastService.success('Widget duplicated');
-    }
-  }
-
-  onItemDelete(itemId: string): void {
-    this.undoRedoService.saveState(this.gridItems, 'Widget deleted');
-    this.gridItems = this.gridItems.filter((item) => item.id !== itemId);
-    this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
-    this.saveToLocalStorage();
-    this.toastService.success('Widget deleted');
-  }
-
-  onWidgetClick(widget: GridItem): void {
-    this.fullscreenWidget = widget;
-  }
-
-  closeFullscreen(): void {
-    this.fullscreenWidget = null;
-  }
-
-  getUndoRedoStatus() {
-    return this.undoRedoService.getHistoryInfo();
+    return this.dashboardState.getDashboardsList();
   }
 }

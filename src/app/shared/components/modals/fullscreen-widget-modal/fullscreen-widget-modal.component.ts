@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GridItem } from '../../dashboard-grid/dashboard-grid.component';
+import { GridItem } from '../../../../core/models/grid-item.model';
 
 @Component({
   selector: 'app-fullscreen-widget-modal',

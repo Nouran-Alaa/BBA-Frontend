@@ -126,5 +126,14 @@ export class DateRangePickerComponent {
     return `${year}-${month}-${day}`;
   }
 
-  applyRange() {}
+  // Handles both custom date inputs and preset-based selection.
+  applyRange(): void {
+    if (this.startDate && this.endDate) {
+      const range: DateRange = {
+        startDate: new Date(this.startDate),
+        endDate: new Date(this.endDate),
+      };
+      this.emitDateRange(range);
+    }
+  }
 }

@@ -9,6 +9,7 @@ import {
   DashboardTemplateService,
   DashboardTemplate,
 } from '../../../../core/services/dashboard-template.service';
+import { DashboardStateService } from '../../../../core/services/dashboard-state.service';
 
 @Component({
   selector: 'app-side-nav',
@@ -73,6 +74,7 @@ export class SideNavComponent implements OnInit {
   constructor(
     private router: Router,
     private templateService: DashboardTemplateService,
+    private dashboardState: DashboardStateService, // ← added
   ) {}
 
   ngOnInit(): void {}
@@ -214,25 +216,14 @@ export class SideNavComponent implements OnInit {
     this.dashboards.push(duplicatedDashboard);
     this.activeDashboardId = duplicatedDashboard.id;
 
-    // Copy the widgets from the original dashboard
-    const originalWidgets = this.getDashboardWidgets(dashboard.id);
-    if (originalWidgets && originalWidgets.length > 0) {
+    // use DashboardStateService instead of reading localStorage directly
+    const originalWidgets = this.dashboardState.allDashboardsData[dashboard.id] || [];
+    if (originalWidgets.length > 0) {
       console.log('Duplicating dashboard widgets:', originalWidgets);
       this.templateService.setTemplateWidgets(duplicatedDashboard.id, originalWidgets);
     }
 
     this.router.navigate(['/dashboard', duplicatedDashboard.id]);
-  }
-
-  getDashboardWidgets(dashboardId: string): any[] {
-    // Get widgets from dashboard container's storage
-    // This assumes the dashboard container stores widgets in localStorage or a service
-    const storedData = localStorage.getItem('dashboardsData');
-    if (storedData) {
-      const dashboardsData = JSON.parse(storedData);
-      return dashboardsData[dashboardId] || [];
-    }
-    return [];
   }
 
   onDashboardDelete(): void {

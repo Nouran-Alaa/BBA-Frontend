@@ -88,9 +88,6 @@
             activeDashboardId === dashboard.id ? 'var(--accent-gradient)' : 'transparent'
           "
           class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 relative cursor-pointer"
-          [style.background]="
-            activeDashboardId === dashboard.id ? 'var(--accent-gradient)' : 'transparent'
-          "
           [style.boxShadow]="activeDashboardId === dashboard.id ? 'var(--shadow-sm)' : 'none'"
           [class.hover-glass]="activeDashboardId !== dashboard.id"
           [class.justify-center]="collapsed"
@@ -180,25 +177,6 @@
         <span *ngIf="!collapsed" class="text-sm font-medium"> Add Dashboard </span>
       </button>
     </nav>
-
-    <!-- Dashboard Templates Modal -->
-    <app-dashboard-templates-modal
-      *ngIf="showTemplatesModal"
-      (close)="showTemplatesModal = false"
-      (selectTemplate)="onTemplateSelected($event)"
-    >
-    </app-dashboard-templates-modal>
-
-    <!-- Dashboard Menu Modal -->
-    <app-dashboard-menu-modal
-      *ngIf="showDashboardMenu && selectedDashboardForMenu"
-      [dashboard]="selectedDashboardForMenu"
-      (close)="showDashboardMenu = false"
-      (rename)="onDashboardRename($event)"
-      (duplicate)="onDashboardDuplicate(selectedDashboardForMenu)"
-      (delete)="onDashboardDelete()"
-    >
-    </app-dashboard-menu-modal>
   </div>
 
   <!-- Footer Section - Fixed at Bottom -->
@@ -231,7 +209,7 @@
     </button>
   </div>
 
-  <!-- MODALS - teleported to body level via portal -->
+  <!-- MODALS - rendered here (at component root, not inside the scroll nav) -->
   <app-dashboard-templates-modal
     *ngIf="showTemplatesModal"
     (close)="showTemplatesModal = false"

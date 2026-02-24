@@ -13,7 +13,7 @@ export interface ChartTemplate {
   examplePrompts: string[];
 }
 
-export interface ChatMessage {
+export interface AiChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
@@ -40,7 +40,7 @@ export class AiChartModalComponent {
   selectedTemplate: ChartTemplate | null = null;
   showChat: boolean = false;
 
-  chatMessages: ChatMessage[] = [];
+  chatMessages: AiChatMessage[] = []; // ← updated type
   userMessage: string = '';
   isGenerating: boolean = false;
   currentPreview: any = null;

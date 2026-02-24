@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridItem } from '../../shared/components/dashboard-grid/dashboard-grid.component';
+import { GridItem } from '../models/grid-item.model';
 
 export interface UndoState {
   items: GridItem[];

@@ -4,21 +4,10 @@ import { CdkDragDrop, CdkDragMove, DragDropModule } from '@angular/cdk/drag-drop
 import { DashboardCardComponent } from '../dashboard-card/dashboard-card.component';
 import { CardActionsComponent } from '../action_menus/card-actions/card-actions.component';
 import { WidgetMenuComponent } from '../action_menus/widget-menu/widget-menu.component';
+import { GridItem } from '../../../core/models/grid-item.model'; // ← moved to core/models
 
-export interface GridItem {
-  id: string;
-  type: 'summary' | 'count' | 'chart';
-  title: string;
-  content?: any;
-  value?: number;
-  label?: string;
-  prompt?: string;
-  chartData?: any;
-  colSpan: number;
-  rowSpan: number;
-  colStart?: number;
-  rowStart?: number;
-}
+// Re-export so any component that was already importing GridItem from here still works
+export type { GridItem };
 
 @Component({
   selector: 'app-dashboard-grid',
