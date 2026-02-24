@@ -458,22 +458,114 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   }
 
   onCreateDashboardFromChat(data: { templateId: string; name: string }): void {
-    // Navigate to new dashboard
-    const newDashboardId = (Object.keys(this.dashboardsData).length + 1).toString();
+    // Generate sequential dashboard ID
+    const allDashboardIds = Object.keys(this.dashboardsData)
+      .map((id) => parseInt(id))
+      .filter((id) => !isNaN(id));
+    const maxId = allDashboardIds.length > 0 ? Math.max(...allDashboardIds) : 0;
+    const newDashboardId = (maxId + 1).toString();
+
+    console.log('Creating new dashboard with ID:', newDashboardId);
 
     // Get template from service
     const template: DashboardTemplate | undefined = this.templateService.getTemplateById(
       data.templateId,
     );
 
-    if (template) {
-      // Apply template to new dashboard
-      this.templateService.setTemplateWidgets(newDashboardId, template.widgets);
+    if (template && template.widgets) {
+      // IMPORTANT: Don't modify current dashboard
+      // Create a completely new entry in dashboardsData
 
-      // Navigate to new dashboard
+      // Map widgets with unique IDs for the new dashboard
+      const newWidgets = template.widgets.map((widget, index) => ({
+        ...widget,
+        id: `${newDashboardId}-${Date.now()}-${index}`,
+        colStart: widget.colStart ?? 0,
+        rowStart: widget.rowStart ?? index,
+      }));
+
+      // Create the new dashboard entry
+      this.dashboardsData[newDashboardId] = newWidgets;
+      this.saveToLocalStorage();
+
+      console.log('New dashboard created:', newDashboardId, 'with', newWidgets.length, 'widgets');
+
+      // Navigate to the new dashboard
       this.router.navigate(['/dashboard', newDashboardId]);
 
       this.toastService.success(`Created ${data.name} dashboard!`);
+    }
+  }
+
+  onAddChartFromChat(data: {
+    dashboardId: string | null;
+    chartPrompt: string;
+    chartTitle: string;
+  }): void {
+    // Create new chart widget
+    const newChart: GridItem = {
+      id: Date.now().toString(),
+      type: 'chart',
+      title: data.chartTitle,
+      prompt: data.chartPrompt,
+      chartData: {},
+      colSpan: 6,
+      rowSpan: 3,
+      colStart: 0,
+      rowStart: 0,
+    };
+
+    // If dashboardId is null, create a new dashboard with just this chart
+    if (data.dashboardId === null) {
+      const allDashboardIds = Object.keys(this.dashboardsData)
+        .map((id) => parseInt(id))
+        .filter((id) => !isNaN(id));
+      const maxId = allDashboardIds.length > 0 ? Math.max(...allDashboardIds) : 0;
+      const newDashboardId = (maxId + 1).toString();
+
+      // Create new dashboard with this chart
+      this.dashboardsData[newDashboardId] = [newChart];
+      this.saveToLocalStorage();
+
+      console.log('Created new dashboard with chart:', newDashboardId);
+
+      // Navigate to the new dashboard
+      this.router.navigate(['/dashboard', newDashboardId]);
+
+      this.toastService.success(`Created new dashboard with "${data.chartTitle}" chart!`);
+    } else {
+      // Add to existing dashboard
+      if (data.dashboardId === this.currentDashboardId) {
+        // Current dashboard - add to grid
+        this.undoRedoService.saveState(this.gridItems, 'Chart added');
+
+        // Set proper position
+        newChart.rowStart =
+          this.gridItems.length > 0
+            ? Math.max(...this.gridItems.map((i) => (i.rowStart ?? 0) + i.rowSpan))
+            : 0;
+
+        this.gridItems.push(newChart);
+        this.dashboardsData[this.currentDashboardId] = [...this.gridItems];
+        this.saveToLocalStorage();
+      } else {
+        // Different dashboard
+        if (!this.dashboardsData[data.dashboardId]) {
+          this.dashboardsData[data.dashboardId] = [];
+        }
+
+        // Set proper position
+        const existingWidgets = this.dashboardsData[data.dashboardId];
+        newChart.rowStart =
+          existingWidgets.length > 0
+            ? Math.max(...existingWidgets.map((i) => (i.rowStart ?? 0) + i.rowSpan))
+            : 0;
+
+        this.dashboardsData[data.dashboardId].push(newChart);
+        this.saveToLocalStorage();
+      }
+
+      this.toastService.success(`Added "${data.chartTitle}" to dashboard!`);
     }
   }
 

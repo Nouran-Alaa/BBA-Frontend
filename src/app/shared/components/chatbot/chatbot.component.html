@@ -5,7 +5,7 @@
     class="glass-heavy rounded-2xl shadow-2xl overflow-hidden flex flex-col chat-window-enter"
     style="width: 400px; height: 600px; border: 1px solid var(--border-glass)"
   >
-    <!-- Header with animated buttons -->
+    <!-- Header -->
     <div
       class="px-4 py-3 flex items-center justify-between flex-shrink-0"
       style="background: var(--accent-gradient); color: var(--text-on-accent)"
@@ -24,14 +24,14 @@
             ></path>
           </svg>
         </div>
-        <div class="flex-1 min-w-0">
+        <div class="flex-1 min-w-0 context-dropdown-container relative">
           <h3 class="font-bold text-sm">Dashboard Assistant</h3>
 
           <!-- Context Dropdown Button -->
           <button
-            (click)="toggleContextDropdown()"
-            class="flex items-center gap-1 text-xs opacity-90 hover:opacity-100 transition-opacity cursor-pointer"
-            (click)="$event.stopPropagation()"
+            (click)="toggleContextDropdown($event)"
+            class="flex items-center gap-1 text-xs opacity-90 hover:opacity-100 transition-opacity cursor-pointer context-label"
+            type="button"
           >
             <span class="truncate max-w-[150px]">{{ getContextLabel() }}</span>
             <svg
@@ -53,56 +53,14 @@
           <!-- Context Dropdown Menu -->
           <div
             *ngIf="showContextDropdown"
-            class="absolute top-full left-0 mt-2 w-64 rounded-xl shadow-2xl overflow-hidden z-50 animate-slideIn"
+            class="absolute top-full left-0 mt-2 w-64 rounded-xl shadow-2xl overflow-hidden z-50 dropdown-menu"
             style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
-            (click)="$event.stopPropagation()"
           >
-            <!-- General Chat -->
-            <button
-              (click)="selectContext('none')"
-              class="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left hover-glass"
-              [style.background]="contextMode === 'none' ? 'var(--bg-overlay)' : 'transparent'"
-              [style.color]="'var(--text-primary)'"
-            >
-              <svg
-                class="w-5 h-5 flex-shrink-0"
-                style="color: var(--text-muted)"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                ></path>
-              </svg>
-              <div class="flex-1 min-w-0">
-                <p class="font-medium text-sm">General Chat</p>
-                <p class="text-xs opacity-70">No dashboard context</p>
-              </div>
-              <svg
-                *ngIf="contextMode === 'none'"
-                class="w-5 h-5"
-                style="color: var(--accent-primary)"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13l4 4L19 7"
-                ></path>
-              </svg>
-            </button>
-
             <!-- Current Dashboard -->
             <button
-              (click)="selectContext('current')"
-              class="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left hover-glass"
+              (click)="selectContext('current', undefined, $event)"
+              type="button"
+              class="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left hover-glass dropdown-item"
               [style.background]="contextMode === 'current' ? 'var(--bg-overlay)' : 'transparent'"
               [style.color]="'var(--text-primary)'"
             >
@@ -126,7 +84,7 @@
               </div>
               <svg
                 *ngIf="contextMode === 'current'"
-                class="w-5 h-5"
+                class="w-5 h-5 checkmark-icon"
                 style="color: var(--accent-primary)"
                 fill="none"
                 stroke="currentColor"
@@ -143,8 +101,9 @@
 
             <!-- All Dashboards -->
             <button
-              (click)="selectContext('all')"
-              class="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left hover-glass"
+              (click)="selectContext('all', undefined, $event)"
+              type="button"
+              class="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left hover-glass dropdown-item"
               [style.background]="contextMode === 'all' ? 'var(--bg-overlay)' : 'transparent'"
               [style.color]="'var(--text-primary)'"
             >
@@ -168,7 +127,7 @@
               </div>
               <svg
                 *ngIf="contextMode === 'all'"
-                class="w-5 h-5"
+                class="w-5 h-5 checkmark-icon"
                 style="color: var(--accent-primary)"
                 fill="none"
                 stroke="currentColor"
@@ -185,17 +144,19 @@
 
             <!-- Divider -->
             <div
-              *ngIf="availableDashboards.length > 0"
+              *ngIf="getAllDashboards().length > 0"
               class="h-px"
               style="background: var(--border-subtle)"
             ></div>
 
-            <!-- Specific Dashboards -->
-            <div *ngIf="availableDashboards.length > 0" class="max-h-48 overflow-y-auto">
+            <!-- List of Available Dashboards -->
+            <div *ngIf="getAllDashboards().length > 0">
+              <!-- Top 3 Dashboards -->
               <button
-                *ngFor="let dashboard of availableDashboards"
-                (click)="selectContext('specific', dashboard.id)"
-                class="w-full px-4 py-2.5 flex items-center gap-3 transition-colors text-left hover-glass"
+                *ngFor="let dashboard of getTopDashboards()"
+                (click)="selectContext('specific', dashboard.id, $event)"
+                type="button"
+                class="w-full px-4 py-2.5 flex items-center gap-3 transition-colors text-left hover-glass dropdown-item"
                 [style.background]="
                   contextMode === 'specific' && selectedDashboardId === dashboard.id
                     ? 'var(--bg-overlay)'
@@ -220,7 +181,7 @@
                 <span class="flex-1 text-sm truncate">{{ dashboard.name }}</span>
                 <svg
                   *ngIf="contextMode === 'specific' && selectedDashboardId === dashboard.id"
-                  class="w-4 h-4"
+                  class="w-4 h-4 checkmark-icon"
                   style="color: var(--accent-primary)"
                   fill="none"
                   stroke="currentColor"
@@ -234,6 +195,82 @@
                   ></path>
                 </svg>
               </button>
+
+              <!-- More dashboards expandable button -->
+              <button
+                *ngIf="hasMoreDashboards()"
+                type="button"
+                (click)="toggleDashboardListExpanded($event)"
+                class="w-full px-4 py-2.5 flex items-center justify-between gap-2 transition-colors text-left hover-glass"
+                style="color: var(--text-muted); background: var(--bg-overlay)"
+              >
+                <span class="text-xs font-medium"
+                  >+{{ getMoreDashboardsCount() }} more dashboard{{
+                    getMoreDashboardsCount() > 1 ? 's' : ''
+                  }}</span
+                >
+                <svg
+                  class="w-4 h-4 transition-transform"
+                  [class.rotate-180]="showDashboardListExpanded"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
+                </svg>
+              </button>
+
+              <!-- Expanded dashboard list -->
+              <div *ngIf="showDashboardListExpanded" class="max-h-48 overflow-y-auto">
+                <button
+                  *ngFor="let dashboard of getRemainingDashboards()"
+                  (click)="selectContext('specific', dashboard.id, $event)"
+                  type="button"
+                  class="w-full px-4 py-2.5 flex items-center gap-3 transition-colors text-left hover-glass dropdown-item"
+                  [style.background]="
+                    contextMode === 'specific' && selectedDashboardId === dashboard.id
+                      ? 'var(--bg-overlay)'
+                      : 'transparent'
+                  "
+                  [style.color]="'var(--text-primary)'"
+                >
+                  <svg
+                    class="w-4 h-4 flex-shrink-0"
+                    style="color: var(--text-muted)"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                  <span class="flex-1 text-sm truncate">{{ dashboard.name }}</span>
+                  <svg
+                    *ngIf="contextMode === 'specific' && selectedDashboardId === dashboard.id"
+                    class="w-4 h-4 checkmark-icon"
+                    style="color: var(--accent-primary)"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div
@@ -241,14 +278,14 @@
               class="px-4 py-3 text-center text-xs"
               style="color: var(--text-muted)"
             >
-              No other dashboards available
+              No dashboards available
             </div>
           </div>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- Clear Chat with hover -->
+        <!-- Clear Chat -->
         <button
           (click)="clearChat()"
           class="p-1.5 rounded-lg transition-all cursor-pointer header-button"
@@ -265,7 +302,7 @@
           </svg>
         </button>
 
-        <!-- Minimize with hover -->
+        <!-- Minimize -->
         <button
           (click)="toggleMinimize()"
           class="p-1.5 rounded-lg transition-all cursor-pointer header-button"
@@ -282,7 +319,7 @@
           </svg>
         </button>
 
-        <!-- Close with hover -->
+        <!-- Close -->
         <button
           (click)="onClose()"
           class="p-1.5 rounded-lg transition-all cursor-pointer header-button"
@@ -328,17 +365,18 @@
             <p class="text-sm whitespace-pre-line leading-relaxed">{{ message.content }}</p>
           </div>
 
-          <!-- Template Action Button with glow -->
+          <!-- Template Action Button -->
           <button
             *ngIf="message.templateId && message.role === 'assistant'"
             (click)="createDashboardFromTemplate(message.templateId)"
+            type="button"
             class="mt-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer text-white template-button"
             style="background: var(--accent-gradient); box-shadow: var(--shadow-sm)"
           >
             ✨ Create This Dashboard
           </button>
 
-          <!-- Suggestions with staggered animation -->
+          <!-- Suggestions -->
           <div
             *ngIf="message.suggestions && message.suggestions.length > 0"
             class="mt-2 flex flex-wrap gap-2"
@@ -346,6 +384,7 @@
             <button
               *ngFor="let suggestion of message.suggestions; let i = index"
               (click)="useSuggestion(suggestion)"
+              type="button"
               class="px-3 py-1.5 text-xs rounded-lg cursor-pointer transition-all suggestion-chip suggestion-button"
               [style.animation-delay]="i * 50 + 'ms'"
               style="
@@ -368,7 +407,7 @@
             </button>
           </div>
 
-          <!-- Timestamp with fade in -->
+          <!-- Timestamp -->
           <p
             class="text-xs mt-1 opacity-60 message-timestamp"
             [class.text-right]="message.role === 'user'"
@@ -379,7 +418,7 @@
         </div>
       </div>
 
-      <!-- Typing Indicator with enhanced animation -->
+      <!-- Typing Indicator -->
       <div *ngIf="isTyping" class="flex items-center gap-2 message-assistant">
         <div class="px-4 py-3 rounded-2xl" style="background: var(--bg-card)">
           <div class="flex gap-1.5">
@@ -400,7 +439,7 @@
       </div>
     </div>
 
-    <!-- Input with enhanced button -->
+    <!-- Input with Chart Button -->
     <div
       class="p-4 flex-shrink-0"
       style="background: var(--bg-card); border-top: 1px solid var(--border-subtle)"
@@ -439,10 +478,238 @@
     </div>
   </div>
 
-  <!-- Minimized Floating Button with animation -->
+  <!-- Chart Destination Selection Modal (ONLY THIS ONE) -->
+  <div
+    *ngIf="showChartDestinationModal && pendingChartData"
+    class="fixed inset-0 z-[10000] flex items-center justify-center p-4"
+    style="background: rgba(0, 0, 0, 0.5)"
+    (click)="showChartDestinationModal = false"
+  >
+    <div
+      class="glass-heavy rounded-2xl shadow-2xl p-6 max-w-md w-full"
+      style="border: 1px solid var(--border-glass)"
+      (click)="$event.stopPropagation()"
+    >
+      <h3 class="text-lg font-bold mb-2" style="color: var(--text-primary)">
+        📊 Where to add this chart?
+      </h3>
+      <p class="text-sm mb-4" style="color: var(--text-secondary)">
+        "{{ pendingChartData.title }}"
+      </p>
+
+      <div class="space-y-2">
+        <!-- Add to Current Dashboard -->
+        <button
+          *ngIf="contextMode === 'current' || contextMode === 'specific'"
+          (click)="selectChartDestination('current')"
+          type="button"
+          class="w-full px-4 py-3 rounded-lg text-left transition-all flex items-center gap-3"
+          style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
+          onmouseover="
+            this.style.background = 'var(--bg-card)';
+            this.style.borderColor = 'var(--accent-primary)';
+          "
+          onmouseout="
+            this.style.background = 'var(--bg-overlay)';
+            this.style.borderColor = 'var(--border-subtle)';
+          "
+        >
+          <svg
+            class="w-5 h-5"
+            style="color: var(--accent-primary)"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            ></path>
+          </svg>
+          <div>
+            <p class="font-medium text-sm" style="color: var(--text-primary)">
+              Add to Current Dashboard
+            </p>
+            <p class="text-xs" style="color: var(--text-muted)">{{ getContextLabel() }}</p>
+          </div>
+        </button>
+
+        <!-- Add to Other Dashboard -->
+        <div class="relative other-dashboards-dropdown">
+          <button
+            (click)="toggleOtherDashboardsDropdown($event)"
+            type="button"
+            class="w-full px-4 py-3 rounded-lg text-left transition-all flex items-center justify-between gap-3"
+            style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
+            onmouseover="
+              this.style.background = 'var(--bg-card)';
+              this.style.borderColor = 'var(--accent-primary)';
+            "
+            onmouseout="
+              this.style.background = 'var(--bg-overlay)';
+              this.style.borderColor = 'var(--border-subtle)';
+            "
+          >
+            <div class="flex items-center gap-3">
+              <svg
+                class="w-5 h-5"
+                style="color: var(--text-muted)"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5z"
+                ></path>
+              </svg>
+              <p class="font-medium text-sm" style="color: var(--text-primary)">
+                Add to Other Dashboard
+              </p>
+            </div>
+            <svg
+              class="w-4 h-4 transition-transform"
+              [class.rotate-180]="showOtherDashboardsDropdown"
+              style="color: var(--text-muted)"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </button>
+
+          <!-- Dropdown list of other dashboards -->
+          <div
+            *ngIf="showOtherDashboardsDropdown"
+            class="absolute top-full left-0 right-0 mt-1 rounded-lg shadow-xl overflow-hidden z-50 max-h-48 overflow-y-auto dropdown-menu"
+            style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
+          >
+            <button
+              *ngFor="let dashboard of getAllDashboards()"
+              (click)="selectChartDestination('other', dashboard.id)"
+              type="button"
+              class="w-full px-4 py-2.5 text-left transition-colors hover-glass flex items-center gap-2"
+              style="color: var(--text-primary)"
+              onmouseover="this.style.background = 'var(--bg-overlay)'"
+              onmouseout="this.style.background = 'transparent'"
+            >
+              <svg
+                class="w-4 h-4"
+                style="color: var(--text-muted)"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              <span class="text-sm">{{ dashboard.name }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Create Another Chart -->
+        <button
+          (click)="selectChartDestination('new-chart')"
+          type="button"
+          class="w-full px-4 py-3 rounded-lg text-left transition-all flex items-center gap-3"
+          style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
+          onmouseover="
+            this.style.background = 'var(--bg-card)';
+            this.style.borderColor = 'var(--accent-primary)';
+          "
+          onmouseout="
+            this.style.background = 'var(--bg-overlay)';
+            this.style.borderColor = 'var(--border-subtle)';
+          "
+        >
+          <svg
+            class="w-5 h-5"
+            style="color: var(--text-muted)"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            ></path>
+          </svg>
+          <p class="font-medium text-sm" style="color: var(--text-primary)">Create Another Chart</p>
+        </button>
+
+        <!-- Create New Dashboard -->
+        <button
+          (click)="selectChartDestination('new-dashboard')"
+          type="button"
+          class="w-full px-4 py-3 rounded-lg text-left transition-all flex items-center gap-3"
+          style="
+            background: var(--accent-gradient);
+            color: var(--text-on-accent);
+            box-shadow: var(--shadow-md);
+          "
+          onmouseover="
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = 'var(--shadow-lg)';
+          "
+          onmouseout="
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'var(--shadow-md)';
+          "
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            ></path>
+          </svg>
+          <div>
+            <p class="font-medium text-sm">Create New Dashboard</p>
+            <p class="text-xs opacity-90">Start fresh with this chart</p>
+          </div>
+        </button>
+      </div>
+
+      <button
+        (click)="showChartDestinationModal = false"
+        type="button"
+        class="mt-4 w-full px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all"
+        style="
+          background: var(--bg-overlay);
+          color: var(--text-primary);
+          border: 1px solid var(--border-subtle);
+        "
+        onmouseover="this.style.background = 'var(--bg-card)'"
+        onmouseout="this.style.background = 'var(--bg-overlay)'"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Minimized Button -->
   <button
     *ngIf="isMinimized"
     (click)="toggleMinimize()"
+    type="button"
     class="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl cursor-pointer floating-button"
     style="background: var(--accent-gradient); color: var(--text-on-accent)"
   >

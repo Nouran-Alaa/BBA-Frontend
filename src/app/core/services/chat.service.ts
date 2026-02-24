@@ -8,6 +8,7 @@ export interface ChatMessage {
   timestamp: Date;
   suggestions?: string[];
   templateId?: string;
+  chartData?: { prompt: string; title: string };
   dashboardPreview?: any;
 }
 
@@ -25,6 +26,7 @@ export class ChatService {
 
   private context: ChatContext = {};
   private conversationHistory: ChatMessage[] = [];
+  private waitingForChartPrompt = false;
 
   constructor() {
     this.initializeChat();
@@ -35,14 +37,9 @@ export class ChatService {
       id: Date.now().toString(),
       role: 'assistant',
       content:
-        "Hi! I'm your dashboard assistant. I can help you create new dashboards, analyze your data, and answer questions about your analytics. What would you like to do today?",
+        "Hi! I'm your dashboard assistant. I can help you:\n\n• Create new dashboards\n• Add charts and widgets\n• Analyze your data\n• Answer questions\n\nWhat would you like to do?",
       timestamp: new Date(),
-      suggestions: [
-        'Create a new dashboard',
-        'Show me social media analytics',
-        'Tell me about my current dashboard',
-        'What templates are available?',
-      ],
+      suggestions: ['Create a new dashboard', 'Add a chart', 'Show available templates'],
     };
 
     this.conversationHistory.push(welcomeMessage);
@@ -65,7 +62,7 @@ export class ChatService {
     this.conversationHistory.push(userMsg);
     this.messages.next([...this.conversationHistory]);
 
-    // Simulate AI response (replace with real API call)
+    // Simulate AI response
     setTimeout(() => {
       const response = this.generateResponse(userMessage);
       this.conversationHistory.push(response);
@@ -75,6 +72,39 @@ export class ChatService {
 
   private generateResponse(userMessage: string): ChatMessage {
     const message = userMessage.toLowerCase();
+
+    // If we're waiting for a chart prompt, treat this message as the chart description
+    if (this.waitingForChartPrompt) {
+      this.waitingForChartPrompt = false;
+      const chartTitle = this.extractChartTitle(userMessage);
+      return {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `Great! I'll create a chart for "${chartTitle}". Where would you like to add it?`,
+        timestamp: new Date(),
+        chartData: {
+          prompt: userMessage,
+          title: chartTitle,
+        },
+      };
+    }
+
+    // Chart creation requests
+    if (
+      message.includes('add a chart') ||
+      message.includes('create a chart') ||
+      (message.includes('chart') && (message.includes('create') || message.includes('add')))
+    ) {
+      this.waitingForChartPrompt = true;
+      return {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content:
+          "I'll help you create a chart! Please describe what you'd like to visualize.\n\nFor example:\n• Monthly revenue trends\n• User growth over time\n• Sales by region",
+        timestamp: new Date(),
+        suggestions: [],
+      };
+    }
 
     // Template suggestions
     if (
@@ -89,11 +119,7 @@ export class ChatService {
           'I can help you create a social media analytics dashboard! This will track engagement, reach, followers, and post performance across all your social platforms.',
         timestamp: new Date(),
         templateId: 'social-media',
-        suggestions: [
-          'Create this dashboard',
-          'Show me more options',
-          'What other templates are available?',
-        ],
+        suggestions: ['Create this dashboard', 'Show me more templates', 'Add a custom chart'],
       };
     }
 
@@ -105,7 +131,7 @@ export class ChatService {
           'Perfect! I can set up a YouTube Analytics dashboard for you. It will show views, subscribers, watch time, and top-performing videos.',
         timestamp: new Date(),
         templateId: 'youtube',
-        suggestions: ['Create YouTube dashboard', 'Show different template', 'Customize it first'],
+        suggestions: ['Create YouTube dashboard', 'Show different template', 'Add custom widget'],
       };
     }
 
@@ -118,10 +144,10 @@ export class ChatService {
         id: Date.now().toString(),
         role: 'assistant',
         content:
-          "I'll create an Executive Summary dashboard with high-level KPIs, trends, and strategic insights. This is perfect for leadership presentations.",
+          "I'll create an Executive Summary dashboard with high-level KPIs, trends, and strategic insights. Perfect for leadership presentations!",
         timestamp: new Date(),
         templateId: 'executive',
-        suggestions: ['Create executive dashboard', 'Show me templates', 'Tell me more'],
+        suggestions: ['Create executive dashboard', 'Show me templates', 'Add custom metrics'],
       };
     }
 
@@ -130,7 +156,7 @@ export class ChatService {
         id: Date.now().toString(),
         role: 'assistant',
         content:
-          'I can help you create a new dashboard! What type of data would you like to track? Choose from:\n\n• Social Media Analytics\n• YouTube Performance\n• Instagram Insights\n• Facebook Analytics\n• Executive Summary\n• Twitter Analytics\n• TikTok Metrics\n• Or tell me what you need!',
+          'I can help you create a new dashboard! What type of data would you like to track?\n\n📱 Social Media Analytics\n📹 YouTube Performance\n📸 Instagram Insights\n📊 Executive Summary\n🐦 Twitter Analytics\n🎵 TikTok Metrics',
         timestamp: new Date(),
         suggestions: [
           'Social media dashboard',
@@ -146,26 +172,9 @@ export class ChatService {
         id: Date.now().toString(),
         role: 'assistant',
         content:
-          'Here are the available dashboard templates:\n\n📱 Social Media Analytics\n📹 YouTube Analytics\n📸 Instagram Insights\n📘 Facebook Page Analytics\n📊 Executive Summary\n🐦 Twitter (X) Analytics\n🎵 TikTok Analytics\n\nWhich one interests you?',
+          'Here are the available dashboard templates:\n\n📱 Social Media Analytics\n📹 YouTube Analytics\n📸 Instagram Insights\n📊 Executive Summary\n🐦 Twitter Analytics\n🎵 TikTok Analytics',
         timestamp: new Date(),
-        suggestions: [
-          'Social media template',
-          'YouTube template',
-          'Executive template',
-          'Custom dashboard',
-        ],
-      };
-    }
-
-    if (message.includes('current') || message.includes('this dashboard')) {
-      return {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: this.context.currentDashboardId
-          ? `You're currently viewing Dashboard ${this.context.currentDashboardId}. It has ${this.getCurrentDashboardInfo()} widgets. Would you like to add more widgets or create a new dashboard?`
-          : "You don't have a dashboard selected yet. Would you like me to create one for you?",
-        timestamp: new Date(),
-        suggestions: ['Add widgets', 'Create new dashboard', 'Show analytics'],
+        suggestions: ['Social media template', 'YouTube template', 'Executive template'],
       };
     }
 
@@ -174,19 +183,35 @@ export class ChatService {
       id: Date.now().toString(),
       role: 'assistant',
       content:
-        "I'm here to help you with your dashboards! You can ask me to:\n\n• Create a new dashboard\n• Add widgets to existing dashboards\n• Analyze your data\n• Get insights and recommendations\n\nWhat would you like to do?",
+        "I'm here to help you with your dashboards! You can:\n\n• Create a new dashboard\n• Add charts and widgets\n• Get insights from your data\n• Ask questions about analytics\n\nWhat would you like to do?",
       timestamp: new Date(),
-      suggestions: ['Create a dashboard', 'Show templates', 'Help me analyze data'],
+      suggestions: ['Create a dashboard', 'Add a chart', 'Show templates'],
     };
   }
 
-  private getCurrentDashboardInfo(): string {
-    // This will be populated from the dashboard service
-    return '4';
+  private extractChartTitle(message: string): string {
+    // Simple extraction - can be improved with NLP
+    const patterns = [
+      /chart (?:for|about|of|showing) (.+)/i,
+      /show (?:me )?(?:a )?(.+) chart/i,
+      /create (?:a )?(.+) chart/i,
+      /visualize (.+)/i,
+      /graph (?:for|about|of) (.+)/i,
+    ];
+
+    for (const pattern of patterns) {
+      const match = message.match(pattern);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+
+    return 'AI Generated Chart';
   }
 
   clearChat(): void {
     this.conversationHistory = [];
+    this.waitingForChartPrompt = false;
     this.initializeChat();
   }
 

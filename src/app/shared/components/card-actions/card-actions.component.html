@@ -1,0 +1,71 @@
+<div class="flex items-center gap-1">
+  <!-- Edit with AI -->
+  <button
+    (click)="editClick.emit($event)"
+    class="p-1.5 rounded-lg transition-all border shadow-sm hover-glass action-button"
+    style="background: var(--bg-card); border-color: var(--border-subtle)"
+    title="Edit with AI"
+  >
+    <svg
+      class="w-4 h-4"
+      style="color: var(--text-muted)"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+      ></path>
+      <circle cx="18" cy="6" r="2" fill="currentColor" style="color: var(--accent-primary)" />
+    </svg>
+  </button>
+
+  <!-- Date Range -->
+  <div class="relative">
+    <button
+      (click)="dateClick.emit($event)"
+      class="p-1.5 rounded-lg transition-all border shadow-sm cursor-pointer action-button"
+      style="background: var(--bg-card); border-color: var(--border-subtle)"
+      title="Change date range"
+    >
+      <svg
+        class="w-4 h-4"
+        style="color: var(--text-muted)"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        ></path>
+      </svg>
+    </button>
+
+    <!-- Date Range Dropdown -->
+    <div
+      *ngIf="isActive"
+      class="fixed z-[20] animate-fadeIn"
+      [style.top.px]="datePickerPosition.top"
+      [style.left.px]="datePickerPosition.left"
+      (click)="$event.stopPropagation()"
+    >
+      <app-date-range-picker (dateRangeChange)="dateRangeChange.emit($event)">
+      </app-date-range-picker>
+    </div>
+  </div>
+
+  <!-- AI Badge for Chart Type -->
+  <span
+    *ngIf="itemType === 'chart'"
+    class="px-2 py-1 text-xs font-medium rounded"
+    style="background: var(--accent-gradient); color: var(--text-on-accent)"
+  >
+    AI
+  </span>
+</div>
