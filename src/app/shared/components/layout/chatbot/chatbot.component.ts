@@ -11,11 +11,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChatService, ChatMessage } from '../../../core/services/chat.service';
+import { ChatService, ChatMessage } from '../../../../core/services/chat.service';
 import {
   DashboardTemplateService,
   DashboardTemplate,
-} from '../../../core/services/dashboard-template.service';
+} from '../../../../core/services/dashboard-template.service';
 import { Observable } from 'rxjs';
 
 export interface DashboardInfo {

@@ -1,9 +1,9 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { TopNavComponent } from '../../shared/components/top-nav/top-nav.component';
-import { SideNavComponent } from '../../shared/components/side-nav/side-nav.component';
-import { ToastComponent } from '../../shared/components/toast/toast.component';
+import { TopNavComponent } from '../../shared/components/layout/top-nav/top-nav.component';
+import { SideNavComponent } from '../../shared/components/layout/side-nav/side-nav.component';
+import { ToastComponent } from '../../shared/components/layout/toast/toast.component';
 import { ThemeService } from '../../core/services/theme.service';
 
 @Component({

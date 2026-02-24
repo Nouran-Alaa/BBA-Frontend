@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   DashboardTemplateService,
   DashboardTemplate,
-} from '../../../core/services/dashboard-template.service';
+} from '../../../../core/services/dashboard-template.service';
 
 @Component({
   selector: 'app-dashboard-templates-modal',

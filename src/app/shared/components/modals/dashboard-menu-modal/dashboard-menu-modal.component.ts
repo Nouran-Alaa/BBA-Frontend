@@ -1,10 +1,10 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Dashboard } from '../../../core/models/dashboard.model';
+import { Dashboard } from '../../../../core/models/dashboard.model';
 import { ShareModalComponent } from '../share-modal/share-modal.component';
 import { ConfirmDeleteModalComponent } from '../confirm-delete-modal/confirm-delete-modal.component';
-import { ToastService } from '../../../core/services/toast.service';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-dashboard-menu-modal',

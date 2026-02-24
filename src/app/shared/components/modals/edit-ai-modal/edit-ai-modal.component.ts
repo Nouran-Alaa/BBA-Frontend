@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GridItem } from '../dashboard-grid/dashboard-grid.component';
+import { GridItem } from '../../dashboard-grid/dashboard-grid.component';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';

@@ -4,25 +4,25 @@ import { Router, ActivatedRoute } from '@angular/router';
 import {
   DateRangePickerComponent,
   DateRange,
-} from '../../../shared/components/date-range-picker/date-range-picker.component';
-import { AiChartModalComponent } from '../../../shared/components/ai-chart-modal/ai-chart-modal.component';
+} from '../../../shared/components/action_menus/date-range-picker/date-range-picker.component';
+import { AiChartModalComponent } from '../../../shared/components/modals/ai-chart-modal/ai-chart-modal.component';
 import {
   DashboardGridComponent,
   GridItem,
 } from '../../../shared/components/dashboard-grid/dashboard-grid.component';
-import { FullscreenWidgetModalComponent } from '../../../shared/components/fullscreen-widget-modal/fullscreen-widget-modal.component';
+import { FullscreenWidgetModalComponent } from '../../../shared/components/modals/fullscreen-widget-modal/fullscreen-widget-modal.component';
 import { ToastService } from '../../../core/services/toast.service';
 import {
   DashboardTemplateService,
   DashboardTemplate,
 } from '../../../core/services/dashboard-template.service';
 import { Subscription } from 'rxjs';
-import { EditAiModalComponent } from '../../../shared/components/edit-ai-modal/edit-ai-modal.component';
+import { EditAiModalComponent } from '../../../shared/components/modals/edit-ai-modal/edit-ai-modal.component';
 import { UndoRedoService } from '../../../core/services/undo-redo.service';
 import {
   ChatbotComponent,
   DashboardInfo,
-} from '../../../shared/components/chatbot/chatbot.component';
+} from '../../../shared/components/layout/chatbot/chatbot.component';
 import { ChatService } from '../../../core/services/chat.service';
 
 @Component({

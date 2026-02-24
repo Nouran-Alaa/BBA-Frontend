@@ -1,14 +1,14 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Dashboard } from '../../../core/models/dashboard.model';
-import { UserRole } from '../../../core/models/user.model';
-import { DashboardTemplatesModalComponent } from '../dashboard-templates-modal/dashboard-templates-modal.component';
-import { DashboardMenuModalComponent } from '../dashboard-menu-modal/dashboard-menu-modal.component';
+import { Dashboard } from '../../../../core/models/dashboard.model';
+import { UserRole } from '../../../../core/models/user.model';
+import { DashboardTemplatesModalComponent } from '../../modals/dashboard-templates-modal/dashboard-templates-modal.component';
+import { DashboardMenuModalComponent } from '../../modals/dashboard-menu-modal/dashboard-menu-modal.component';
 import {
   DashboardTemplateService,
   DashboardTemplate,
-} from '../../../core/services/dashboard-template.service';
+} from '../../../../core/services/dashboard-template.service';
 
 @Component({
   selector: 'app-side-nav',

@@ -2,8 +2,8 @@ import { Component, Input, Output, EventEmitter, HostListener } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDragMove, DragDropModule } from '@angular/cdk/drag-drop';
 import { DashboardCardComponent } from '../dashboard-card/dashboard-card.component';
-import { CardActionsComponent } from '../card-actions/card-actions.component';
-import { WidgetMenuComponent } from '../widget-menu/widget-menu.component';
+import { CardActionsComponent } from '../action_menus/card-actions/card-actions.component';
+import { WidgetMenuComponent } from '../action_menus/widget-menu/widget-menu.component';
 
 export interface GridItem {
   id: string;
