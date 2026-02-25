@@ -1,0 +1,120 @@
+import { VideoWidgetConfig } from '../models/video-widget.model';
+
+export const DEFAULT_VIDEO_CONFIG: VideoWidgetConfig = {
+  widgetTitle: 'Featured Video',
+  videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+  platform: 'youtube',
+  thumbnailUrl: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+  title: 'أحمد موسى: المهندس نجيب ساويرس كاتب كلام صعب ولازم نفهمه.. هل يعرف حاجة إحنا مانعرفهاش؟',
+  description: 'تعليق أحمد موسى على تصريحات رجل الأعمال نجيب ساويرس حول الأوضاع الاقتصادية في مصر',
+  duration: '2:31',
+  channelName: 'سدى البلد – صدى البلد',
+  channelAvatarUrl: 'https://picsum.photos/seed/sada-balad/64/64',
+  publishedAt: new Date('2022-08-15T21:30:00').toISOString(),
+  language: 'Arabic',
+  sentiment: 'negative',
+
+  storytelling: `في هذا المقطع المثير للجدل، يتناول الإعلامي أحمد موسى تصريحات رجل الأعمال البارز نجيب ساويرس بنظرة نقدية حادة. يُلمح موسى في معرض حديثه إلى أن ثمة معلومات وتفاصيل قد تكون في متناول ساويرس دون سائر المواطنين، مستنداً إلى موقع الأخير المتميز في عالم الأعمال والثروة.
+
+يتصاعد الجدل حين يُصوّر موسى تصريحات ساويرس باعتبارها "كلاماً صعباً" يستعصي على فهم عامة الناس، في توصيف يُفسره البعض على أنه انتقاد لأسلوب التعبير النخبوي المنفصل عن الواقع المعيشي اليومي.
+
+أثار هذا التعليق موجة واسعة من التفاعل على منصات التواصل الاجتماعي، مع انقسام واضح بين من يؤيد رؤية موسى النقدية، ومن يرى أن الانتقاد في غير محله وأن ساويرس يُعبّر بحرية مشروعة عن قناعاته الاقتصادية.`,
+
+  transcript: [
+    { timestamp: '00:00:03', speaker: 'أحمد موسى', text: 'نجيب ساويرس كاتب كلام صعب ولازم نفهمه.. هل يعرف حاجة إحنا مانعرفهاش؟', sentiment: 'negative' },
+    { timestamp: '00:00:18', speaker: 'أحمد موسى', text: 'المهندس نجيب ساويرس كتب.. م أريد أن أكتب تعزية قبل أن أعرف تفاصيل الحادث', sentiment: 'positive' },
+    { timestamp: '00:00:35', speaker: 'أحمد موسى', text: 'نجيب ساويرس كاتب كلام صعب ولازم نفهمه.. هل يعرف حاجة إحنا مانعرفهاش؟', sentiment: 'negative' },
+    { timestamp: '00:00:52', speaker: 'أحمد موسى', text: 'المهندس نجيب ساويرس كتب.. م أريد أن أكتب تعزية قبل أن أعرف تفاصيل الحادث', sentiment: 'positive' },
+    { timestamp: '00:01:10', speaker: 'أحمد موسى', text: 'المهندس نجيب ساويرس كتب.. م أريد أن أكتب تعزية قبل أن أعرف تفاصيل الحادث', sentiment: 'positive' },
+    { timestamp: '00:01:28', speaker: 'أحمد موسى', text: 'المهندس نجيب ساويرس كتب.. م أريد أن أكتب تعزية قبل أن أعرف تفاصيل الحادث', sentiment: 'positive' },
+    { timestamp: '00:01:45', speaker: 'أحمد موسى', text: 'وده بيوضح إن في حاجات محتاجين نعرفها قبل ما نبقى حكّام على الموقف', sentiment: 'neutral' },
+    { timestamp: '00:02:05', speaker: 'أحمد موسى', text: 'الصورة مش واضحة لأي حد، وكل اللي بيتكلم بيتكلم من منظوره هو', sentiment: 'neutral' },
+  ],
+
+  tags: [
+    { label: 'نجيب ساويرس', category: 'Public Figures', subCategory: 'Businessmen', highlighted: true },
+    { label: 'أحمد موسى', category: 'Public Figures', subCategory: 'Journalists', highlighted: false },
+    { label: 'مجلس الوزراء', category: 'Public Figures', subCategory: 'Political Positions', highlighted: false },
+    { label: 'وزير النقل', category: 'Public Figures', subCategory: 'Ministers', highlighted: false },
+    { label: 'كامل الوزير', category: 'Public Figures', subCategory: 'Ministers', highlighted: true },
+    { label: 'السيسي', category: 'Public Figures', subCategory: 'Presidents Of Egypt', highlighted: false },
+    { label: 'عدلي منصور', category: 'Public Figures', subCategory: 'Presidents Of Egypt', highlighted: false },
+    { label: 'مصر', category: 'Places', subCategory: 'Countries', highlighted: false },
+    { label: 'السودان', category: 'Places', subCategory: 'Countries', highlighted: false },
+    { label: 'قطر', category: 'Places', subCategory: 'Countries', highlighted: false },
+    { label: 'الكويت', category: 'Places', subCategory: 'Countries', highlighted: false },
+    { label: 'أستراليا', category: 'Places', subCategory: 'Countries', highlighted: false },
+    { label: 'الجونة', category: 'Places', subCategory: 'Hotels', highlighted: false },
+    { label: 'سوهاج', category: 'Places', subCategory: 'Sub Region', highlighted: false },
+    { label: 'العاصمة الإدارية', category: 'Places', subCategory: 'Sub Region', highlighted: false },
+    { label: 'العلمين الجديدة', category: 'Places', subCategory: 'Sub Region', highlighted: false },
+    { label: 'القاهرة', category: 'Places', subCategory: 'Sub Region', highlighted: false },
+    { label: 'وزارة الداخلية', category: 'Entities', subCategory: 'Ministry', highlighted: false },
+    { label: 'وزارة الدفاع', category: 'Entities', subCategory: 'Ministry', highlighted: false },
+    { label: 'العام', category: 'Entities', subCategory: 'Journalists', highlighted: false },
+    { label: 'ض', category: 'Entities', subCategory: 'Television Programmes', highlighted: false },
+  ],
+
+  comments: [
+    {
+      id: 'c1',
+      userName: 'مريم أحمد',
+      userAvatarUrl: 'https://picsum.photos/seed/user1/80/80',
+      date: '2021-03-02',
+      text: 'يجب علينا التكاتف من أجل هذا الوطن والعمل سويا على إنمائه وتقاسم نتائج التنمية سواسية',
+      sentiment: 'positive',
+      emotion: 'Happy'
+    },
+    {
+      id: 'c2',
+      userName: 'خالد سمير',
+      userAvatarUrl: 'https://picsum.photos/seed/user2/80/80',
+      date: '2021-03-02',
+      text: 'من أجل نمو مصر أشجع وبقوة أن يتشارك الجميع في المسؤوليات والنتائج وبذلك ينمو هذا المجتمع وينافس على مستويات عالية',
+      sentiment: 'positive',
+      emotion: 'Happy'
+    },
+    {
+      id: 'c3',
+      userName: 'سارة محمود',
+      userAvatarUrl: 'https://picsum.photos/seed/user3/80/80',
+      date: '2021-03-02',
+      text: 'الكلام ده صح بس محتاج شرح أكتر، ساويرس بيتكلم من منظور رجل أعمال مش من منظور المواطن العادي',
+      sentiment: 'negative',
+      emotion: 'Angry'
+    },
+    {
+      id: 'c4',
+      userName: 'محمد العمري',
+      userAvatarUrl: 'https://picsum.photos/seed/user4/80/80',
+      date: '2021-03-03',
+      text: 'أحمد موسى دايماً بيدافع عن المواطن البسيط، التعليق ده في محله تماماً',
+      sentiment: 'positive',
+      emotion: 'Happy'
+    },
+  ],
+
+  analytics: {
+    views: 196000,
+    likes: 3000,
+    comments: 791,
+    shares: 450,
+    ageGroups: [
+      { label: '18-24', percentage: 72 },
+      { label: '25-34', percentage: 58 },
+      { label: '35-44', percentage: 44 },
+      { label: '45-54', percentage: 30 },
+      { label: '55-64', percentage: 18 },
+      { label: '65+', percentage: 8 },
+    ],
+    genderSplit: { male: 62, female: 38 },
+    sentimentBreakdown: { positive: 45, negative: 38, neutral: 17 },
+    topRegions: [
+      { name: 'Cairo', percentage: 34 },
+      { name: 'Alexandria', percentage: 21 },
+      { name: 'Giza', percentage: 18 },
+      { name: 'Other Egypt', percentage: 15 },
+      { name: 'Gulf', percentage: 12 },
+    ]
+  }
+};

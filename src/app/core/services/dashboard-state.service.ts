@@ -158,10 +158,24 @@ export class DashboardStateService {
     const original = this.gridItems.find((item) => item.id === itemId);
     if (!original) return null;
 
+    // The bottom row of the original widget
+    const originalBottom = (original.rowStart ?? 0) + original.rowSpan;
+
+    // Find the lowest occupied row across ALL existing items so the copy
+    // never overlaps anything — not just the original.
+    const maxOccupiedRow =
+      this.gridItems.length > 0
+        ? Math.max(...this.gridItems.map((i) => (i.rowStart ?? 0) + i.rowSpan))
+        : 0;
+
+    const newRowStart = Math.max(originalBottom, maxOccupiedRow);
+
     const duplicate: GridItem = {
-      ...original,
+      ...JSON.parse(JSON.stringify(original)), // deep clone (preserves newsConfig/videoConfig)
       id: Date.now().toString(),
       title: `${original.title} (Copy)`,
+      colStart: original.colStart ?? 0,
+      rowStart: newRowStart,
     };
 
     this.addWidget(duplicate);

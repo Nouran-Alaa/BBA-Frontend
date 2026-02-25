@@ -1,0 +1,454 @@
+<!-- Backdrop -->
+<div class="vfm-backdrop" (click)="onClose()">
+  <div class="vfm-panel" (click)="$event.stopPropagation()">
+    <!-- ── Top bar ─────────────────────────────────────── -->
+    <div class="vfm-topbar">
+      <div class="vfm-topbar-info">
+        <img
+          *ngIf="config.channelAvatarUrl"
+          [src]="config.channelAvatarUrl"
+          class="vfm-channel-avatar"
+          onerror="this.style.display = 'none'"
+        />
+        <div class="vfm-topbar-text">
+          <span class="vfm-channel-name">{{ config.channelName }}</span>
+          <div class="vfm-topbar-meta">
+            <span *ngIf="config.language" class="vfm-meta-pill">{{ config.language }}</span>
+            <span class="vfm-dot-sep">·</span>
+            <span class="vfm-meta-time">{{ getTimeAgo(config.publishedAt) }}</span>
+            <span class="vfm-dot-sep">·</span>
+            <span class="vfm-meta-duration">⏱ {{ config.duration }}</span>
+            <ng-container *ngIf="config.analytics">
+              <span class="vfm-dot-sep">·</span>
+              <span class="vfm-meta-stat">👁 {{ formatCount(config.analytics!.views) }}</span>
+              <span class="vfm-dot-sep">·</span>
+              <span class="vfm-meta-stat">👍 {{ formatCount(config.analytics!.likes) }}</span>
+              <span class="vfm-dot-sep">·</span>
+              <span class="vfm-meta-stat">💬 {{ formatCount(config.analytics!.comments) }}</span>
+            </ng-container>
+          </div>
+        </div>
+        <span
+          *ngIf="config.sentiment"
+          class="vfm-sentiment-badge"
+          [style.color]="getSentimentColor(config.sentiment)"
+          [style.background]="getSentimentColor(config.sentiment) + '1a'"
+          [style.border-color]="getSentimentColor(config.sentiment) + '44'"
+          >{{ getSentimentLabel(config.sentiment) }}</span
+        >
+      </div>
+      <button class="vfm-close-btn" (click)="onClose()" title="Close (ESC)">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.5"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Tab bar ──────────────────────────────────────── -->
+    <div class="vfm-tab-bar">
+      <button
+        *ngFor="let tab of tabs"
+        class="vfm-tab"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            [attr.d]="tab.icon"
+          />
+        </svg>
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- ── Main content ────────────────────────────────── -->
+    <div class="vfm-body">
+      <!-- ━━ PLAYER TAB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div *ngIf="activeTab === 'player'" class="vfm-tab-pane">
+        <div class="vfm-video-wrapper">
+          <!-- YouTube embed -->
+          <iframe
+            *ngIf="config.platform === 'youtube'"
+            [src]="config.videoUrl | trustUrl"
+            class="vfm-iframe"
+            frameborder="0"
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture;
+            "
+            allowfullscreen
+          ></iframe>
+          <!-- Direct video -->
+          <video
+            *ngIf="config.platform === 'direct'"
+            [src]="config.videoUrl"
+            class="vfm-iframe"
+            controls
+          ></video>
+          <!-- Fallback thumbnail -->
+          <div *ngIf="config.platform === 'vimeo'" class="vfm-iframe vfm-thumb-fallback">
+            <img [src]="config.thumbnailUrl" class="w-full h-full object-cover" />
+            <div class="vfm-play-overlay">
+              <a
+                [href]="config.videoUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="vfm-play-link"
+              >
+                Open on Vimeo
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- Title under player -->
+        <h2 class="vfm-video-title" dir="auto">{{ config.title }}</h2>
+        <p *ngIf="config.description" class="vfm-video-desc" dir="auto">{{ config.description }}</p>
+      </div>
+
+      <!-- ━━ TRANSCRIPTION TAB ━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div *ngIf="activeTab === 'transcription'" class="vfm-tab-pane">
+        <div class="vfm-section-header">
+          <h3 class="vfm-section-title">Transcription</h3>
+          <label class="vfm-toggle-row">
+            <span class="vfm-toggle-label">On Video</span>
+            <label class="vfm-toggle-switch">
+              <input type="checkbox" [(ngModel)]="showTranscriptOnVideo" />
+              <span class="vfm-toggle-knob"></span>
+            </label>
+          </label>
+        </div>
+
+        <div class="vfm-transcript-list" *ngIf="config.transcript?.length; else noTranscript">
+          <div *ngFor="let line of config.transcript" class="vfm-transcript-row">
+            <span class="vfm-ts-time">{{ line.timestamp }}</span>
+            <span
+              *ngIf="line.sentiment"
+              class="vfm-ts-sentiment"
+              [style.background]="getSentimentColor(line.sentiment) + '22'"
+              [style.color]="getSentimentColor(line.sentiment)"
+              [style.border-color]="getSentimentColor(line.sentiment) + '55'"
+              >{{ getSentimentLabel(line.sentiment) }}</span
+            >
+            <span *ngIf="line.speaker" class="vfm-ts-speaker">{{ line.speaker }}</span>
+            <p class="vfm-ts-text" dir="auto">{{ line.text }}</p>
+          </div>
+        </div>
+        <ng-template #noTranscript>
+          <div class="vfm-empty-state">No transcription available</div>
+        </ng-template>
+      </div>
+
+      <!-- ━━ TAGS & KEYWORDS TAB ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div *ngIf="activeTab === 'tags'" class="vfm-tab-pane">
+        <div class="vfm-section-header">
+          <h3 class="vfm-section-title">Tags and Keywords</h3>
+          <div class="vfm-toggle-row gap-3">
+            <label class="vfm-toggle-item">
+              <span class="vfm-toggle-label">Logo Detection</span>
+              <label class="vfm-toggle-switch">
+                <input type="checkbox" />
+                <span class="vfm-toggle-knob"></span>
+              </label>
+            </label>
+            <label class="vfm-toggle-item">
+              <span class="vfm-toggle-label">Celebrity Detection</span>
+              <label class="vfm-toggle-switch">
+                <input type="checkbox" [checked]="true" />
+                <span class="vfm-toggle-knob"></span>
+              </label>
+            </label>
+          </div>
+        </div>
+
+        <div class="vfm-tag-groups" *ngIf="groupedTags.length; else noTags">
+          <div *ngFor="let group of groupedTags" class="vfm-tag-group">
+            <!-- Category heading — coloured underline driven by CSS variable -->
+            <h4 class="vfm-tag-category" [style.--cat-color]="getCategoryColor(group.category)">
+              {{ group.category }}
+            </h4>
+
+            <div *ngFor="let sub of group.subGroups" class="vfm-tag-subgroup">
+              <span class="vfm-tag-subcategory">{{ sub.subCategory }}</span>
+              <div class="vfm-tag-chips">
+                <span
+                  *ngFor="let tag of sub.tags"
+                  class="vfm-tag-chip"
+                  [class.highlighted]="tag.highlighted"
+                  [style.--cat-color]="getCategoryColor(group.category)"
+                  >{{ tag.label }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noTags>
+          <div class="vfm-empty-state">No tags available</div>
+        </ng-template>
+      </div>
+
+      <!-- ━━ COMMENTS TAB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div *ngIf="activeTab === 'comments'" class="vfm-tab-pane">
+        <h3 class="vfm-section-title mb-4">Comments</h3>
+        <div class="vfm-comments-list" *ngIf="config.comments?.length; else noComments">
+          <div *ngFor="let comment of config.comments" class="vfm-comment-card">
+            <img
+              *ngIf="comment.userAvatarUrl"
+              [src]="comment.userAvatarUrl"
+              [alt]="comment.userName"
+              class="vfm-comment-avatar"
+              onerror="this.style.display = 'none'"
+            />
+            <div class="vfm-comment-body">
+              <div class="vfm-comment-meta-row">
+                <svg
+                  class="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style="color: var(--text-muted)"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                <span class="vfm-comment-user">{{ comment.userName }}</span>
+                <svg
+                  class="w-3.5 h-3.5 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style="color: var(--text-muted)"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <span class="vfm-comment-date">{{ comment.date }}</span>
+                <span *ngIf="comment.emotion" class="vfm-comment-emotion">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {{ comment.emotion }}
+                </span>
+                <span
+                  *ngIf="comment.sentiment"
+                  class="vfm-comment-sentiment"
+                  [style.color]="getSentimentColor(comment.sentiment)"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  {{ getSentimentLabel(comment.sentiment) }}
+                </span>
+              </div>
+              <p class="vfm-comment-text" dir="auto">{{ comment.text }}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noComments>
+          <div class="vfm-empty-state">No comments available</div>
+        </ng-template>
+      </div>
+
+      <!-- ━━ REPORT TAB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div *ngIf="activeTab === 'report'" class="vfm-tab-pane">
+        <div class="vfm-section-header">
+          <h3 class="vfm-section-title">Report</h3>
+          <span class="vfm-badge-accent">Auto-generated</span>
+        </div>
+
+        <div class="vfm-report-grid">
+          <!-- Key stats -->
+          <div class="vfm-report-stat-card" *ngIf="config.analytics">
+            <span class="vfm-rs-label">Total Views</span>
+            <span class="vfm-rs-value">{{ formatCount(config.analytics!.views) }}</span>
+          </div>
+          <div class="vfm-report-stat-card" *ngIf="config.analytics">
+            <span class="vfm-rs-label">Likes</span>
+            <span class="vfm-rs-value">{{ formatCount(config.analytics!.likes) }}</span>
+          </div>
+          <div class="vfm-report-stat-card" *ngIf="config.analytics">
+            <span class="vfm-rs-label">Comments</span>
+            <span class="vfm-rs-value">{{ formatCount(config.analytics!.comments) }}</span>
+          </div>
+          <div class="vfm-report-stat-card" *ngIf="config.analytics">
+            <span class="vfm-rs-label">Shares</span>
+            <span class="vfm-rs-value">{{ formatCount(config.analytics!.shares) }}</span>
+          </div>
+        </div>
+
+        <!-- Sentiment breakdown -->
+        <div class="vfm-report-section" *ngIf="config.analytics!.sentimentBreakdown">
+          <h4 class="vfm-report-subtitle">Sentiment Distribution</h4>
+          <div class="vfm-sentiment-bars">
+            <div class="vfm-sent-bar-row">
+              <span class="vfm-sent-label positive">Positive</span>
+              <div class="vfm-bar-track">
+                <div
+                  class="vfm-bar-fill positive"
+                  [style.width]="getBarWidth(config.analytics!.sentimentBreakdown!.positive)"
+                ></div>
+              </div>
+              <span class="vfm-bar-pct">{{ config.analytics!.sentimentBreakdown!.positive }}%</span>
+            </div>
+            <div class="vfm-sent-bar-row">
+              <span class="vfm-sent-label negative">Negative</span>
+              <div class="vfm-bar-track">
+                <div
+                  class="vfm-bar-fill negative"
+                  [style.width]="getBarWidth(config.analytics!.sentimentBreakdown!.negative)"
+                ></div>
+              </div>
+              <span class="vfm-bar-pct">{{ config.analytics!.sentimentBreakdown!.negative }}%</span>
+            </div>
+            <div class="vfm-sent-bar-row">
+              <span class="vfm-sent-label neutral">Neutral</span>
+              <div class="vfm-bar-track">
+                <div
+                  class="vfm-bar-fill neutral"
+                  [style.width]="getBarWidth(config.analytics!.sentimentBreakdown!.neutral)"
+                ></div>
+              </div>
+              <span class="vfm-bar-pct">{{ config.analytics!.sentimentBreakdown!.neutral }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top regions -->
+        <div class="vfm-report-section" *ngIf="config.analytics!.topRegions">
+          <h4 class="vfm-report-subtitle">Top Regions</h4>
+          <div class="vfm-region-bars">
+            <div *ngFor="let region of config.analytics!.topRegions" class="vfm-region-row">
+              <span class="vfm-region-label">{{ region.name }}</span>
+              <div class="vfm-bar-track">
+                <div
+                  class="vfm-bar-fill accent"
+                  [style.width]="getBarWidth(region.percentage)"
+                ></div>
+              </div>
+              <span class="vfm-bar-pct">{{ region.percentage }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ━━ ANALYZER TAB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div *ngIf="activeTab === 'analyzer'" class="vfm-tab-pane">
+        <h3 class="vfm-section-title mb-4">Analyzer</h3>
+
+        <!-- Age groups -->
+        <div class="vfm-report-section" *ngIf="config.analytics!.ageGroups">
+          <h4 class="vfm-report-subtitle">Age Group</h4>
+          <div class="vfm-age-bars">
+            <div *ngFor="let age of config.analytics!.ageGroups" class="vfm-age-row">
+              <span class="vfm-age-label">{{ age.label }}</span>
+              <div class="vfm-bar-track">
+                <div class="vfm-bar-fill accent" [style.width]="getBarWidth(age.percentage)"></div>
+              </div>
+              <span class="vfm-bar-pct">{{ age.percentage }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gender -->
+        <div class="vfm-report-section" *ngIf="config.analytics!.genderSplit">
+          <h4 class="vfm-report-subtitle">Gender</h4>
+          <div class="vfm-gender-donut-row">
+            <div class="vfm-gender-donut">
+              <div
+                class="vfm-donut-ring"
+                [style.background]="
+                  'conic-gradient(#0096cc ' +
+                  config.analytics!.genderSplit!.male +
+                  '%, rgba(255,255,255,0.1) 0)'
+                "
+              >
+                <div class="vfm-donut-hole">
+                  <span class="vfm-donut-val">{{ config.analytics!.genderSplit!.male }}%</span>
+                  <span class="vfm-donut-lbl">Male</span>
+                </div>
+              </div>
+            </div>
+            <div class="vfm-gender-legend">
+              <div class="vfm-gender-leg-item">
+                <span class="vfm-leg-dot" style="background: #0096cc"></span>
+                <span class="vfm-leg-label">Male</span>
+                <span class="vfm-leg-val">{{ config.analytics!.genderSplit!.male }}%</span>
+              </div>
+              <div class="vfm-gender-leg-item">
+                <span class="vfm-leg-dot" style="background: #e879a8"></span>
+                <span class="vfm-leg-label">Female</span>
+                <span class="vfm-leg-val">{{ config.analytics!.genderSplit!.female }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!config.analytics" class="vfm-empty-state">No analytics data available</div>
+      </div>
+
+      <!-- ━━ STORYTELLING TAB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div *ngIf="activeTab === 'storytelling'" class="vfm-tab-pane">
+        <div class="vfm-st-header">
+          <div class="vfm-st-icon">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="vfm-st-title">AI Storytelling</h3>
+            <p class="vfm-st-sub">Narrative-style summary generated from the video content</p>
+          </div>
+          <span class="vfm-badge-accent ml-auto">✨ AI Generated</span>
+        </div>
+
+        <blockquote class="vfm-story-block" *ngIf="config.storytelling">
+          <div class="vfm-story-qmark">"</div>
+          <div class="vfm-story-text" dir="auto">
+            <p *ngFor="let para of config.storytelling.split('\n\n')" class="vfm-story-para">
+              {{ para }}
+            </p>
+          </div>
+        </blockquote>
+
+        <div class="vfm-empty-state" *ngIf="!config.storytelling">
+          No storytelling content available
+        </div>
+      </div>
+    </div>
+    <!-- end vfm-body -->
+  </div>
+</div>

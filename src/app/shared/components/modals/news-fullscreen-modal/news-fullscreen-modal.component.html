@@ -1,0 +1,200 @@
+<!-- Backdrop -->
+<div class="nfm-backdrop" (click)="onClose()">
+
+  <!-- Panel -->
+  <div class="nfm-panel" (click)="$event.stopPropagation()">
+
+    <!-- ── Hero ───────────────────────────────────── -->
+    <div class="nfm-hero">
+      <img
+        *ngIf="article.imageUrl"
+        [src]="article.imageUrl"
+        [alt]="article.title"
+        class="nfm-hero-img"
+      />
+      <div *ngIf="!article.imageUrl" class="nfm-hero-placeholder"></div>
+      <div class="nfm-hero-gradient"></div>
+
+      <!-- Close -->
+      <button class="nfm-close-btn" (click)="onClose()" title="Close (ESC)">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- Source + time overlaid -->
+      <div class="nfm-hero-meta">
+        <img
+          *ngIf="article.sourceFaviconUrl"
+          [src]="article.sourceFaviconUrl"
+          class="nfm-hero-favicon"
+          onerror="this.style.display='none'"
+        />
+        <span class="nfm-hero-source">{{ article.sourceName }}</span>
+        <span class="nfm-hero-sep">·</span>
+        <span class="nfm-hero-time">{{ getTimeAgo(article.publishedAt) }}</span>
+      </div>
+    </div>
+
+    <!-- ── Tab bar ────────────────────────────────── -->
+    <div class="nfm-tab-bar">
+      <button
+        *ngFor="let tab of tabs"
+        class="nfm-tab"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="tab.icon"/>
+        </svg>
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- ── Content ────────────────────────────────── -->
+    <div class="nfm-content">
+
+      <!-- ── ARTICLE TAB ── -->
+      <div *ngIf="activeTab === 'article'" class="nfm-tab-pane">
+        <!-- Badges row -->
+        <div class="nfm-badges-row">
+          <span
+            *ngIf="article.sentiment"
+            class="nfm-badge"
+            [style.color]="getSentimentColor(article.sentiment)"
+            [style.background]="getSentimentColor(article.sentiment) + '1a'"
+            [style.border-color]="getSentimentColor(article.sentiment) + '44'"
+          >{{ getSentimentLabel(article.sentiment) }}</span>
+          <span *ngIf="article.category" class="nfm-badge nfm-badge-muted">{{ article.category }}</span>
+          <span *ngIf="article.engagementScore" class="nfm-badge nfm-badge-accent">
+            ⚡ {{ formatEngagement(article.engagementScore) }}
+          </span>
+          <span class="nfm-badge nfm-badge-muted nfm-ml-auto">{{ getReadingTime() }}</span>
+        </div>
+
+        <!-- Title -->
+        <h1 class="nfm-article-title" dir="auto">{{ article.title }}</h1>
+
+        <!-- Author -->
+        <div class="nfm-author-row" *ngIf="article.author">
+          <div class="nfm-author-dot"></div>
+          <span class="nfm-author-name">{{ article.author }}</span>
+        </div>
+
+        <!-- Tags -->
+        <div class="nfm-tags-row" *ngIf="article.tags?.length">
+          <span *ngFor="let tag of article.tags" class="nfm-tag">{{ tag }}</span>
+        </div>
+
+        <!-- Divider -->
+        <div class="nfm-divider"></div>
+
+        <!-- Body text -->
+        <div class="nfm-body" dir="auto">
+          <ng-container *ngIf="article.fullContent">
+            <p *ngFor="let para of article.fullContent.split('\n\n')" [class.nfm-para]="true">
+              {{ para }}
+            </p>
+          </ng-container>
+          <p *ngIf="!article.fullContent" class="nfm-para">{{ article.summary }}</p>
+        </div>
+      </div>
+
+      <!-- ── STORYTELLING TAB ── -->
+      <div *ngIf="activeTab === 'storytelling'" class="nfm-tab-pane">
+        <div class="nfm-storytelling-header">
+          <div class="nfm-st-icon">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="nfm-st-heading">AI Storytelling</h3>
+            <p class="nfm-st-sub">Narrative-style retelling of this article's key themes</p>
+          </div>
+        </div>
+
+        <blockquote class="nfm-story-quote">
+          <div class="nfm-story-quote-mark">"</div>
+          <div class="nfm-story-body" dir="auto">
+            <ng-container *ngIf="article.fullContent">
+              <p *ngFor="let para of article.fullContent.split('\n\n')" class="nfm-para">
+                {{ para }}
+              </p>
+            </ng-container>
+            <p *ngIf="!article.fullContent" class="nfm-para">{{ article.summary }}</p>
+          </div>
+        </blockquote>
+
+        <div class="nfm-st-meta">
+          <span class="nfm-badge nfm-badge-accent">✨ AI Generated</span>
+          <span class="nfm-badge nfm-badge-muted">{{ article.sourceName }}</span>
+          <span class="nfm-badge nfm-badge-muted">{{ getReadingTime() }}</span>
+        </div>
+      </div>
+
+      <!-- ── READ SCREEN TAB ── -->
+      <div *ngIf="activeTab === 'readscreen'" class="nfm-tab-pane">
+        <div class="nfm-readscreen-header">
+          <div class="nfm-rs-icon">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="nfm-st-heading">Read Screen</h3>
+            <p class="nfm-st-sub">Distraction-free reading mode · {{ getReadingTime() }}</p>
+          </div>
+        </div>
+
+        <div class="nfm-readscreen-card">
+          <!-- Source header -->
+          <div class="nfm-rs-source-row">
+            <img
+              *ngIf="article.sourceFaviconUrl"
+              [src]="article.sourceFaviconUrl"
+              class="nfm-hero-favicon"
+              onerror="this.style.display='none'"
+            />
+            <span class="nfm-rs-source-name">{{ article.sourceName }}</span>
+            <span class="nfm-hero-sep">·</span>
+            <span class="nfm-rs-date">{{ getTimeAgo(article.publishedAt) }}</span>
+          </div>
+
+          <h2 class="nfm-rs-title" dir="auto">{{ article.title }}</h2>
+
+          <div class="nfm-rs-divider"></div>
+
+          <div class="nfm-rs-body" dir="auto">
+            <ng-container *ngIf="article.fullContent">
+              <p *ngFor="let para of article.fullContent.split('\n\n')" class="nfm-rs-para">
+                {{ para }}
+              </p>
+            </ng-container>
+            <p *ngIf="!article.fullContent" class="nfm-rs-para">{{ article.summary }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Footer ─────────────────────────────────── -->
+    <div class="nfm-footer">
+      <a
+        *ngIf="article.sourceUrl"
+        [href]="article.sourceUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="nfm-footer-primary-btn"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+        Open Source
+      </a>
+      <button class="nfm-footer-close-btn" (click)="onClose()">Close</button>
+    </div>
+  </div>
+</div>

@@ -64,4 +64,24 @@
       </div>
     </div>
   </div>
+
+  <!-- Widget Card (News or Video) -->
+
+  <!-- News Widget -->
+  <ng-container *ngIf="item.type === 'news'">
+    <app-news-widget
+      [config]="item.newsConfig"
+      class="block w-full h-full"
+      (click)="$event.stopPropagation()"
+    ></app-news-widget>
+  </ng-container>
+
+  <!-- Video Widget -->
+  <ng-container *ngIf="item.type === 'video'">
+    <app-video-widget
+      [config]="item.videoConfig"
+      class="block w-full h-full"
+      (click)="$event.stopPropagation()"
+    ></app-video-widget>
+  </ng-container>
 </div>

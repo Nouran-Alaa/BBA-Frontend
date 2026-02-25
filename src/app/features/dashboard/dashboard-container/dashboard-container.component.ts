@@ -24,6 +24,8 @@ import {
   ChatbotComponent,
   DashboardInfo,
 } from '../../../shared/components/layout/chatbot/chatbot.component';
+import { DEFAULT_NEWS_CONFIG } from '../../../core/data/news.mock.data';
+import { DEFAULT_VIDEO_CONFIG } from '../../../core/data/video.mock.data';
 
 @Component({
   selector: 'app-dashboard-container',
@@ -53,6 +55,7 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   fullscreenWidget: GridItem | null = null;
   editingWidget: GridItem | null = null;
   showEditAiModal: boolean = false;
+  isAddCardOpen: boolean = false;
 
   // Chart date ranges (per chart widget)
   chartDateRanges: { [chartId: string]: DateRange } = {};
@@ -246,6 +249,15 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
   // ─── AI Chart Modal ───────────────────────────────────────────────────────────
 
   openAiChat(): void {
+    this.isAddCardOpen = true;
+  }
+
+  closeAddCard(): void {
+    this.isAddCardOpen = false;
+  }
+
+  openAiChartModal(): void {
+    this.isAddCardOpen = false;
     this.isAiChatOpen = true;
   }
 
@@ -275,6 +287,52 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
       this.isGenerating = false;
       this.isAiChatOpen = false;
     }, 3000);
+  }
+
+  // ── Methods to ADD ────────────
+
+  onNewsWidgetAdd(): void {
+    this.undoRedoService.saveState(this.gridItems, 'News widget added');
+
+    const newItem: GridItem = {
+      id: Date.now().toString(),
+      type: 'news',
+      title: DEFAULT_NEWS_CONFIG.widgetTitle,
+      newsConfig: { ...DEFAULT_NEWS_CONFIG }, // ← real config, never undefined
+      colSpan: 8,
+      rowSpan: 4,
+      colStart: 0,
+      rowStart:
+        this.gridItems.length > 0
+          ? Math.max(...this.gridItems.map((i) => (i.rowStart ?? 0) + i.rowSpan))
+          : 0,
+    };
+
+    this.dashboardState.addWidget(newItem);
+    this.isAddCardOpen = false;
+    this.toastService.success('News widget added!');
+  }
+
+  onVideoWidgetAdd(): void {
+    this.undoRedoService.saveState(this.gridItems, 'Video widget added');
+
+    const newItem: GridItem = {
+      id: Date.now().toString(),
+      type: 'video',
+      title: DEFAULT_VIDEO_CONFIG.widgetTitle,
+      videoConfig: { ...DEFAULT_VIDEO_CONFIG }, // ← real config, never undefined
+      colSpan: 4,
+      rowSpan: 3,
+      colStart: 0,
+      rowStart:
+        this.gridItems.length > 0
+          ? Math.max(...this.gridItems.map((i) => (i.rowStart ?? 0) + i.rowSpan))
+          : 0,
+    };
+
+    this.dashboardState.addWidget(newItem);
+    this.isAddCardOpen = false;
+    this.toastService.success('Video widget added!');
   }
 
   // ─── Edit AI Modal ────────────────────────────────────────────────────────────

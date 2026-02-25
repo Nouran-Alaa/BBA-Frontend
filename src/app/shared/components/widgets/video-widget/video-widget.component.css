@@ -1,0 +1,167 @@
+/* ─── Card ───────────────────────────────────────────────────── */
+.vw-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-card, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.vw-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(0, 150, 200, 0.18);
+  border-color: var(--accent-primary, #0096cc);
+}
+
+/* ─── Thumbnail ──────────────────────────────────────────────── */
+.vw-thumb {
+  position: relative;
+  flex: 1; /* fills all available space above the meta strip */
+  min-height: 0;
+  overflow: hidden;
+  background: #050d18;
+}
+
+.vw-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.vw-card:hover .vw-thumb-img {
+  transform: scale(1.05);
+}
+
+.vw-thumb-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a1628 0%, #0d2040 100%);
+  color: #fff;
+}
+
+/* gradient overlay */
+.vw-thumb-grad {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.65) 100%);
+  pointer-events: none;
+}
+
+/* ─── Play button ────────────────────────────────────────────── */
+.vw-play-ring {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.vw-card:hover .vw-play-ring {
+  opacity: 1;
+}
+.vw-play-ring > svg {
+  width: 52px;
+  height: 52px;
+  background: rgba(0, 150, 200, 0.88);
+  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(0, 150, 200, 0.5);
+}
+
+/* ─── Badges ─────────────────────────────────────────────────── */
+.vw-duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+.vw-sentiment-dot {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── Meta strip ─────────────────────────────────────────────── */
+.vw-meta {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  background: var(--bg-card, rgba(255, 255, 255, 0.04));
+  border-top: 1px solid var(--border-subtle);
+}
+
+.vw-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border-subtle);
+}
+
+.vw-avatar-placeholder {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-overlay);
+  border: 1.5px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.vw-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.vw-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vw-sub {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
