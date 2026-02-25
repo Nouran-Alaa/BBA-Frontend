@@ -10,7 +10,7 @@ export interface GridItem {
   label?: string;
   prompt?: string;
   chartData?: any;
-  newsConfig?: NewsWidgetConfig;   // populated when type === 'news'
+  newsConfig?: NewsWidgetConfig; // populated when type === 'news'
   videoConfig?: VideoWidgetConfig; // populated when type === 'video'
   colSpan: number;
   rowSpan: number;

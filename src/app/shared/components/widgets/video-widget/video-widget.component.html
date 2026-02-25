@@ -1,69 +1,116 @@
-<!-- Guard: render nothing until config is resolved -->
 <ng-container *ngIf="resolved">
-  <div class="vw-card" (click)="openModal()">
-    <!-- ── Thumbnail ─────────────────────────────── -->
-    <div class="vw-thumb">
-      <!-- Poster image -->
-      <img
-        *ngIf="resolved.thumbnailUrl"
-        [src]="resolved.thumbnailUrl"
-        [alt]="resolved.title"
-        class="vw-thumb-img"
-      />
-      <div *ngIf="!resolved.thumbnailUrl" class="vw-thumb-fallback">
-        <svg class="w-10 h-10 opacity-20" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8 5v14l11-7z" />
-        </svg>
+  <div class="h-full flex flex-col p-3 sm:p-4">
+    <div
+      class="flex flex-col rounded-xl overflow-hidden cursor-pointer transition-all duration-200 video-card"
+      style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
+      (click)="openModal()"
+    >
+      <!-- Thumbnail -->
+      <div
+        class="relative flex-1 min-h-0 overflow-hidden"
+        style="background: linear-gradient(135deg, #0a1628 0%, #0d2040 100%)"
+      >
+        <!-- Image -->
+        <img
+          *ngIf="resolved.thumbnailUrl"
+          [src]="resolved.thumbnailUrl"
+          [alt]="resolved.title"
+          class="w-full h-full object-cover video-thumb"
+        />
+
+        <div *ngIf="!resolved.thumbnailUrl" class="w-full h-full flex items-center justify-center">
+          <svg class="w-12 h-12 opacity-20 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+
+        <!-- Gradient overlay -->
+        <div
+          class="absolute inset-0 pointer-events-none"
+          style="background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.65) 100%)"
+        ></div>
+
+        <!-- Play button -->
+        <div
+          class="play-overlay absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 pointer-events-none"
+        >
+          <div
+            class="w-14 h-14 rounded-full flex items-center justify-center"
+            style="
+              background: rgba(0, 150, 200, 0.88);
+              box-shadow: 0 4px 20px rgba(0, 150, 200, 0.5);
+            "
+          >
+            <svg class="w-7 h-7 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Duration -->
+        <span
+          class="absolute bottom-2 right-2 text-xs font-bold tracking-wide px-2 py-0.5 rounded"
+          style="background: rgba(0, 0, 0, 0.72); color: white; backdrop-filter: blur(4px)"
+        >
+          {{ resolved.duration }}
+        </span>
+
+        <!-- Sentiment -->
+        <span
+          *ngIf="resolved.sentiment"
+          class="absolute top-2 left-2 w-2 h-2 rounded-full border-2"
+          [style.background]="getSentimentColor(resolved.sentiment)"
+          [title]="resolved.sentiment"
+          style="border-color: rgba(255, 255, 255, 0.6); box-shadow: 0 0 5px rgba(0, 0, 0, 0.5)"
+        ></span>
       </div>
 
-      <!-- Dark gradient from bottom -->
-      <div class="vw-thumb-grad"></div>
+      <!-- Meta strip -->
+      <div
+        class="flex items-center gap-2 p-3 flex-shrink-0"
+        style="background: var(--bg-card); border-top: 1px solid var(--border-subtle)"
+      >
+        <!-- Avatar -->
+        <img
+          *ngIf="resolved.channelAvatarUrl"
+          [src]="resolved.channelAvatarUrl"
+          [alt]="resolved.channelName"
+          class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover flex-shrink-0"
+          style="border: 1.5px solid var(--border-subtle)"
+          onerror="this.style.display = 'none'"
+        />
 
-      <!-- Play button centred -->
-      <div class="vw-play-ring">
-        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8 5v14l11-7z" />
-        </svg>
+        <div
+          *ngIf="!resolved.channelAvatarUrl"
+          class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0"
+          style="background: var(--bg-overlay); border: 1.5px solid var(--border-subtle)"
+        >
+          <svg
+            class="w-4 h-4 opacity-50"
+            style="color: var(--text-muted)"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"
+            />
+          </svg>
+        </div>
+
+        <!-- Text - Bigger font -->
+        <div class="flex-1 min-w-0">
+          <p
+            class="text-xs sm:text-sm font-bold leading-tight line-clamp-2"
+            style="color: var(--text-primary)"
+          >
+            {{ resolved.title }}
+          </p>
+          <p class="text-[10px] sm:text-xs mt-0.5 truncate" style="color: var(--text-muted)">
+            {{ resolved.channelName }} · {{ getTimeAgo(resolved.publishedAt) }}
+          </p>
+        </div>
       </div>
-
-      <!-- Duration pill bottom-right -->
-      <span class="vw-duration">{{ resolved.duration }}</span>
-
-      <!-- Sentiment dot top-left -->
-      <span
-        *ngIf="resolved.sentiment"
-        class="vw-sentiment-dot"
-        [style.background]="getSentimentColor(resolved.sentiment)"
-        [title]="resolved.sentiment"
-      ></span>
     </div>
-    <!-- /thumb -->
-
-    <!-- ── Meta strip ─────────────────────────────── -->
-    <div class="vw-meta">
-      <!-- Channel avatar -->
-      <img
-        *ngIf="resolved.channelAvatarUrl"
-        [src]="resolved.channelAvatarUrl"
-        [alt]="resolved.channelName"
-        class="vw-avatar"
-        onerror="this.style.display = 'none'"
-      />
-      <div *ngIf="!resolved.channelAvatarUrl" class="vw-avatar-placeholder">
-        <svg class="w-4 h-4 opacity-50" fill="currentColor" viewBox="0 0 24 24">
-          <path
-            d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"
-          />
-        </svg>
-      </div>
-
-      <!-- Title + channel name + time -->
-      <div class="vw-text">
-        <p class="vw-title" dir="auto">{{ resolved.title }}</p>
-        <p class="vw-sub">{{ resolved.channelName }} · {{ getTimeAgo(resolved.publishedAt) }}</p>
-      </div>
-    </div>
-    <!-- /meta -->
   </div>
 
   <!-- Fullscreen modal -->
