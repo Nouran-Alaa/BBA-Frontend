@@ -1039,11 +1039,14 @@ export function countKpiChart(opts: {
   const dark = opts.dark ?? false;
   const t = tk(dark);
   const color = opts.color ?? PALETTE.primary;
-  // auto-scale max to a clean ceiling above value
-  const max =
-    opts.max ??
-    Math.ceil(opts.value / Math.pow(10, Math.floor(Math.log10(opts.value)))) *
-      Math.pow(10, Math.floor(Math.log10(opts.value)));
+  // Safe auto-scale: works for decimals (e.g. 4.8), integers and large numbers.
+  // Rounds up to the next clean magnitude above the value.
+  function safeMax(v: number): number {
+    if (v <= 0 || !isFinite(v)) return 100;
+    const exp = Math.pow(10, Math.floor(Math.log10(v))); // e.g. 4.8→1, 842→100
+    return Math.ceil(v / exp) * exp; // e.g. 4.8→5, 842→900
+  }
+  const max = opts.max ?? safeMax(opts.value);
   const pct = Math.min(100, Math.round((opts.value / max) * 100));
 
   return {

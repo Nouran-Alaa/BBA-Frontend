@@ -26,6 +26,14 @@ button:hover .w-14.h-14 {
   transition: all 0.2s ease-out;
 }
 
+/* Force ngx-echarts to fill the flex container in the preview grid */
+.echarts-preview-host ::ng-deep > div,
+.echarts-preview-host ::ng-deep .echarts {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
 /* for search bar */
 .modal-search-input,
 .modal-search-input:focus {

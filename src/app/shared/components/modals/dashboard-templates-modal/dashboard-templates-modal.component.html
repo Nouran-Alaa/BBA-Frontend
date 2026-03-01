@@ -1,6 +1,7 @@
+<!-- ── Templates List Modal ──────────────────────────────────────────────────── -->
 <div
   class="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4"
-  style="background-color: rgba(0, 0, 0, 0.5)"
+  style="background-color: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px)"
   (click)="onClose()"
 >
   <div
@@ -22,7 +23,7 @@
         </div>
         <button
           (click)="onClose()"
-          class="w-10 h-10 rounded-lg transition-colors flex items-center justify-center cursor-pointer hover-glass"
+          class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer hover-glass"
           style="background: rgba(255, 255, 255, 0.15)"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,15 +32,13 @@
               stroke-linejoin="round"
               stroke-width="2"
               d="M6 18L18 6M6 6l12 12"
-            ></path>
+            />
           </svg>
         </button>
       </div>
-
-      <!-- Search Bar -->
       <div class="relative">
         <svg
-          class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-white"
+          class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 opacity-70"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -49,24 +48,24 @@
             stroke-linejoin="round"
             stroke-width="2"
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          ></path>
+          />
         </svg>
         <input
           type="text"
           [(ngModel)]="searchQuery"
           placeholder="Search templates..."
-          class="modal-search-input w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-white/70 focus:outline-none transition-all font-medium"
+          class="modal-search-input w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-white/70 focus:outline-none font-medium"
           style="border: 1px solid rgba(255, 255, 255, 0.4)"
         />
       </div>
     </div>
 
-    <!-- Categories -->
+    <!-- Category pills -->
     <div
-      class="px-4 sm:px-6 py-3 flex-shrink-0"
-      style="border-bottom: 1px solid var(--border-subtle)"
+      class="px-4 sm:px-6 py-3 flex-shrink-0 border-b"
+      style="border-color: var(--border-subtle)"
     >
-      <div class="flex gap-2 overflow-x-auto">
+      <div class="flex gap-2 overflow-x-auto" style="scrollbar-width: none">
         <button
           *ngFor="let category of categories"
           (click)="selectedCategory = category"
@@ -74,9 +73,7 @@
           [style.background]="
             selectedCategory === category ? 'var(--accent-gradient)' : 'var(--bg-overlay)'
           "
-          [style.color]="
-            selectedCategory === category ? 'var(--text-on-accent)' : 'var(--text-primary)'
-          "
+          [style.color]="selectedCategory === category ? '#fff' : 'var(--text-primary)'"
           [style.border]="
             '1px solid ' + (selectedCategory === category ? 'transparent' : 'var(--border-subtle)')
           "
@@ -86,13 +83,13 @@
       </div>
     </div>
 
-    <!-- Templates Grid -->
+    <!-- Templates grid -->
     <div class="flex-1 overflow-y-auto p-4 sm:p-6">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <button
           *ngFor="let template of getFilteredTemplates()"
           (click)="template.id === 'blank' ? onSelectTemplate(template) : showPreview(template)"
-          class="text-left p-4 sm:p-6 rounded-lg transition-all cursor-pointer flex flex-col h-full"
+          class="text-left p-4 sm:p-5 rounded-xl transition-all cursor-pointer flex flex-col"
           style="background: var(--bg-card); border: 2px solid var(--border-subtle)"
           onmouseover="
             this.style.borderColor = 'var(--accent-primary)';
@@ -105,18 +102,17 @@
         >
           <div class="flex items-start justify-between mb-3">
             <div
-              class="w-14 h-14 rounded-xl flex items-center justify-center"
+              class="w-12 h-12 rounded-xl flex items-center justify-center"
               [style.background]="
-                template.iconGradient || 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                template.iconGradient || 'linear-gradient(135deg,#6366f1,#8b5cf6)'
               "
             >
               <lucide-icon
                 *ngIf="dashboardIconService.getIcon(template.iconId) as icon"
                 [img]="icon"
-                [size]="28"
+                [size]="24"
                 class="text-white"
-              >
-              </lucide-icon>
+              ></lucide-icon>
             </div>
             <span
               class="px-2 py-1 text-xs rounded-full"
@@ -125,33 +121,43 @@
               {{ template.category }}
             </span>
           </div>
-          <h3 class="font-semibold mb-2" style="color: var(--text-primary)">{{ template.name }}</h3>
-          <p class="text-sm mb-3 flex-1" style="color: var(--text-secondary)">
+
+          <h3 class="font-semibold mb-1.5 text-sm" style="color: var(--text-primary)">
+            {{ template.name }}
+          </h3>
+          <p class="text-xs mb-3 flex-1 leading-relaxed" style="color: var(--text-secondary)">
             {{ template.description }}
           </p>
 
-          <!-- Widget Count -->
           <div
-            class="flex items-center gap-2 text-xs pt-3"
-            style="border-top: 1px solid var(--border-subtle); color: var(--text-muted)"
+            class="flex flex-wrap items-center gap-1.5 pt-3 border-t"
+            style="border-color: var(--border-subtle)"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"
-              ></path>
-            </svg>
-            <span
-              >{{ template.widgets.length }}
-              {{ template.widgets.length === 1 ? 'widget' : 'widgets' }}</span
-            >
+            <ng-container *ngIf="template.widgets.length > 0; else blankCta">
+              <span
+                *ngFor="let chip of getWidgetChips(template)"
+                class="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                style="
+                  background: var(--bg-overlay);
+                  color: var(--text-muted);
+                  border: 1px solid var(--border-subtle);
+                "
+              >
+                {{ chip }}
+              </span>
+              <span class="text-[10px] font-semibold ml-auto" style="color: var(--accent-primary)">
+                {{ template.widgets.length }} widgets →
+              </span>
+            </ng-container>
+            <ng-template #blankCta>
+              <span class="text-xs font-semibold" style="color: var(--accent-primary)"
+                >Start from scratch →</span
+              >
+            </ng-template>
           </div>
         </button>
       </div>
 
-      <!-- Empty State -->
       <div *ngIf="getFilteredTemplates().length === 0" class="text-center py-16">
         <p style="color: var(--text-muted)">No templates found</p>
       </div>
@@ -159,11 +165,11 @@
   </div>
 </div>
 
-<!-- Template Preview Modal -->
+<!-- ── Preview Modal ─────────────────────────────────────────────────────────── -->
 <div
   *ngIf="selectedTemplatePreview"
   class="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4"
-  style="background-color: rgba(0, 0, 0, 0.75)"
+  style="background-color: rgba(0, 0, 0, 0.82); backdrop-filter: blur(6px)"
   (click)="closePreview()"
 >
   <div
@@ -171,24 +177,23 @@
     style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
     (click)="$event.stopPropagation()"
   >
-    <!-- Preview Header -->
+    <!-- Preview header -->
     <div
-      class="px-3 sm:px-6 py-3 sm:py-4 text-white flex-shrink-0"
+      class="px-4 sm:px-6 py-3 sm:py-4 text-white flex-shrink-0"
       style="background: var(--accent-gradient)"
     >
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
           <div
-            class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center flex-shrink-0"
+            class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
             style="background: rgba(255, 255, 255, 0.2)"
           >
             <lucide-icon
               *ngIf="dashboardIconService.getIcon(selectedTemplatePreview.iconId) as icon"
               [img]="icon"
-              [size]="32"
+              [size]="28"
               class="text-white"
-            >
-            </lucide-icon>
+            ></lucide-icon>
           </div>
           <div class="min-w-0 flex-1">
             <h2 class="text-lg sm:text-2xl font-bold truncate">
@@ -202,141 +207,103 @@
         <div class="flex items-center gap-2 flex-shrink-0">
           <button
             (click)="onSelectTemplate(selectedTemplatePreview); closePreview()"
-            class="px-3 sm:px-6 py-2 rounded-lg font-medium text-xs sm:text-base whitespace-nowrap cursor-pointer transition-all"
+            class="px-4 sm:px-6 py-2 rounded-lg font-bold text-sm cursor-pointer hover:opacity-90 transition-opacity"
             style="background: white; color: var(--accent-primary)"
-            onmouseover="this.style.background = 'rgba(255,255,255,0.9)'"
-            onmouseout="this.style.background = 'white'"
           >
             <span class="hidden sm:inline">Use Template</span>
             <span class="sm:hidden">Use</span>
           </button>
           <button
             (click)="closePreview()"
-            class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg transition-colors flex items-center justify-center flex-shrink-0 cursor-pointer"
+            class="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer"
             style="background: rgba(255, 255, 255, 0.15)"
           >
-            <svg
-              class="w-5 h-5 sm:w-6 sm:h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M6 18L18 6M6 6l12 12"
-              ></path>
+              />
             </svg>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Preview Content -->
-    <div class="flex-1 overflow-y-auto p-3 sm:p-6" style="background: var(--bg-secondary)">
-      <div class="rounded-lg p-3 sm:p-6 max-w-[1800px] mx-auto" style="background: var(--bg-card)">
-        <!-- Simulated Dashboard Grid - 1 col mobile, 2 cols tablet, 12 cols desktop -->
-        <div
-          class="grid gap-3 sm:gap-4 md:gap-6 auto-rows-[100px] sm:auto-rows-[120px] grid-cols-1 sm:grid-cols-2 lg:grid-cols-12"
-        >
-          <div
-            *ngFor="let widget of selectedTemplatePreview.widgets"
-            [ngClass]="{
-              'col-span-1': true,
-              'sm:col-span-1': widget.colSpan <= 6,
-              'sm:col-span-2': widget.colSpan > 6,
-              'lg:col-span-2': widget.colSpan === 2,
-              'lg:col-span-3': widget.colSpan === 3,
-              'lg:col-span-4': widget.colSpan === 4,
-              'lg:col-span-6': widget.colSpan === 6,
-              'lg:col-span-8': widget.colSpan === 8,
-              'lg:col-span-12': widget.colSpan === 12,
-            }"
-            [style.grid-row]="'span ' + widget.rowSpan"
-            class="rounded-lg p-3 sm:p-4 shadow-sm"
-            style="background: var(--bg-card); border: 1px solid var(--border-subtle)"
-          >
-            <!-- Summary Widget Preview -->
-            <div *ngIf="widget.type === 'summary'" class="h-full flex flex-col">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-xl sm:text-2xl flex-shrink-0">✨</span>
+    <!-- Real ECharts dashboard preview -->
+    <div class="flex-1 overflow-y-auto p-3 sm:p-5" style="background: var(--bg-secondary)">
+      <div
+        class="rounded-xl p-3 sm:p-4"
+        style="background: var(--bg-card); border: 1px solid var(--border-subtle)"
+      >
+        <!-- 12-column grid, 160px rows -->
+        <div class="grid grid-cols-12 gap-3" style="grid-auto-rows: 160px">
+          <ng-container *ngFor="let widget of selectedTemplatePreview.widgets">
+            <!-- Summary widget -->
+            <div
+              *ngIf="widget.type === 'summary'"
+              class="rounded-xl p-3 flex flex-col overflow-hidden"
+              [style.grid-column]="'span ' + widget.colSpan"
+              [style.grid-row]="'span ' + widget.rowSpan"
+              style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
+            >
+              <div class="flex items-center gap-2 mb-2 flex-shrink-0">
+                <span class="text-lg">✨</span>
+                <h3 class="font-bold text-xs truncate" style="color: var(--text-primary)">
+                  {{ widget.title }}
+                </h3>
+              </div>
+              <p
+                class="text-[11px] leading-relaxed overflow-hidden"
+                style="
+                  color: var(--text-secondary);
+                  display: -webkit-box;
+                  -webkit-line-clamp: 7;
+                  -webkit-box-orient: vertical;
+                "
+              >
+                {{ widget.content }}
+              </p>
+            </div>
+
+            <!-- Chart widget — real ECharts -->
+            <div
+              *ngIf="widget.type === 'chart'"
+              class="rounded-xl flex flex-col overflow-hidden"
+              [style.grid-column]="'span ' + widget.colSpan"
+              [style.grid-row]="'span ' + widget.rowSpan"
+              style="background: var(--bg-card); border: 1px solid var(--border-subtle)"
+            >
+              <!-- Mini card header -->
+              <div class="flex items-center gap-1.5 px-3 pt-2.5 pb-0 flex-shrink-0">
+                <span
+                  class="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style="background: linear-gradient(135deg, #6366f1, #8b5cf6)"
+                ></span>
                 <h3
-                  class="font-semibold text-xs sm:text-sm truncate flex-1"
+                  class="text-[11px] font-bold flex-1 truncate"
                   style="color: var(--text-primary)"
                 >
                   {{ widget.title }}
                 </h3>
-              </div>
-              <div class="flex-1 overflow-hidden">
-                <h4 class="font-semibold mb-1 text-xs" style="color: var(--text-secondary)">
-                  Executive Summary
-                </h4>
-                <p class="text-[10px] sm:text-xs line-clamp-3" style="color: var(--text-muted)">
-                  {{ widget.content }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Count Widget Preview -->
-            <div *ngIf="widget.type === 'count'" class="h-full flex flex-col justify-center">
-              <h3 class="text-xs font-medium mb-1 truncate" style="color: var(--text-secondary)">
-                {{ widget.title }}
-              </h3>
-              <p
-                class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1"
-                style="color: var(--accent-primary)"
-              >
-                {{ widget.value | number }}
-              </p>
-              <p class="text-xs" style="color: var(--text-muted)">{{ widget.label }}</p>
-            </div>
-
-            <!-- Chart Widget Preview -->
-            <div *ngIf="widget.type === 'chart'" class="h-full flex flex-col">
-              <div class="flex items-center justify-between gap-2 mb-2">
-                <div class="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
-                  <span class="text-base sm:text-xl flex-shrink-0">🤖</span>
-                  <h3
-                    class="font-semibold text-xs sm:text-sm truncate"
-                    style="color: var(--text-primary)"
-                  >
-                    {{ widget.title }}
-                  </h3>
-                </div>
                 <span
-                  class="px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs rounded flex-shrink-0"
-                  style="background: var(--accent-gradient); color: var(--text-on-accent)"
-                  >AI</span
+                  class="text-[9px] font-bold px-1.5 py-px rounded text-white flex-shrink-0"
+                  style="background: var(--accent-gradient)"
                 >
+                  {{ getChartLabel(widget.chartType) }}
+                </span>
               </div>
+              <!-- ECharts canvas fills remaining space -->
               <div
-                class="flex-1 rounded flex items-center justify-center min-h-[50px]"
-                style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
-              >
-                <svg
-                  class="w-8 h-8 sm:w-12 sm:h-12"
-                  style="color: var(--text-muted)"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  ></path>
-                </svg>
-              </div>
-              <p
-                class="text-[10px] sm:text-xs italic mt-1 sm:mt-2 line-clamp-1"
-                style="color: var(--text-muted)"
-              >
-                "{{ widget.prompt }}"
-              </p>
+                class="flex-1 min-h-0 echarts-preview-host"
+                echarts
+                [options]="getPreviewChartOption(widget.chartType)"
+                [initOpts]="initOpts"
+                [autoResize]="true"
+              ></div>
             </div>
-          </div>
+          </ng-container>
         </div>
       </div>
     </div>

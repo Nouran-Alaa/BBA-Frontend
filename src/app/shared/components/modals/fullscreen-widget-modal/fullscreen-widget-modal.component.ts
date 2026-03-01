@@ -66,13 +66,13 @@ export class FullscreenWidgetModalComponent implements OnInit {
   }
 
   get calcResult(): number {
-    const vals = this.widget?.calcValues ?? [];
+    const vals: number[] = this.widget?.calcValues ?? [];
     if (!vals.length) return 0;
     switch (this.widget?.calcFormula) {
       case 'sum':
-        return vals.reduce((a, b) => a + b, 0);
+        return vals.reduce((a: number, b: number) => a + b, 0);
       case 'average':
-        return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+        return Math.round(vals.reduce((a: number, b: number) => a + b, 0) / vals.length);
       case 'max':
         return Math.max(...vals);
       case 'min':
@@ -80,7 +80,7 @@ export class FullscreenWidgetModalComponent implements OnInit {
       case 'count':
         return vals.length;
       default:
-        return vals.reduce((a, b) => a + b, 0);
+        return vals.reduce((a: number, b: number) => a + b, 0);
     }
   }
 
