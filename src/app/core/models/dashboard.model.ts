@@ -12,12 +12,12 @@ export interface WidgetPosition {
 export interface Dashboard {
   id: string;
   name: string;
+  description?: string; // Optional dashboard description
+  iconId: string; // Changed from 'icon' - now stores icon ID like 'layout-dashboard'
   companyId: string;
   createdBy: string;
   widgets: WidgetPosition[];
   isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
-  description?: string; // Optional dashboard description
-  icon?: string; // Icon for the dashboard in the sidebar list
 }

@@ -1,22 +1,33 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 import { Dashboard } from '../../../../core/models/dashboard.model';
 import { ShareModalComponent } from '../share-modal/share-modal.component';
 import { ConfirmDeleteModalComponent } from '../confirm-delete-modal/confirm-delete-modal.component';
 import { ToastService } from '../../../../core/services/toast.service';
+import {
+  DashboardIconService,
+  DashboardIconOption,
+} from '../../../../core/services/dashboard-icon.service';
 
 @Component({
   selector: 'app-dashboard-menu-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ShareModalComponent, ConfirmDeleteModalComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    ShareModalComponent,
+    ConfirmDeleteModalComponent,
+  ],
   templateUrl: './dashboard-menu-modal.component.html',
   styleUrls: ['./dashboard-menu-modal.component.css'],
 })
 export class DashboardMenuModalComponent implements OnInit {
   @Input() dashboard!: Dashboard;
   @Output() close = new EventEmitter<void>();
-  @Output() rename = new EventEmitter<{ name: string; icon: string }>();
+  @Output() rename = new EventEmitter<{ name: string; iconId: string }>();
   @Output() duplicate = new EventEmitter<void>();
   @Output() share = new EventEmitter<void>();
   @Output() delete = new EventEmitter<void>();
@@ -25,32 +36,28 @@ export class DashboardMenuModalComponent implements OnInit {
   showShareModal: boolean = false;
   showDeleteModal: boolean = false;
   newName: string = '';
-  selectedIcon: string = '';
+  selectedIconId: string = '';
 
-  icons: string[] = [
-    '📊',
-    '📈',
-    '📉',
-    '💼',
-    '🎯',
-    '📱',
-    '💻',
-    '🌐',
-    '📺',
-    '📸',
-    '🎬',
-    '🎮',
-    '📘',
-    '📗',
-    '📙',
-    '📕',
-  ];
+  iconOptions: DashboardIconOption[] = [];
+  selectedCategory: string = 'All';
+  categories: string[] = ['All', 'Analytics', 'Social', 'Business', 'Technology'];
 
-  constructor(private toastService: ToastService) {}
+  constructor(
+    private toastService: ToastService,
+    public dashboardIconService: DashboardIconService,
+  ) {}
 
   ngOnInit(): void {
     this.newName = this.dashboard.name;
-    this.selectedIcon = this.dashboard.icon || '📊';
+    this.selectedIconId = this.dashboard.iconId || this.dashboardIconService.getDefaultIconId();
+    this.iconOptions = this.dashboardIconService.getIconOptions();
+  }
+
+  getFilteredIcons(): DashboardIconOption[] {
+    if (this.selectedCategory === 'All') {
+      return this.iconOptions;
+    }
+    return this.iconOptions.filter((opt) => opt.category === this.selectedCategory);
   }
 
   onClose(): void {
@@ -63,7 +70,7 @@ export class DashboardMenuModalComponent implements OnInit {
 
   saveRename(): void {
     if (this.newName.trim()) {
-      this.rename.emit({ name: this.newName, icon: this.selectedIcon });
+      this.rename.emit({ name: this.newName, iconId: this.selectedIconId });
       this.isRenaming = false;
     }
   }

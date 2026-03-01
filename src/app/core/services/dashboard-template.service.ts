@@ -10,10 +10,11 @@ export interface DashboardTemplate {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  iconId: string;
   category: string;
   preview: string;
   widgets: any[];
+  iconGradient?: string;
 }
 
 @Injectable({
@@ -28,18 +29,20 @@ export class DashboardTemplateService {
       id: 'blank',
       name: 'Blank Dashboard',
       description: 'Start from scratch with an empty dashboard and build your own custom layout',
-      icon: '📄',
+      iconId: 'layout-dashboard',
       category: 'Basic',
       preview: 'blank',
+      iconGradient: 'linear-gradient(135deg, #00c8ff, #00e5cc)', // Website theme gradient
       widgets: [],
     },
     {
       id: 'social-media',
       name: 'Social Media Analytics',
       description: 'Track engagement, reach, and followers across all social platforms',
-      icon: '📱',
+      iconId: 'users',
       category: 'Marketing',
       preview: 'social',
+      iconGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Purple gradient
       widgets: [
         {
           type: 'count',
@@ -105,9 +108,10 @@ export class DashboardTemplateService {
       id: 'youtube',
       name: 'YouTube Analytics',
       description: 'Monitor views, subscribers, watch time and video performance metrics',
-      icon: '📹',
+      iconId: 'youtube',
       category: 'Content',
       preview: 'youtube',
+      iconGradient: 'linear-gradient(135deg, #ff0000 0%, #cc0000 100%)', // YouTube red
       widgets: [
         {
           type: 'count',
@@ -173,9 +177,11 @@ export class DashboardTemplateService {
       id: 'instagram',
       name: 'Instagram Insights',
       description: 'Analyze stories, reels, posts, and profile engagement metrics',
-      icon: '📸',
+      iconId: 'instagram',
       category: 'Social',
       preview: 'instagram',
+      iconGradient:
+        'linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', // Instagram gradient
       widgets: [
         {
           type: 'count',
@@ -231,9 +237,10 @@ export class DashboardTemplateService {
       id: 'facebook',
       name: 'Facebook Page Analytics',
       description: 'Track page likes, post reach, engagement and audience demographics',
-      icon: '📘',
+      iconId: 'facebook',
       category: 'Social',
       preview: 'facebook',
+      iconGradient: 'linear-gradient(135deg, #1877f2 0%, #0c63d4 100%)', // Facebook blue
       widgets: [
         {
           type: 'count',
@@ -299,9 +306,10 @@ export class DashboardTemplateService {
       id: 'executive',
       name: 'Executive Summary',
       description: 'High-level overview with KPIs, trends and strategic insights',
-      icon: '📊',
+      iconId: 'bar-chart',
       category: 'Business',
       preview: 'executive',
+      iconGradient: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)', // Sky blue
       widgets: [
         {
           type: 'summary',
@@ -337,9 +345,10 @@ export class DashboardTemplateService {
       id: 'twitter',
       name: 'Twitter (X) Analytics',
       description: 'Monitor tweets, impressions, engagement and follower growth',
-      icon: '🐦',
+      iconId: 'twitter',
       category: 'Social',
       preview: 'twitter',
+      iconGradient: 'linear-gradient(135deg, #000000 0%, #14171a 100%)', // Twitter/X black
       widgets: [
         {
           type: 'count',
@@ -405,9 +414,10 @@ export class DashboardTemplateService {
       id: 'tiktok',
       name: 'TikTok Analytics',
       description: 'Track video views, likes, shares and trending content performance',
-      icon: '🎵',
+      iconId: 'smartphone',
       category: 'Content',
       preview: 'tiktok',
+      iconGradient: 'linear-gradient(135deg, #00f2ea 0%, #ff0050 50%, #000000 100%)', // TikTok gradient
       widgets: [
         {
           type: 'count',

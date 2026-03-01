@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { LucideAngularModule, Plus } from 'lucide-angular';
 import { Dashboard } from '../../../../core/models/dashboard.model';
 import { UserRole } from '../../../../core/models/user.model';
 import { DashboardTemplatesModalComponent } from '../../modals/dashboard-templates-modal/dashboard-templates-modal.component';
@@ -10,11 +11,17 @@ import {
   DashboardTemplate,
 } from '../../../../core/services/dashboard-template.service';
 import { DashboardStateService } from '../../../../core/services/dashboard-state.service';
+import { DashboardIconService } from '../../../../core/services/dashboard-icon.service';
 
 @Component({
   selector: 'app-side-nav',
   standalone: true,
-  imports: [CommonModule, DashboardTemplatesModalComponent, DashboardMenuModalComponent],
+  imports: [
+    CommonModule,
+    LucideAngularModule,
+    DashboardTemplatesModalComponent,
+    DashboardMenuModalComponent,
+  ],
   templateUrl: './side-nav.component.html',
   styleUrls: ['./side-nav.component.css'],
 })
@@ -31,6 +38,8 @@ export class SideNavComponent implements OnInit {
     'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%230099cc" width="100" height="100"/><text x="50" y="50" font-size="40" fill="white" text-anchor="middle" dy=".3em">MC</text></svg>';
   currentUserRole: UserRole = UserRole.SuperAdmin;
 
+  icons = { Plus };
+
   showCreateDashboardModal: boolean = false;
 
   dashboards: Dashboard[] = [
@@ -41,7 +50,7 @@ export class SideNavComponent implements OnInit {
       createdBy: 'user-1',
       widgets: [],
       isDefault: true,
-      icon: '📊',
+      iconId: 'users',
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -52,7 +61,7 @@ export class SideNavComponent implements OnInit {
       createdBy: 'user-1',
       widgets: [],
       isDefault: false,
-      icon: '📘',
+      iconId: 'facebook',
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -63,7 +72,7 @@ export class SideNavComponent implements OnInit {
       createdBy: 'user-1',
       widgets: [],
       isDefault: false,
-      icon: '📹',
+      iconId: 'youtube',
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -74,13 +83,19 @@ export class SideNavComponent implements OnInit {
   constructor(
     private router: Router,
     private templateService: DashboardTemplateService,
-    private dashboardState: DashboardStateService, // ← added
+    private dashboardState: DashboardStateService,
+    public dashboardIconService: DashboardIconService,
   ) {}
 
   ngOnInit(): void {}
 
   isSuperAdmin(): boolean {
     return this.currentUserRole === UserRole.SuperAdmin;
+  }
+
+  // Method to get icon for template
+  getDashboardIcon(iconId: string) {
+    return this.dashboardIconService.getIcon(iconId);
   }
 
   selectDashboard(dashboardId: string): void {
@@ -94,12 +109,12 @@ export class SideNavComponent implements OnInit {
     }
   }
 
-  onDashboardCreated(data: { name: string; description: string; icon: string }): void {
+  onDashboardCreated(data: { name: string; description: string; iconId: string }): void {
     const newDashboard: Dashboard = {
       id: Date.now().toString(),
       name: data.name,
       description: data.description,
-      icon: data.icon,
+      iconId: data.iconId,
       companyId: 'company-1',
       createdBy: 'user-1',
       widgets: [],
@@ -147,7 +162,7 @@ export class SideNavComponent implements OnInit {
       id: dashboardId,
       name: template.name,
       description: template.description || `Created from ${template.name} template`,
-      icon: template.icon,
+      iconId: template.iconId,
       companyId: 'company-1',
       createdBy: 'user-1',
       widgets: [],
@@ -188,10 +203,10 @@ export class SideNavComponent implements OnInit {
     this.showDashboardMenu = true;
   }
 
-  onDashboardRename(data: { name: string; icon: string }): void {
+  onDashboardRename(data: { name: string; iconId: string }): void {
     if (this.selectedDashboardForMenu) {
       this.selectedDashboardForMenu.name = data.name;
-      this.selectedDashboardForMenu.icon = data.icon;
+      this.selectedDashboardForMenu.iconId = data.iconId;
       this.selectedDashboardForMenu.updatedAt = new Date();
     }
     this.showDashboardMenu = false;

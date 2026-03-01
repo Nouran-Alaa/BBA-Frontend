@@ -1,5 +1,5 @@
 <ng-container *ngIf="resolved">
-  <div class="h-full flex flex-col p-3 sm:p-4">
+  <div class="p-3 sm:p-4">
     <div
       class="flex flex-col rounded-xl overflow-hidden cursor-pointer transition-all duration-200 video-card"
       style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
@@ -7,7 +7,7 @@
     >
       <!-- Thumbnail -->
       <div
-        class="relative flex-1 min-h-0 overflow-hidden"
+        class="relative flex-1 overflow-hidden video-thumb-container"
         style="background: linear-gradient(135deg, #0a1628 0%, #0d2040 100%)"
       >
         <!-- Image -->
@@ -18,7 +18,10 @@
           class="w-full h-full object-cover video-thumb"
         />
 
-        <div *ngIf="!resolved.thumbnailUrl" class="w-full h-full flex items-center justify-center">
+        <div
+          *ngIf="!resolved.thumbnailUrl"
+          class="absolute inset-0 flex items-center justify-center"
+        >
           <svg class="w-12 h-12 opacity-20 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z" />
           </svg>
@@ -75,7 +78,7 @@
           *ngIf="resolved.channelAvatarUrl"
           [src]="resolved.channelAvatarUrl"
           [alt]="resolved.channelName"
-          class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover flex-shrink-0"
+          class="w-8 h-8 rounded-full object-cover flex-shrink-0"
           style="border: 1.5px solid var(--border-subtle)"
           onerror="this.style.display = 'none'"
         />

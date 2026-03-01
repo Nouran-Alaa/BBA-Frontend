@@ -39,7 +39,7 @@
       <!-- Search Bar -->
       <div class="relative">
         <svg
-          class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 opacity-70"
+          class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-white"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -55,8 +55,8 @@
           type="text"
           [(ngModel)]="searchQuery"
           placeholder="Search templates..."
-          class="w-full pl-10 pr-4 py-2.5 rounded-lg text-white placeholder-white/60 focus:outline-none transition-all"
-          style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2)"
+          class="modal-search-input w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-white/70 focus:outline-none transition-all font-medium"
+          style="border: 1px solid rgba(255, 255, 255, 0.4)"
         />
       </div>
     </div>
@@ -104,7 +104,20 @@
           "
         >
           <div class="flex items-start justify-between mb-3">
-            <span class="text-3xl sm:text-4xl">{{ template.icon }}</span>
+            <div
+              class="w-14 h-14 rounded-xl flex items-center justify-center"
+              [style.background]="
+                template.iconGradient || 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+              "
+            >
+              <lucide-icon
+                *ngIf="dashboardIconService.getIcon(template.iconId) as icon"
+                [img]="icon"
+                [size]="28"
+                class="text-white"
+              >
+              </lucide-icon>
+            </div>
             <span
               class="px-2 py-1 text-xs rounded-full"
               style="background: var(--bg-overlay); color: var(--text-muted)"
@@ -165,7 +178,18 @@
     >
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-          <span class="text-2xl sm:text-4xl flex-shrink-0">{{ selectedTemplatePreview.icon }}</span>
+          <div
+            class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center flex-shrink-0"
+            style="background: rgba(255, 255, 255, 0.2)"
+          >
+            <lucide-icon
+              *ngIf="dashboardIconService.getIcon(selectedTemplatePreview.iconId) as icon"
+              [img]="icon"
+              [size]="32"
+              class="text-white"
+            >
+            </lucide-icon>
+          </div>
           <div class="min-w-0 flex-1">
             <h2 class="text-lg sm:text-2xl font-bold truncate">
               {{ selectedTemplatePreview.name }}

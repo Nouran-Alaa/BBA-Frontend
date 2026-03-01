@@ -94,9 +94,16 @@
           [title]="collapsed ? dashboard.name : ''"
         >
           <!-- Dashboard Icon -->
-          <span class="text-2xl flex-shrink-0" [class.text-xl]="collapsed">
-            {{ dashboard.icon || '📊' }}
-          </span>
+          <lucide-icon
+            *ngIf="getDashboardIcon(dashboard.iconId) as icon"
+            [img]="icon"
+            [size]="collapsed ? 20 : 18"
+            class="flex-shrink-0"
+            [style.color]="
+              activeDashboardId === dashboard.id ? 'var(--text-on-accent)' : 'var(--text-primary)'
+            "
+          >
+          </lucide-icon>
 
           <!-- Dashboard Name -->
           <span

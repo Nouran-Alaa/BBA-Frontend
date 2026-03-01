@@ -1,15 +1,17 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 import {
   DashboardTemplateService,
   DashboardTemplate,
 } from '../../../../core/services/dashboard-template.service';
+import { DashboardIconService } from '../../../../core/services/dashboard-icon.service';
 
 @Component({
   selector: 'app-dashboard-templates-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './dashboard-templates-modal.component.html',
   styleUrls: ['./dashboard-templates-modal.component.css'],
 })
@@ -23,7 +25,10 @@ export class DashboardTemplatesModalComponent {
   selectedCategory: string = 'All';
   categories: string[] = ['All', 'Basic', 'Marketing', 'Social', 'Content', 'Business'];
 
-  constructor(private templateService: DashboardTemplateService) {}
+  constructor(
+    private templateService: DashboardTemplateService,
+    public dashboardIconService: DashboardIconService,
+  ) {}
 
   ngOnInit(): void {
     // Get templates from centralized service
