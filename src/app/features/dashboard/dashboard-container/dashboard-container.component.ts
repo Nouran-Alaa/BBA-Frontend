@@ -265,28 +265,33 @@ export class DashboardContainerComponent implements OnInit, OnDestroy {
     this.isAiChatOpen = false;
   }
 
-  onChartGenerated(prompt: string): void {
-    this.isGenerating = true;
+  onChartGenerated(payload: any): void {
+    this.undoRedoService.saveState(this.gridItems, 'Widget added');
 
-    setTimeout(() => {
-      this.undoRedoService.saveState(this.gridItems, 'Widget added');
+    const rowStart =
+      this.gridItems.length > 0
+        ? Math.max(...this.gridItems.map((i) => (i.rowStart ?? 0) + i.rowSpan))
+        : 0;
 
-      const newItem: GridItem = {
-        id: Date.now().toString(),
-        type: 'chart',
-        title: 'AI Generated Chart',
-        prompt: prompt,
-        chartData: {},
-        colSpan: 6,
-        rowSpan: 3,
-        colStart: 0,
-        rowStart: this.gridItems.length,
-      };
+    // New-style payload from updated AiChartModalComponent: { type, title, chartType }
+    // Old-style payload (legacy): plain string prompt
+    const isObject = typeof payload === 'object' && payload !== null;
 
-      this.dashboardState.addWidget(newItem);
-      this.isGenerating = false;
-      this.isAiChatOpen = false;
-    }, 3000);
+    const newItem: GridItem = {
+      id: Date.now().toString(),
+      type: 'chart',
+      title: isObject ? payload.title : 'AI Generated Chart',
+      chartType: isObject ? payload.chartType : 'buying-cycle',
+      prompt: isObject ? payload.title : payload,
+      chartData: {},
+      colSpan: 4,
+      rowSpan: 3,
+      colStart: 0,
+      rowStart,
+    };
+
+    this.dashboardState.addWidget(newItem);
+    this.isAiChatOpen = false;
   }
 
   // ── Methods to ADD ────────────

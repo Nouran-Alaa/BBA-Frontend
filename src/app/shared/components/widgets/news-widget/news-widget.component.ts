@@ -1,17 +1,18 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ComponentRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NewsWidgetConfig, NewsArticle } from '../../../../core/models/news-widget.model';
 import { NewsFullscreenModalComponent } from '../../modals/news-fullscreen-modal/news-fullscreen-modal.component';
 import { DEFAULT_NEWS_CONFIG } from '../../../../core/data/news.mock.data';
+import { ModalPortalService } from '../../../../core/services/modal-portal.service';
 
 @Component({
   selector: 'app-news-widget',
   standalone: true,
-  imports: [CommonModule, NewsFullscreenModalComponent],
+  imports: [CommonModule],
   templateUrl: './news-widget.component.html',
   styleUrls: ['./news-widget.component.css'],
 })
-export class NewsWidgetComponent implements OnChanges {
+export class NewsWidgetComponent implements OnChanges, OnDestroy {
   /** Optional config — falls back to mock data when undefined */
   @Input() config: NewsWidgetConfig | undefined;
 
@@ -21,10 +22,18 @@ export class NewsWidgetComponent implements OnChanges {
   selectedArticle: NewsArticle | null = null;
   visibleCount = 6;
 
+  private modalRef?: ComponentRef<NewsFullscreenModalComponent>;
+
+  constructor(private modalPortal: ModalPortalService) {}
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['config']) {
       this.resolved = this.config ?? DEFAULT_NEWS_CONFIG;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.closeModal();
   }
 
   get visibleArticles(): NewsArticle[] {
@@ -40,10 +49,17 @@ export class NewsWidgetComponent implements OnChanges {
   }
 
   openArticle(article: NewsArticle): void {
-    this.selectedArticle = article;
+    this.closeModal();
+    // Open at document.body — bypasses CDK drag / overflow:hidden stacking contexts
+    this.modalRef = this.modalPortal.open(NewsFullscreenModalComponent, { article });
+    this.modalRef.instance.close.subscribe(() => this.closeModal());
   }
+
   closeModal(): void {
-    this.selectedArticle = null;
+    if (this.modalRef) {
+      this.modalPortal.close(this.modalRef);
+      this.modalRef = undefined;
+    }
   }
 
   getTimeAgo(isoString: string): string {

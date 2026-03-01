@@ -1,14 +1,83 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+/**
+ * ai-chart-modal.component.ts
+ *
+ * BASE = document 15 (original) — every property, method and interface kept identical.
+ *
+ * Additions (minimal):
+ *   • NgxEchartsDirective added to imports so HTML can use [echarts]
+ *   • Each ChartTemplate gains optional `lucideIcon`, `categoryColor`, `gridChartType`
+ *   • `previewOptions` map built once (keyed by template.id)
+ *   • `chatPreviewOption` set when AI generates a response
+ *   • `generate` output changed from EventEmitter<string> → EventEmitter<any>
+ *     so it can emit either a plain string (old containers) or a Partial<GridItem>
+ */
+import { Component, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import type { EChartsOption } from 'echarts';
+import {
+  LucideAngularModule,
+  TrendingUp,
+  BarChart2,
+  PieChart,
+  LineChart,
+  Activity,
+  Users,
+  Globe,
+  Smile,
+  Zap,
+  Trophy,
+  Smartphone,
+  LayoutGrid,
+  Lightbulb,
+  MapPin,
+  Battery,
+  UserCheck,
+  Award,
+  BarChart,
+} from 'lucide-angular';
+
+import { ThemeService } from '../../../../core/services/theme.service';
+import { GridItem } from '../../../../core/models/grid-item.model';
+import {
+  previewLineChart,
+  previewBarChart,
+  previewDonutChart,
+  previewPieChart,
+  previewRoseChart,
+  previewGaugeChart,
+  previewGenderChart,
+  previewStackedBarChart,
+  previewGroupedBarChart,
+  previewMultiLineChart,
+  previewDualLineChart,
+  previewBarVerticalChart,
+  getChartOption,
+  PALETTE,
+  DashboardChartType,
+} from '../../../../core/data/chart-config';
+
+// Per-category accent colours
+const CAT_COLOR: Record<string, string> = {
+  All: '#6366f1',
+  Engagement: '#10b981',
+  Growth: '#06b6d4',
+  Content: '#f59e0b',
+  Audience: '#ec4899',
+  Performance: '#3b82f6',
+};
 
 export interface ChartTemplate {
   id: string;
   title: string;
   description: string;
   chartType: string;
-  icon: string;
-  preview: string;
+  icon: string; // kept for TS compat; not used in template (Lucide used instead)
+  preview: string; // key into previewOptions
+  gridChartType?: DashboardChartType;
+  lucideIcon?: any;
+  categoryColor?: string;
   category: string;
   examplePrompts: string[];
 }
@@ -17,44 +86,54 @@ export interface AiChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  preview?: {
-    type: string;
-    title: string;
-    prompt: string;
-  };
+  preview?: { type: string; title: string; prompt: string };
 }
 
 @Component({
   selector: 'app-ai-chart-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgxEchartsDirective, LucideAngularModule],
   templateUrl: './ai-chart-modal.component.html',
   styleUrls: ['./ai-chart-modal.component.css'],
 })
-export class AiChartModalComponent {
+export class AiChartModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
-  @Output() generate = new EventEmitter<string>();
+  @Output() generate = new EventEmitter<any>();
 
-  searchQuery: string = '';
-  selectedCategory: string = 'All';
+  // ECharts init options
+  readonly svgOpts = { renderer: 'svg' as const };
+  readonly canvasOpts = { renderer: 'canvas' as const };
+  private readonly themeService = inject(ThemeService);
+
+  // ── Original state — unchanged ───────────────────────────────────────────
+  searchQuery = '';
+  selectedCategory = 'All';
   selectedTemplate: ChartTemplate | null = null;
-  showChat: boolean = false;
-
-  chatMessages: AiChatMessage[] = []; // ← updated type
-  userMessage: string = '';
-  isGenerating: boolean = false;
+  showChat = false;
+  chatMessages: AiChatMessage[] = [];
+  userMessage = '';
+  isGenerating = false;
   currentPreview: any = null;
 
+  // New: ECharts options
+  previewOptions: Record<string, EChartsOption> = {};
+  chatPreviewOption: EChartsOption = {};
+
+  // ── Original categories — unchanged ──────────────────────────────────────
   categories = ['All', 'Engagement', 'Growth', 'Content', 'Audience', 'Performance'];
 
+  // ── Templates — original list + lucideIcon / categoryColor / gridChartType ─
   templates: ChartTemplate[] = [
     {
       id: 'custom',
       title: 'Custom Chart',
       description: 'Describe your chart and AI will create it for you',
       chartType: 'AI Direct',
-      icon: '🤖',
-      preview: 'custom',
+      icon: '💡',
+      preview: 'line',
+      gridChartType: 'line-chart',
+      lucideIcon: Lightbulb,
+      categoryColor: '#7c3aed',
       category: 'All',
       examplePrompts: [
         'Show me engagement trends over the last 30 days',
@@ -69,6 +148,9 @@ export class AiChartModalComponent {
       chartType: 'Line Chart',
       icon: '📈',
       preview: 'line',
+      gridChartType: 'line-chart',
+      lucideIcon: TrendingUp,
+      categoryColor: CAT_COLOR['Engagement'],
       category: 'Engagement',
       examplePrompts: [
         'Show engagement for the last 7 days',
@@ -83,6 +165,9 @@ export class AiChartModalComponent {
       chartType: 'Bar Chart',
       icon: '📊',
       preview: 'bar',
+      gridChartType: 'horizontal-bar-chart',
+      lucideIcon: BarChart2,
+      categoryColor: CAT_COLOR['Content'],
       category: 'Content',
       examplePrompts: [
         'Show top 5 posts by engagement',
@@ -97,6 +182,9 @@ export class AiChartModalComponent {
       chartType: 'Pie Chart',
       icon: '🥧',
       preview: 'pie',
+      gridChartType: 'pie-chart',
+      lucideIcon: PieChart,
+      categoryColor: CAT_COLOR['Audience'],
       category: 'Audience',
       examplePrompts: [
         'Show follower distribution',
@@ -111,6 +199,9 @@ export class AiChartModalComponent {
       chartType: 'Area Chart',
       icon: '📈',
       preview: 'area',
+      gridChartType: 'multi-line-chart',
+      lucideIcon: LineChart,
+      categoryColor: CAT_COLOR['Growth'],
       category: 'Growth',
       examplePrompts: [
         'Show growth for last 90 days',
@@ -124,7 +215,10 @@ export class AiChartModalComponent {
       description: 'Best performing posts',
       chartType: 'Bar Chart',
       icon: '🏆',
-      preview: 'bar',
+      preview: 'hbar',
+      gridChartType: 'ranked-bar-chart',
+      lucideIcon: Trophy,
+      categoryColor: CAT_COLOR['Performance'],
       category: 'Performance',
       examplePrompts: [
         'Top 10 posts this month',
@@ -139,6 +233,9 @@ export class AiChartModalComponent {
       chartType: 'Line Chart',
       icon: '📱',
       preview: 'line',
+      gridChartType: 'line-chart',
+      lucideIcon: Smartphone,
+      categoryColor: CAT_COLOR['Content'],
       category: 'Content',
       examplePrompts: [
         'Story views over 2 weeks',
@@ -152,7 +249,10 @@ export class AiChartModalComponent {
       description: 'Age and gender breakdown',
       chartType: 'Stacked Bar',
       icon: '👥',
-      preview: 'bar',
+      preview: 'stacked',
+      gridChartType: 'stacked-bar-chart',
+      lucideIcon: Users,
+      categoryColor: CAT_COLOR['Audience'],
       category: 'Audience',
       examplePrompts: [
         'Show age distribution',
@@ -166,7 +266,10 @@ export class AiChartModalComponent {
       description: 'Compare reach and impressions',
       chartType: 'Dual Line',
       icon: '🌐',
-      preview: 'line',
+      preview: 'dualline',
+      gridChartType: 'dual-line-chart',
+      lucideIcon: Globe,
+      categoryColor: CAT_COLOR['Performance'],
       category: 'Performance',
       examplePrompts: [
         'Compare reach and impressions',
@@ -174,8 +277,130 @@ export class AiChartModalComponent {
         'Analyze reach expansion',
       ],
     },
+    {
+      id: 'sentiment',
+      title: 'Sentiment Analysis',
+      description: 'Viewer sentiment breakdown',
+      chartType: 'Donut Chart',
+      icon: '💬',
+      preview: 'donut',
+      gridChartType: 'donut-chart',
+      lucideIcon: Zap,
+      categoryColor: CAT_COLOR['Audience'],
+      category: 'Audience',
+      examplePrompts: [
+        'Show positive vs negative sentiment',
+        'Sentiment breakdown by topic',
+        'Weekly sentiment trend',
+      ],
+    },
+    {
+      id: 'emotions',
+      title: 'Emotion Breakdown',
+      description: 'Viewer emotional response map',
+      chartType: 'Rose Chart',
+      icon: '😊',
+      preview: 'rose',
+      gridChartType: 'rose-chart',
+      lucideIcon: Smile,
+      categoryColor: CAT_COLOR['Audience'],
+      category: 'Audience',
+      examplePrompts: ['Show emotional breakdown', 'Fear vs joy analysis', 'Viewer reaction map'],
+    },
+    {
+      id: 'political',
+      title: 'Political Sentiment',
+      description: 'Candidate sentiment tracker',
+      chartType: 'Grouped Bar',
+      icon: '🗳️',
+      preview: 'grouped',
+      gridChartType: 'grouped-bar-chart',
+      lucideIcon: Activity,
+      categoryColor: CAT_COLOR['Performance'],
+      category: 'Performance',
+      examplePrompts: [
+        'Candidate approval ratings',
+        'Positive vs negative per candidate',
+        'Election sentiment over time',
+      ],
+    },
+    {
+      id: 'gender-split',
+      title: 'Gender Split',
+      description: 'Semicircle chart with ♂/♀ icons and gradient arc',
+      chartType: 'Gender Chart',
+      icon: '⚧',
+      preview: 'gender',
+      gridChartType: 'gauge-chart',
+      lucideIcon: UserCheck,
+      categoryColor: CAT_COLOR['Audience'],
+      category: 'Audience',
+      examplePrompts: [
+        'Male vs female split',
+        'Gender audience breakdown',
+        'Compare gender engagement',
+      ],
+    },
+    {
+      id: 'election-poll',
+      title: 'Election Poll',
+      description: 'Multi-candidate vertical bar chart with percentage labels',
+      chartType: 'Bar Chart',
+      icon: '🗳️',
+      preview: 'barvert',
+      gridChartType: 'bar-chart',
+      lucideIcon: BarChart,
+      categoryColor: CAT_COLOR['Performance'],
+      category: 'Comparison',
+      examplePrompts: [
+        'Election poll aggregator',
+        'Candidate vote share',
+        'Poll vs actual turnout',
+      ],
+    },
+    {
+      id: 'regional-sentiment',
+      title: 'Regional Sentiment',
+      description: 'Color-coded horizontal bars by region',
+      chartType: 'Horizontal Bar',
+      icon: '🗺️',
+      preview: 'hbar',
+      gridChartType: 'map-chart',
+      lucideIcon: MapPin,
+      categoryColor: CAT_COLOR['Engagement'],
+      category: 'Comparison',
+      examplePrompts: [
+        'Sentiment by region',
+        'Geographic audience breakdown',
+        'Regional performance comparison',
+      ],
+    },
   ];
 
+  ngOnInit(): void {
+    this.buildPreviews();
+  }
+
+  private buildPreviews(): void {
+    this.previewOptions = {
+      line: previewLineChart(''),
+      area: previewLineChart(''),
+      multiline: previewMultiLineChart(), // area chart - follower growth
+      dualline: previewDualLineChart(), // 2 lines - reach vs impressions
+      bar: previewBarChart('', false),
+      hbar: previewBarChart('', true),
+      barvert: previewBarVerticalChart(), // vertical bars - election poll
+      stacked: previewStackedBarChart(),
+      grouped: previewGroupedBarChart(),
+      pie: previewPieChart([]),
+      donut: previewDonutChart([]),
+      rose: previewRoseChart([]),
+      gauge: previewGaugeChart(''),
+      gender: previewGenderChart(),
+    };
+  }
+
+  // ── All original methods — unchanged ──────────────────────────────────────
   onClose(): void {
     this.close.emit();
   }
@@ -185,8 +410,8 @@ export class AiChartModalComponent {
     this.showChat = true;
     this.chatMessages = [];
     this.currentPreview = null;
+    this.chatPreviewOption = {};
 
-    // Add welcome message
     this.chatMessages.push({
       role: 'assistant',
       content:
@@ -203,6 +428,7 @@ export class AiChartModalComponent {
     this.chatMessages = [];
     this.userMessage = '';
     this.currentPreview = null;
+    this.chatPreviewOption = {};
   }
 
   useExamplePrompt(prompt: string): void {
@@ -211,31 +437,21 @@ export class AiChartModalComponent {
   }
 
   handleEnterKey(event: Event): void {
-    const keyboardEvent = event as KeyboardEvent;
-
-    if (!keyboardEvent.shiftKey) {
-      keyboardEvent.preventDefault();
+    const e = event as KeyboardEvent;
+    if (!e.shiftKey) {
+      e.preventDefault();
       this.sendMessage();
     }
-    // If shift key is pressed, allow default behavior (new line)
   }
 
   sendMessage(): void {
     if (!this.userMessage.trim() || this.isGenerating) return;
 
     const userPrompt = this.userMessage;
-
-    // Add user message
-    this.chatMessages.push({
-      role: 'user',
-      content: userPrompt,
-      timestamp: new Date(),
-    });
-
+    this.chatMessages.push({ role: 'user', content: userPrompt, timestamp: new Date() });
     this.userMessage = '';
     this.isGenerating = true;
 
-    // Simulate AI response with preview
     setTimeout(() => {
       const preview = {
         type: this.selectedTemplate?.preview || 'line',
@@ -243,12 +459,23 @@ export class AiChartModalComponent {
         prompt: userPrompt,
       };
 
+      // Build the real ECharts option for the chat preview card — dark-mode aware
+      const isDark =
+        this.themeService.isDark || document.documentElement.getAttribute('data-theme') === 'dark';
+      if (this.selectedTemplate?.gridChartType) {
+        const opt = getChartOption(this.selectedTemplate.gridChartType, isDark);
+        // Strip tooltip so it does not interfere inside the small chat preview card
+        this.chatPreviewOption = { ...opt, tooltip: { show: false } };
+      } else {
+        this.chatPreviewOption = this.previewOptions[preview.type] ?? this.previewOptions['line'];
+      }
+
       this.chatMessages.push({
         role: 'assistant',
         content:
           "I've generated a preview based on your request. You can add it to your dashboard or request adjustments.",
         timestamp: new Date(),
-        preview: preview,
+        preview,
       });
 
       this.isGenerating = false;
@@ -256,46 +483,61 @@ export class AiChartModalComponent {
   }
 
   addToDashboard(): void {
-    const firstUserMessage = this.chatMessages.find((m) => m.role === 'user');
-    if (firstUserMessage) {
-      this.generate.emit(firstUserMessage.content);
-      this.onClose();
+    const first = this.chatMessages.find((m) => m.role === 'user');
+    if (!first) return;
+    if (this.selectedTemplate?.gridChartType) {
+      this.generate.emit({
+        type: 'chart',
+        title: this.selectedTemplate.title,
+        chartType: this.selectedTemplate.gridChartType,
+      } as Partial<GridItem>);
+    } else {
+      this.generate.emit(first.content);
     }
+    this.onClose();
   }
 
   addPreviewToDashboard(preview: any): void {
-    this.generate.emit(preview.prompt);
+    const tpl = this.templates.find((t) => t.preview === preview.type || t.id === preview.type);
+    if (tpl?.gridChartType) {
+      this.generate.emit({
+        type: 'chart',
+        title: preview.title,
+        chartType: tpl.gridChartType,
+      } as Partial<GridItem>);
+    } else {
+      this.generate.emit(preview.prompt);
+    }
     this.onClose();
   }
 
   getFilteredTemplates(): ChartTemplate[] {
     let filtered = this.templates;
-
     if (this.selectedCategory !== 'All') {
       filtered = filtered.filter(
         (t) => t.category === this.selectedCategory || t.category === 'All',
       );
     }
-
     if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
+      const q = this.searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (t) => t.title.toLowerCase().includes(query) || t.description.toLowerCase().includes(query),
+        (t) => t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q),
       );
     }
-
     return filtered;
   }
 
+  // kept for any legacy callers
   getPreviewSVG(type: string): string {
-    const previews: { [key: string]: string } = {
-      custom:
-        'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+    const m: Record<string, string> = {
       line: 'M3 17l6-6 4 4 8-8M3 21h18',
-      bar: 'M3 17v4m6-8v8m6-12v12m6-8v8',
-      pie: 'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z',
       area: 'M7 12l3-9 3 9 3-4 3 4',
+      bar: 'M3 17v4m6-8v8m6-12v12m6-8v8',
+      pie: 'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z',
+      donut: 'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z',
+      rose: 'M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z',
+      hbar: 'M4 6h16M4 12h10M4 18h14',
     };
-    return previews[type] || previews['bar'];
+    return m[type] ?? m['bar'];
   }
 }

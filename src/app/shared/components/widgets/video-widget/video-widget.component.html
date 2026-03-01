@@ -113,6 +113,5 @@
     </div>
   </div>
 
-  <!-- Fullscreen modal -->
-  <app-video-fullscreen-modal *ngIf="isModalOpen" [config]="resolved" (close)="closeModal()" />
+  <!-- Modal is rendered at document.body via ModalPortalService — not here -->
 </ng-container>

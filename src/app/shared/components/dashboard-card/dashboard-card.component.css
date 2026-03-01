@@ -1,18 +1,38 @@
+/* dashboard-card.component.css — minimal, Tailwind handles layout */
+
+/* ngx-echarts default 400px override — can't be done in Tailwind */
+.chart-canvas-wrapper ::ng-deep > div,
+.chart-canvas-wrapper ::ng-deep .echarts,
+.chart-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+/* Chart dot accent — gradient can't be done with inline Tailwind */
+.chart-dot {
+  box-shadow: 0 0 6px rgba(99, 102, 241, 0.45);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+/* Calculation card decorative rings */
+.calc-ring-1 {
+  background: rgba(255, 255, 255, 0.06);
+}
+.calc-ring-2 {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Thin scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--border-subtle);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
 }
 
 .line-clamp-2 {

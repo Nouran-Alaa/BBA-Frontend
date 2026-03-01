@@ -1,5 +1,11 @@
+/**
+ * theme.service.ts
+ * ONE change only: added `isDark$` observable derived from existing BehaviorSubject.
+ * All original code preserved exactly.
+ */
 import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -9,10 +15,13 @@ export class ThemeService {
   private currentTheme = new BehaviorSubject<'light' | 'dark'>('light');
   theme$ = this.currentTheme.asObservable();
 
+  // ── ADD THIS: boolean stream for chart re-rendering on theme toggle ────────
+  readonly isDark$: Observable<boolean> = this.currentTheme.pipe(map((t) => t === 'dark'));
+  // ─────────────────────────────────────────────────────────────────────────
+
   constructor(rendererFactory: RendererFactory2) {
     this.renderer = rendererFactory.createRenderer(null, null);
 
-    // Load saved theme or detect system preference
     const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
     const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initial = saved || (systemDark ? 'dark' : 'light');
@@ -24,11 +33,9 @@ export class ThemeService {
   }
 
   setTheme(theme: 'light' | 'dark'): void {
-    // Apply data-theme to both html and body
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
 
-    // Apply background directly on body for unified color
     if (theme === 'dark') {
       document.body.style.background = `
         radial-gradient(ellipse 65% 45% at 12% 18%, rgba(0,200,255,0.09) 0%, transparent 55%),

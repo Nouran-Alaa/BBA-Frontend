@@ -1,3 +1,9 @@
+<!--
+  dashboard-grid.component.html
+  Responsive grid: 1 col (mobile <768px) | 2 col (md 768-1023px) | 3 col (lg 1024px+)
+  Items use colSpan/rowSpan relative to a 12-col lg base; CSS clamps them per breakpoint.
+  Hover: .card-hover class on the card container adds background opacity lift.
+-->
 <div
   cdkDropList
   cdkDropListSortingDisabled
@@ -6,13 +12,11 @@
   class="grid gap-3 sm:gap-4 md:gap-6"
   [ngClass]="{
     'grid-cols-1': true,
-    'sm:grid-cols-2': true,
-    'md:grid-cols-4': true,
-    'lg:grid-cols-8': true,
-    'xl:grid-cols-12': true,
+    'md:grid-cols-6': true,
+    'lg:grid-cols-12': true,
   }"
   [ngStyle]="{
-    'grid-auto-rows': isEditMode ? '120px' : 'minmax(140px, auto)',
+    'grid-auto-rows': isEditMode ? '120px' : 'minmax(150px, auto)',
   }"
 >
   <div
@@ -67,8 +71,7 @@
         (toggle)="toggleWidgetMenu(item.id, $event)"
         (duplicate)="duplicateItem(item.id); activeWidgetMenu = null"
         (delete)="deleteItem(item.id); activeWidgetMenu = null"
-      >
-      </app-widget-menu>
+      ></app-widget-menu>
     </div>
 
     <!-- Resize Handles (Edit Mode Only) -->
@@ -99,7 +102,7 @@
     <div
       (click)="onWidgetClick(item)"
       [class.cursor-pointer]="!isEditMode"
-      class="h-full glass-nofilter rounded-xl transition-all duration-200 overflow-visible relative"
+      class="h-full glass-nofilter rounded-xl transition-all duration-200 overflow-visible relative card-hover"
       [style.border]="isEditMode ? '2px solid var(--accent-primary)' : ''"
       [style.box-shadow]="isEditMode ? '0 0 0 2px var(--accent-primary), var(--shadow-card)' : ''"
     >
@@ -113,12 +116,11 @@
           (editClick)="onEditWithAI(item.id, $event)"
           (dateClick)="toggleChartDateMenu(item.id, $event)"
           (dateRangeChange)="onChartDateRangeSelected(item.id, $event)"
-        >
-        </app-card-actions>
+        ></app-card-actions>
       </div>
 
       <!-- Card Content -->
-      <app-dashboard-card [item]="item" [isEditMode]="isEditMode"> </app-dashboard-card>
+      <app-dashboard-card [item]="item" [isEditMode]="isEditMode"></app-dashboard-card>
     </div>
 
     <!-- Drag Placeholder -->

@@ -1,67 +1,112 @@
+<!-- dashboard-card.component.html  v4 -->
 <div class="h-full">
-  <!-- Summary Card -->
-  <div *ngIf="item.type === 'summary'" class="h-full flex flex-col p-3 sm:p-4 md:p-6">
-    <div class="flex items-center gap-2 mb-3 sm:mb-4" [class.pr-20]="!isEditMode">
-      <span class="text-xl sm:text-2xl flex-shrink-0">{{ getSummaryIcon() }}</span>
+  <!-- ── Summary Card ──────────────────────────────────────────────────── -->
+  <div *ngIf="item.type === 'summary'" class="h-full flex flex-col p-3 sm:p-4">
+    <div class="flex items-center gap-2 mb-2 flex-shrink-0" [class.pr-20]="!isEditMode">
+      <lucide-icon
+        [img]="icons.BarChart2"
+        [size]="16"
+        class="flex-shrink-0 text-indigo-500"
+      ></lucide-icon>
+      <h3 class="text-sm font-semibold truncate flex-1" style="color: var(--text-primary)">
+        {{ item.title }}
+      </h3>
+    </div>
+    <div class="flex-1 overflow-y-auto custom-scrollbar">
+      <p class="text-xs leading-relaxed" style="color: var(--text-muted)">{{ item.content }}</p>
+    </div>
+  </div>
+
+  <!-- ── Count Card  (ECharts KPI arc gauge) ───────────────────────────── -->
+  <!--
+    countKpiChart() renders a coloured progress arc with the value as large
+    graphic text in the centre — far more visually expressive than a raw number.
+    The arc percentage represents value/target (auto-scales if no countMax given).
+  -->
+  <div *ngIf="item.type === 'count'" class="flex flex-col w-full h-full overflow-hidden">
+    <div
+      class="flex items-center gap-1.5 px-2.5 pt-2 pb-0 flex-shrink-0"
+      [class.pr-20]="!isEditMode"
+    >
+      <span class="chart-dot w-2 h-2 rounded-full flex-shrink-0"></span>
       <h3
-        class="text-base sm:text-lg font-semibold truncate flex-1"
+        class="text-[0.78rem] font-semibold truncate flex-1 m-0"
         style="color: var(--text-primary)"
       >
         {{ item.title }}
       </h3>
     </div>
-    <div class="space-y-2 sm:space-y-3 flex-1 overflow-y-auto custom-scrollbar">
-      <div>
-        <h4 class="font-semibold mb-1 text-xs sm:text-sm" style="color: var(--text-secondary)">
-          Executive Summary
-        </h4>
-        <p class="text-xs leading-relaxed" style="color: var(--text-muted)">{{ item.content }}</p>
-      </div>
+    <div class="chart-canvas-wrapper flex-1 min-h-0 relative">
+      <div
+        echarts
+        [options]="countKpiOption"
+        [initOpts]="initOpts"
+        [autoResize]="true"
+        class="chart-canvas block w-full h-full"
+      ></div>
     </div>
   </div>
 
-  <!-- Count Card -->
+  <!-- ── Calculation Widget ────────────────────────────────────────────── -->
   <div
-    *ngIf="item.type === 'count'"
-    class="h-full flex flex-col justify-center p-3 sm:p-4 md:p-6"
+    *ngIf="item.type === 'calculation'"
+    class="relative h-full flex items-center justify-center overflow-hidden rounded-[inherit]"
+    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
     [class.pr-20]="!isEditMode"
   >
-    <h3
-      class="text-xs sm:text-sm font-medium mb-1 sm:mb-2 truncate"
-      style="color: var(--text-secondary)"
-    >
-      {{ item.title }}
-    </h3>
-    <p class="text-2xl sm:text-3xl md:text-4xl font-bold mb-1" style="color: var(--accent-primary)">
-      {{ item.value | number }}
-    </p>
-    <p class="text-xs sm:text-sm" style="color: var(--text-muted)">{{ item.label }}</p>
+    <div
+      class="calc-ring-1 absolute -top-[30%] -left-[20%] w-[80%] pb-[80%] rounded-full pointer-events-none"
+    ></div>
+    <div
+      class="calc-ring-2 absolute -bottom-[25%] -right-[10%] w-[60%] pb-[60%] rounded-full pointer-events-none"
+    ></div>
+    <div class="relative z-10 flex flex-col items-center justify-center p-5 text-center">
+      <div
+        class="w-10 h-10 rounded-xl flex items-center justify-center mb-3 border border-white/25"
+        style="background: rgba(255, 255, 255, 0.18)"
+      >
+        <lucide-icon [img]="icons.Sigma" [size]="18" class="text-white"></lucide-icon>
+      </div>
+      <p
+        class="font-extrabold text-white leading-none mb-1.5 tracking-tight"
+        style="font-size: clamp(1.8rem, 4vw, 2.6rem)"
+      >
+        {{ calcResult | number }}
+      </p>
+      <div class="flex items-center gap-1 mb-2">
+        <lucide-icon [img]="icons.TrendingUp" [size]="13" class="text-white/70"></lucide-icon>
+        <span class="text-[0.82rem] text-white/85 font-medium">{{ item.calcUnit || 'items' }}</span>
+      </div>
+      <span
+        class="text-[0.68rem] font-semibold uppercase tracking-widest px-2.5 py-0.5 rounded-full text-white/90 border border-white/25"
+        style="background: rgba(255, 255, 255, 0.18)"
+        >{{ calcLabel }}</span
+      >
+    </div>
   </div>
 
-  <!-- Chart Card -->
-  <div *ngIf="item.type === 'chart'" class="h-full flex flex-col p-3 sm:p-4 md:p-6">
-    <div class="flex items-center gap-2 mb-2 sm:mb-3" [class.pr-24]="!isEditMode">
-      <span class="text-base sm:text-xl flex-shrink-0">{{ getChartIcon() }}</span>
+  <!-- ── Chart Card ────────────────────────────────────────────────────── -->
+  <div *ngIf="item.type === 'chart'" class="flex flex-col w-full h-full overflow-hidden">
+    <div
+      class="flex items-center gap-1.5 px-2.5 pt-2 pb-1 flex-shrink-0"
+      [class.pr-20]="!isEditMode"
+    >
+      <span class="chart-dot w-2 h-2 rounded-full flex-shrink-0"></span>
       <h3
-        class="text-sm sm:text-base font-semibold truncate flex-1"
+        class="text-[0.78rem] font-semibold truncate flex-1 m-0"
         style="color: var(--text-primary)"
       >
         {{ item.title }}
       </h3>
     </div>
-    <div
-      class="rounded-lg p-2 sm:p-3 border flex-1 overflow-hidden flex flex-col min-h-[60px]"
-      style="background: var(--bg-overlay); border-color: var(--border-subtle)"
-    >
-      <p class="text-[10px] sm:text-xs italic mb-2 line-clamp-2" style="color: var(--text-muted)">
-        "{{ item.prompt }}"
-      </p>
+    <div class="chart-canvas-wrapper flex-1 min-h-0 px-1 pb-1.5 relative">
       <div
-        class="flex-1 flex items-center justify-center text-xs sm:text-sm"
-        style="color: var(--text-muted)"
-      >
-        Chart visualization
-      </div>
+        echarts
+        [options]="chartOption"
+        [initOpts]="initOpts"
+        [autoResize]="true"
+        class="chart-canvas block w-full h-full"
+      ></div>
     </div>
   </div>
 

@@ -163,10 +163,5 @@
     </div>
   </div>
 
-  <!-- Fullscreen modal -->
-  <app-news-fullscreen-modal
-    *ngIf="selectedArticle"
-    [article]="selectedArticle"
-    (close)="closeModal()"
-  />
+  <!-- Modal is rendered at document.body via ModalPortalService — not here -->
 </ng-container>

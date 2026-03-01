@@ -1,19 +1,36 @@
-import { NewsWidgetConfig } from './news-widget.model';
-import { VideoWidgetConfig } from './video-widget.model';
-
+/**
+ * grid-item.model.ts
+ * Place at: src/app/core/models/grid-item.model.ts
+ */
 export interface GridItem {
   id: string;
-  type: 'summary' | 'count' | 'chart' | 'news' | 'video';
+  type: 'chart' | 'count' | 'summary' | 'calculation' | 'news' | 'video';
   title: string;
-  content?: any;
-  value?: number;
-  label?: string;
-  prompt?: string;
-  chartData?: any;
-  newsConfig?: NewsWidgetConfig; // populated when type === 'news'
-  videoConfig?: VideoWidgetConfig; // populated when type === 'video'
   colSpan: number;
   rowSpan: number;
   colStart?: number;
   rowStart?: number;
+
+  // ── chart ──────────────────────────────────────────────────────────────
+  chartType?: string;
+  prompt?: string; // optional AI prompt / description
+  chartData?: any; // optional raw data payload for the chart
+
+  // ── count (ECharts KPI gauge) ──────────────────────────────────────────
+  value?: number;
+  label?: string;
+  countMax?: number;
+  countColor?: string;
+
+  // ── summary ────────────────────────────────────────────────────────────
+  content?: string;
+
+  // ── calculation ────────────────────────────────────────────────────────
+  calcFormula?: 'sum' | 'average' | 'max' | 'min' | 'count';
+  calcValues?: number[];
+  calcUnit?: string;
+
+  // ── news / video ───────────────────────────────────────────────────────
+  newsConfig?: any;
+  videoConfig?: any;
 }
