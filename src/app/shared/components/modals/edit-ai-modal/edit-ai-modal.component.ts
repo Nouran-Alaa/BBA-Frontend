@@ -39,13 +39,6 @@ export class EditAiModalComponent implements OnInit {
         'Change Y-axis to percentage',
         'Group by week instead of day',
       ];
-    } else if (this.widget.type === 'count') {
-      this.examplePrompts = [
-        'Change the metric to show growth rate',
-        'Add comparison with last month',
-        'Show as percentage',
-        'Include trend indicator',
-      ];
     } else {
       this.examplePrompts = [
         'Make it more concise',

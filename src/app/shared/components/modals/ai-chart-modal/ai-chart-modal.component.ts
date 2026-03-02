@@ -36,6 +36,7 @@ import {
   UserCheck,
   Award,
   BarChart,
+  Hash,
 } from 'lucide-angular';
 
 import { ThemeService } from '../../../../core/services/theme.service';
@@ -76,6 +77,7 @@ export interface ChartTemplate {
   icon: string; // kept for TS compat; not used in template (Lucide used instead)
   preview: string; // key into previewOptions
   gridChartType?: DashboardChartType;
+  gridItemType?: 'chart' | 'count-card'; // overrides emitted type; defaults to 'chart'
   lucideIcon?: any;
   categoryColor?: string;
   category: string;
@@ -375,6 +377,24 @@ export class AiChartModalComponent implements OnInit {
         'Regional performance comparison',
       ],
     },
+    {
+      id: 'stat-card',
+      title: 'Stat Card',
+      description:
+        'A single metric with title, big number, optional platform logo, and optional trend indicator (↑/↓)',
+      chartType: 'Stat Card',
+      icon: '#',
+      preview: 'stat-card', // special key — renders the custom HTML preview, not echarts
+      gridItemType: 'count-card', // emits type:'count-card', not type:'chart'
+      lucideIcon: Hash,
+      categoryColor: '#06b6d4',
+      category: 'Performance',
+      examplePrompts: [
+        'Facebook total conversations this week',
+        'Instagram reach with change indicator',
+        'All posts count with logo',
+      ],
+    },
   ];
 
   ngOnInit(): void {
@@ -459,12 +479,13 @@ export class AiChartModalComponent implements OnInit {
         prompt: userPrompt,
       };
 
-      // Build the real ECharts option for the chat preview card — dark-mode aware
+      // Build ECharts option for chat preview (stat-card uses custom HTML, not echarts)
       const isDark =
         this.themeService.isDark || document.documentElement.getAttribute('data-theme') === 'dark';
-      if (this.selectedTemplate?.gridChartType) {
+      if (this.selectedTemplate?.gridItemType === 'count-card') {
+        this.chatPreviewOption = {};
+      } else if (this.selectedTemplate?.gridChartType) {
         const opt = getChartOption(this.selectedTemplate.gridChartType, isDark);
-        // Strip tooltip so it does not interfere inside the small chat preview card
         this.chatPreviewOption = { ...opt, tooltip: { show: false } };
       } else {
         this.chatPreviewOption = this.previewOptions[preview.type] ?? this.previewOptions['line'];
@@ -485,11 +506,19 @@ export class AiChartModalComponent implements OnInit {
   addToDashboard(): void {
     const first = this.chatMessages.find((m) => m.role === 'user');
     if (!first) return;
-    if (this.selectedTemplate?.gridChartType) {
+    const tpl = this.selectedTemplate;
+    if (tpl?.gridItemType === 'count-card') {
+      this.generate.emit({
+        type: 'count-card',
+        title: tpl.title,
+        cardValue: 0,
+        cardSubtitle: tpl.title,
+      } as Partial<GridItem>);
+    } else if (tpl?.gridChartType) {
       this.generate.emit({
         type: 'chart',
-        title: this.selectedTemplate.title,
-        chartType: this.selectedTemplate.gridChartType,
+        title: tpl.title,
+        chartType: tpl.gridChartType,
       } as Partial<GridItem>);
     } else {
       this.generate.emit(first.content);
@@ -499,7 +528,14 @@ export class AiChartModalComponent implements OnInit {
 
   addPreviewToDashboard(preview: any): void {
     const tpl = this.templates.find((t) => t.preview === preview.type || t.id === preview.type);
-    if (tpl?.gridChartType) {
+    if (tpl?.gridItemType === 'count-card') {
+      this.generate.emit({
+        type: 'count-card',
+        title: preview.title,
+        cardValue: 0,
+        cardSubtitle: preview.title,
+      } as Partial<GridItem>);
+    } else if (tpl?.gridChartType) {
       this.generate.emit({
         type: 'chart',
         title: preview.title,

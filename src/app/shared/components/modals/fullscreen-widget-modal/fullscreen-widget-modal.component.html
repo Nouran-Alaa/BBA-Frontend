@@ -31,112 +31,167 @@
     class="glass-heavy rounded-2xl shadow-2xl w-full max-w-7xl max-h-[92vh] flex flex-col overflow-hidden animate-scaleUp"
     (click)="$event.stopPropagation()"
   >
-    <!-- ── SUMMARY ──────────────────────────────────────────────────────────── -->
-    <div *ngIf="widget.type === 'summary'" class="overflow-y-auto">
-      <div class="fwm-header px-8 py-6 flex items-center gap-4">
-        <div class="fwm-header-icon">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-        </div>
-        <div>
-          <p class="text-[0.7rem] font-black uppercase tracking-widest mb-0.5 text-white/50">
-            Executive Summary
-          </p>
-          <h2 class="text-2xl font-bold text-white">{{ widget.title }}</h2>
+    <!-- ══════════════════════════════════════════════════════════════════════
+         COUNT-CARD — stat box: title + big number + optional logo + optional ↑/↓
+    ══════════════════════════════════════════════════════════════════════ -->
+    <ng-container *ngIf="widget.type === 'count-card'">
+      <!-- Gradient header -->
+      <div class="fwm-header flex-shrink-0 px-8 py-5 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="fwm-header-icon">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="text-[0.7rem] font-black uppercase tracking-widest mb-0.5 text-white/50">
+              Stat Card
+            </p>
+            <h2 class="text-2xl font-bold text-white leading-tight">{{ widget.title }}</h2>
+            <p *ngIf="widget.cardSubtitle" class="text-sm mt-0.5 italic text-white/55">
+              {{ widget.cardSubtitle }}
+            </p>
+          </div>
         </div>
       </div>
-      <div class="p-8">
-        <p class="text-lg leading-relaxed" style="color: var(--text-secondary)">
-          {{ widget.content }}
-        </p>
-      </div>
-    </div>
 
-    <!-- ── CALCULATION ──────────────────────────────────────────────────────── -->
-    <div *ngIf="widget.type === 'calculation'" class="overflow-y-auto">
-      <div class="fwm-header px-8 py-6 flex items-center gap-4">
-        <div class="fwm-header-icon">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-            />
-          </svg>
-        </div>
-        <div>
-          <p class="text-[0.7rem] font-black uppercase tracking-widest mb-0.5 text-white/50">
-            {{ calcLabel }}
-          </p>
-          <h2 class="text-2xl font-bold text-white">{{ widget.title }}</h2>
-        </div>
-      </div>
-      <div class="p-8">
-        <div
-          class="text-center py-16 rounded-2xl"
-          style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
-        >
-          <p class="text-8xl font-extrabold text-white mb-4">{{ calcResult | number }}</p>
-          <p class="text-2xl text-white/80">{{ widget.calcUnit || 'items' }}</p>
-          <p class="text-base mt-2 text-white/55 uppercase tracking-widest">{{ calcLabel }}</p>
-        </div>
-      </div>
-    </div>
+      <!-- Scrollable body -->
+      <div class="flex-1 overflow-y-auto">
+        <div class="p-8 flex flex-col items-center gap-8">
+          <!-- ── Primary stat strip (mimics "All Posts / 13,280") ── -->
+          <div class="fwm-count-card-primary w-full max-w-lg">
+            <p class="fwm-count-card-subtitle">
+              {{ widget.cardSubtitle || widget.title }}
+            </p>
+            <p
+              class="fwm-count-card-value"
+              [style.color]="widget.cardAccentColor || 'var(--text-primary)'"
+            >
+              {{ formatCardValue(widget.cardValue ?? 0) }}
+            </p>
+          </div>
 
-    <!-- ── COUNT ───────────────────────────────────────────────────────────── -->
-    <div *ngIf="widget.type === 'count'" class="overflow-y-auto">
-      <div class="fwm-header px-8 py-6 flex items-center gap-4">
-        <div class="fwm-header-icon">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
-            />
-          </svg>
-        </div>
-        <div>
-          <p class="text-[0.7rem] font-black uppercase tracking-widest mb-0.5 text-white/50">
-            KPI Metric
-          </p>
-          <h2 class="text-2xl font-bold text-white">{{ widget.title }}</h2>
-        </div>
-      </div>
-      <div class="p-8 text-center">
-        <p class="text-9xl font-bold mb-3" style="color: var(--accent-primary)">
-          {{ widget.value }}
-        </p>
-        <p class="text-2xl mb-12" style="color: var(--text-muted)">{{ widget.label }}</p>
-        <div
-          class="rounded-xl overflow-hidden"
-          style="
-            height: 320px;
-            background: var(--bg-overlay);
-            border: 1px solid var(--border-subtle);
-          "
-        >
-          <div
-            echarts
-            [options]="chartOption"
-            [initOpts]="initOpts"
-            [autoResize]="true"
-            class="block w-full h-full"
-          ></div>
-        </div>
-      </div>
-    </div>
+          <!-- ── Detail card: logo + title + big number + change ── -->
+          <div class="fwm-count-card-detail w-full max-w-lg">
+            <!-- Optional logo -->
+            <div *ngIf="widget.cardLogoUrl" class="fwm-count-card-logo-wrap mb-5">
+              <img
+                [src]="widget.cardLogoUrl"
+                [alt]="widget.title"
+                class="fwm-count-card-logo"
+                onerror="this.style.display = 'none'"
+              />
+            </div>
 
-    <!-- ── CHART (chart + storytelling in one scroll) ───────────────────────── -->
+            <!-- Title -->
+            <p class="fwm-count-card-detail-title">{{ widget.title }}</p>
+
+            <!-- Big number -->
+            <p
+              class="fwm-count-card-detail-value"
+              [style.color]="widget.cardAccentColor || 'var(--accent-primary, #0096cc)'"
+            >
+              {{ formatCardValue(widget.cardValue ?? 0) }}
+            </p>
+
+            <!-- Optional change indicator -->
+            <div
+              *ngIf="widget.cardChange !== undefined && widget.cardChange !== null"
+              class="fwm-count-card-change"
+              [class.fwm-change-up]="widget.cardChange > 0"
+              [class.fwm-change-down]="widget.cardChange < 0"
+              [class.fwm-change-neutral]="widget.cardChange === 0"
+            >
+              <svg
+                *ngIf="widget.cardChange > 0"
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M5 10l7-7 7 7"
+                />
+              </svg>
+              <svg
+                *ngIf="widget.cardChange < 0"
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M19 14l-7 7-7-7"
+                />
+              </svg>
+              <svg
+                *ngIf="widget.cardChange === 0"
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M5 12h14"
+                />
+              </svg>
+              <span
+                >{{ widget.cardChange > 0 ? '+' : '' }}{{ widget.cardChange
+                }}{{ widget.cardChangeUnit || '%' }}</span
+              >
+            </div>
+          </div>
+
+          <!-- ── Context cards ── -->
+          <div class="w-full max-w-lg grid grid-cols-2 gap-4">
+            <div class="fwm-stat-context-card">
+              <p class="fwm-stat-context-label">Value</p>
+              <p
+                class="fwm-stat-context-value"
+                [style.color]="widget.cardAccentColor || 'var(--accent-primary)'"
+              >
+                {{ formatCardValue(widget.cardValue ?? 0) }}
+              </p>
+            </div>
+            <div class="fwm-stat-context-card">
+              <p class="fwm-stat-context-label">Change</p>
+              <p
+                class="fwm-stat-context-value"
+                [style.color]="(widget.cardChange ?? 0) >= 0 ? '#10b981' : '#ef4444'"
+              >
+                {{
+                  widget.cardChange !== undefined
+                    ? (widget.cardChange > 0 ? '+' : '') +
+                      widget.cardChange +
+                      (widget.cardChangeUnit || '%')
+                    : '—'
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CHART — ECharts visualisation + inline storytelling
+    ══════════════════════════════════════════════════════════════════════ -->
     <ng-container *ngIf="widget.type === 'chart'">
-      <!-- Gradient header — accent colour, no gray -->
+      <!-- Gradient header -->
       <div class="fwm-header flex-shrink-0 px-8 py-5 flex items-center justify-between gap-4">
         <div class="flex items-center gap-4">
           <div class="fwm-header-icon">
@@ -159,16 +214,15 @@
             </p>
           </div>
         </div>
-        <!-- Action buttons in header -->
         <div class="flex items-center gap-2 flex-shrink-0">
           <button class="fwm-header-btn">Export</button>
           <button class="fwm-header-btn">Download</button>
         </div>
       </div>
 
-      <!-- Single scrollable body — chart then storytelling below -->
+      <!-- Single scrollable body: chart + story -->
       <div class="flex-1 overflow-y-auto">
-        <!-- ── Chart canvas ─────────────────────────────────────────────── -->
+        <!-- Chart canvas -->
         <div class="px-6 pt-6 pb-4">
           <div
             class="rounded-2xl overflow-hidden"
@@ -188,7 +242,7 @@
           </div>
         </div>
 
-        <!-- ── Storytelling divider ─────────────────────────────────────── -->
+        <!-- Storytelling divider -->
         <div class="px-6 pt-2 pb-5">
           <div class="fwm-story-divider">
             <div class="fwm-story-divider-line"></div>
@@ -207,7 +261,7 @@
           </div>
         </div>
 
-        <!-- ── Story sections ───────────────────────────────────────────── -->
+        <!-- Story section cards -->
         <div class="px-6 pb-8 flex flex-col gap-4">
           <div
             *ngFor="let section of storySections; let i = index"

@@ -1,31 +1,13 @@
-<!-- dashboard-card.component.html  v4 -->
+<!-- dashboard-card.component.html  v5 -->
 <div class="h-full">
-  <!-- ── Summary Card ──────────────────────────────────────────────────── -->
-  <div *ngIf="item.type === 'summary'" class="h-full flex flex-col p-3 sm:p-4">
-    <div class="flex items-center gap-2 mb-2 flex-shrink-0" [class.pr-20]="!isEditMode">
-      <lucide-icon
-        [img]="icons.BarChart2"
-        [size]="16"
-        class="flex-shrink-0 text-indigo-500"
-      ></lucide-icon>
-      <h3 class="text-sm font-semibold truncate flex-1" style="color: var(--text-primary)">
-        {{ item.title }}
-      </h3>
-    </div>
-    <div class="flex-1 overflow-y-auto custom-scrollbar">
-      <p class="text-xs leading-relaxed" style="color: var(--text-muted)">{{ item.content }}</p>
-    </div>
-  </div>
-
-  <!-- ── Count Card  (ECharts KPI arc gauge) ───────────────────────────── -->
-  <!--
-    countKpiChart() renders a coloured progress arc with the value as large
-    graphic text in the centre — far more visually expressive than a raw number.
-    The arc percentage represents value/target (auto-scales if no countMax given).
-  -->
-  <div *ngIf="item.type === 'count'" class="flex flex-col w-full h-full overflow-hidden">
+  <!-- ══════════════════════════════════════════════════════════════════════
+       COUNT-CARD — stat box: [logo] / title / description / number / change
+       All fields except title + number are optional.
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="item.type === 'count-card'" class="flex flex-col w-full h-full overflow-hidden">
+    <!-- Header row — identical pattern to chart card: dot + title -->
     <div
-      class="flex items-center gap-1.5 px-2.5 pt-2 pb-0 flex-shrink-0"
+      class="flex items-center gap-1.5 px-2.5 pt-2 pb-1 flex-shrink-0"
       [class.pr-20]="!isEditMode"
     >
       <span class="chart-dot w-2 h-2 rounded-full flex-shrink-0"></span>
@@ -36,56 +18,112 @@
         {{ item.title }}
       </h3>
     </div>
-    <div class="chart-canvas-wrapper flex-1 min-h-0 relative">
-      <div
-        echarts
-        [options]="countKpiOption"
-        [initOpts]="initOpts"
-        [autoResize]="true"
-        class="chart-canvas block w-full h-full"
-      ></div>
-    </div>
-  </div>
 
-  <!-- ── Calculation Widget ────────────────────────────────────────────── -->
-  <div
-    *ngIf="item.type === 'calculation'"
-    class="relative h-full flex items-center justify-center overflow-hidden rounded-[inherit]"
-    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
-    [class.pr-20]="!isEditMode"
-  >
-    <div
-      class="calc-ring-1 absolute -top-[30%] -left-[20%] w-[80%] pb-[80%] rounded-full pointer-events-none"
-    ></div>
-    <div
-      class="calc-ring-2 absolute -bottom-[25%] -right-[10%] w-[60%] pb-[60%] rounded-full pointer-events-none"
-    ></div>
-    <div class="relative z-10 flex flex-col items-center justify-center p-5 text-center">
+    <!-- Body -->
+    <div class="flex-1 flex flex-col justify-center px-3 pb-3 gap-2 min-h-0">
+      <!-- Optional logo -->
       <div
-        class="w-10 h-10 rounded-xl flex items-center justify-center mb-3 border border-white/25"
-        style="background: rgba(255, 255, 255, 0.18)"
+        *ngIf="item.cardLogoUrl"
+        class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+        style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
       >
-        <lucide-icon [img]="icons.Sigma" [size]="18" class="text-white"></lucide-icon>
+        <img
+          [src]="item.cardLogoUrl"
+          [alt]="item.title"
+          class="w-6 h-6 object-contain rounded-lg"
+          onerror="this.parentElement.style.display = 'none'"
+        />
       </div>
-      <p
-        class="font-extrabold text-white leading-none mb-1.5 tracking-tight"
-        style="font-size: clamp(1.8rem, 4vw, 2.6rem)"
-      >
-        {{ calcResult | number }}
+
+      <!-- Title (label for what the count is for) -->
+      <p class="text-[0.72rem] font-semibold leading-snug" style="color: var(--text-secondary)">
+        {{ item.cardSubtitle || item.title }}
       </p>
-      <div class="flex items-center gap-1 mb-2">
-        <lucide-icon [img]="icons.TrendingUp" [size]="13" class="text-white/70"></lucide-icon>
-        <span class="text-[0.82rem] text-white/85 font-medium">{{ item.calcUnit || 'items' }}</span>
-      </div>
-      <span
-        class="text-[0.68rem] font-semibold uppercase tracking-widest px-2.5 py-0.5 rounded-full text-white/90 border border-white/25"
-        style="background: rgba(255, 255, 255, 0.18)"
-        >{{ calcLabel }}</span
+
+      <!-- Optional description -->
+      <p
+        *ngIf="item.cardDescription"
+        class="text-[0.65rem] leading-relaxed -mt-1"
+        style="color: var(--text-muted)"
       >
+        {{ item.cardDescription }}
+      </p>
+
+      <!-- Big number -->
+      <p
+        class="font-extrabold leading-none tracking-tight"
+        style="font-size: clamp(1.6rem, 4vw, 2.6rem); letter-spacing: -0.03em"
+        [style.color]="item.cardAccentColor || 'var(--text-primary)'"
+      >
+        {{ formatCardValue(item.cardValue) }}
+      </p>
+
+      <!-- Optional change pill -->
+      <div
+        *ngIf="item.cardChange !== undefined && item.cardChange !== null"
+        class="flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[0.68rem] font-bold"
+        [style.color]="
+          item.cardChange > 0 ? '#10b981' : item.cardChange < 0 ? '#ef4444' : 'var(--text-muted)'
+        "
+        [style.background]="
+          item.cardChange > 0
+            ? 'rgba(16,185,129,0.12)'
+            : item.cardChange < 0
+              ? 'rgba(239,68,68,0.12)'
+              : 'var(--bg-overlay)'
+        "
+        [style.border]="
+          '1px solid ' +
+          (item.cardChange > 0
+            ? 'rgba(16,185,129,0.25)'
+            : item.cardChange < 0
+              ? 'rgba(239,68,68,0.25)'
+              : 'var(--border-subtle)')
+        "
+      >
+        <svg
+          *ngIf="item.cardChange > 0"
+          class="w-2.5 h-2.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7 7 7" />
+        </svg>
+        <svg
+          *ngIf="item.cardChange < 0"
+          class="w-2.5 h-2.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="3"
+            d="M19 14l-7 7-7-7"
+          />
+        </svg>
+        <svg
+          *ngIf="item.cardChange === 0"
+          class="w-2.5 h-2.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 12h14" />
+        </svg>
+        <span
+          >{{ item.cardChange > 0 ? '+' : '' }}{{ item.cardChange
+          }}{{ item.cardChangeUnit || '%' }}</span
+        >
+      </div>
     </div>
   </div>
 
-  <!-- ── Chart Card ────────────────────────────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════════════════════
+       CHART CARD — unchanged from v4
+  ══════════════════════════════════════════════════════════════════════ -->
   <div *ngIf="item.type === 'chart'" class="flex flex-col w-full h-full overflow-hidden">
     <div
       class="flex items-center gap-1.5 px-2.5 pt-2 pb-1 flex-shrink-0"
@@ -110,9 +148,9 @@
     </div>
   </div>
 
-  <!-- Widget Card (News or Video) -->
-
-  <!-- News Widget -->
+  <!-- ══════════════════════════════════════════════════════════════════════
+       NEWS WIDGET — unchanged from v4
+  ══════════════════════════════════════════════════════════════════════ -->
   <ng-container *ngIf="item.type === 'news'">
     <app-news-widget
       [config]="item.newsConfig"
@@ -121,7 +159,9 @@
     ></app-news-widget>
   </ng-container>
 
-  <!-- Video Widget -->
+  <!-- ══════════════════════════════════════════════════════════════════════
+       VIDEO WIDGET — unchanged from v4
+  ══════════════════════════════════════════════════════════════════════ -->
   <ng-container *ngIf="item.type === 'video'">
     <app-video-widget
       [config]="item.videoConfig"

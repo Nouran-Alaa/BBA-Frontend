@@ -130,7 +130,7 @@ function lineEmphasis(color: string) {
 // ═════════════════════════════════════════════════════════════════════════════
 // 1. VIEWERSHIP BY RUNS
 // ═════════════════════════════════════════════════════════════════════════════
-export function viewershipByRunsChart(dark = false): EChartsOption {
+export function multiLineChart(dark = false): EChartsOption {
   const t = tk(dark);
   const x = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const data = [12, 18, 24, 32, 41, 55, 68, 80, 89, 97, 108, 124];
@@ -231,7 +231,7 @@ function donutBase(opts: {
   };
 }
 
-export function sentimentAnalysisChart(dark = false): EChartsOption {
+export function donutChart(dark = false): EChartsOption {
   return donutBase({
     dark,
     data: [
@@ -246,7 +246,7 @@ export function sentimentAnalysisChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 3. TIME ANALYSIS — dual line: Reach vs Impressions
 // ═════════════════════════════════════════════════════════════════════════════
-export function timeAnalysisChart(dark = false): EChartsOption {
+export function lineChart(dark = false): EChartsOption {
   const t = tk(dark);
   const x = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const data = [22, 28, 35, 42, 80, 95, 88, 72, 55, 42, 38, 30];
@@ -295,7 +295,7 @@ export function timeAnalysisChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 3b. REACH VS IMPRESSIONS — dual line (2 series)
 // ═════════════════════════════════════════════════════════════════════════════
-export function reachImpressionsChart(dark = false): EChartsOption {
+export function dualLineChart(dark = false): EChartsOption {
   const t = tk(dark);
   const x = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const series = [
@@ -360,7 +360,7 @@ export function reachImpressionsChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 4. GENDER — half-donut (D-ring), male left / female right labels
 // ═════════════════════════════════════════════════════════════════════════════
-export function genderChart(dark = false): EChartsOption {
+export function gaugeChart(dark = false): EChartsOption {
   const t = tk(dark);
 
   const data = [
@@ -493,7 +493,7 @@ export function genderChart(dark = false): EChartsOption {
 // 5. EMOTION BREAKDOWN — Nightingale ROSE chart (roseType:'area')
 //    Slices grow to different radii based on their value
 // ═════════════════════════════════════════════════════════════════════════════
-export function emotionDonutChart(dark = false): EChartsOption {
+export function roseChart(dark = false): EChartsOption {
   const t = tk(dark);
   const data = [
     { name: 'Fear', value: 22, color: '#ef4444' },
@@ -544,7 +544,7 @@ export function emotionDonutChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 6. AGE BRACKETS — stacked horizontal bar, Male vs Female per bracket
 // ═════════════════════════════════════════════════════════════════════════════
-export function ageBracketsChart(dark = false): EChartsOption {
+export function stackedBarChart(dark = false): EChartsOption {
   const t = tk(dark);
   const cats = ['18 - 24', '25 - 34', '35 - 44', '45 - 54', '55 - 64', '65 +'];
   const male = [42, 30, 38, 22, 28, 16];
@@ -617,7 +617,7 @@ export function ageBracketsChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 7. POLITICAL SENTIMENT
 // ═════════════════════════════════════════════════════════════════════════════
-export function politicalSentimentChart(dark = false): EChartsOption {
+export function groupedBarChart(dark = false): EChartsOption {
   const t = tk(dark);
   const cats = [
     'Candidate A',
@@ -705,7 +705,7 @@ export function politicalSentimentChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 8. ELECTION POLL
 // ═════════════════════════════════════════════════════════════════════════════
-export function electionPollChart(dark = false): EChartsOption {
+export function barChart(dark = false): EChartsOption {
   const t = tk(dark);
   const candidates = ['Candidate A', 'Candidate B', 'Candidate C', 'Candidate D', 'Candidate E'];
   const vals = [42, 28, 15, 10, 5];
@@ -775,7 +775,7 @@ export function electionPollChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 9. REGIONAL SENTIMENT
 // ═════════════════════════════════════════════════════════════════════════════
-export function regionalSentimentChart(dark = false): EChartsOption {
+export function mapChart(dark = false): EChartsOption {
   const t = tk(dark);
   const regions = [
     'North America',
@@ -849,7 +849,7 @@ export function regionalSentimentChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 11. SOCIAL CLASS — clean basic pie with left legend (no graphics overlay)
 // ═════════════════════════════════════════════════════════════════════════════
-export function socialClassChart(dark = false): EChartsOption {
+export function pieChart(dark = false): EChartsOption {
   const t = tk(dark);
   const data = [
     {
@@ -919,7 +919,7 @@ export function socialClassChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 13. BUYING CYCLE
 // ═════════════════════════════════════════════════════════════════════════════
-export function buyingCycleChart(dark = false): EChartsOption {
+export function horizontalBarChart(dark = false): EChartsOption {
   const t = tk(dark);
   const cats = ['Trigger', 'Consider', 'Choose', 'Buy', 'Good Exp.', 'Bad Exp.'];
   const vals = [92, 80, 65, 55, 45, 30];
@@ -968,7 +968,7 @@ export function buyingCycleChart(dark = false): EChartsOption {
 // ═════════════════════════════════════════════════════════════════════════════
 // 14. WATCHING TRIGGERS
 // ═════════════════════════════════════════════════════════════════════════════
-export function watchingTriggersChart(dark = false): EChartsOption {
+export function rankedBarChart(dark = false): EChartsOption {
   const t = tk(dark);
   const cats = [
     'For Their Talkshows',
@@ -1423,7 +1423,7 @@ export function previewGroupedBarChart(): EChartsOption {
   };
 }
 
-// Multi-Line preview — 3 distinct coloured lines (matches viewershipByRunsChart)
+// Multi-Line preview — 3 distinct coloured lines (matches multiLineChart)
 // Area chart preview (single line with fill) — Follower Growth
 export function previewMultiLineChart(): EChartsOption {
   const color = '#6366f1';
@@ -1503,64 +1503,64 @@ export function previewBarVerticalChart(): EChartsOption {
 // what dataset is plugged in later.
 //
 // Mapping:
-//   line-chart          ← timeAnalysisChart      (multi-line trend)
-//   multi-line-chart    ← viewershipByRunsChart   (multiple run lines)
-//   gauge-chart         ← genderChart             (two side-by-side gauges)
-//   donut-chart         ← sentimentAnalysisChart  (ring / donut)
-//   rose-chart          ← emotionDonutChart       (Nightingale rose)
-//   stacked-bar-chart   ← ageBracketsChart        (horizontal stacked bar)
-//   grouped-bar-chart   ← politicalSentimentChart (vertical grouped bar)
-//   bar-chart           ← electionPollChart       (simple vertical bar)
-//   map-chart           ← regionalSentimentChart  (map / geo chart)
-//   pie-chart           ← socialClassChart        (basic pie)
-//   horizontal-bar-chart← buyingCycleChart        (horizontal bar funnel)
-//   ranked-bar-chart    ← watchingTriggersChart   (horizontal ranked bar)
+//   line-chart          ← lineChart      (multi-line trend)
+//   multi-line-chart    ← multiLineChart   (multiple run lines)
+//   gauge-chart         ← gaugeChart             (two side-by-side gauges)
+//   donut-chart         ← donutChart  (ring / donut)
+//   rose-chart          ← roseChart       (Nightingale rose)
+//   stacked-bar-chart   ← stackedBarChart        (horizontal stacked bar)
+//   grouped-bar-chart   ← groupedBarChart (vertical grouped bar)
+//   bar-chart           ← barChart       (simple vertical bar)
+//   map-chart           ← mapChart  (map / geo chart)
+//   pie-chart           ← pieChart        (basic pie)
+//   horizontal-bar-chart← horizontalBarChart        (horizontal bar funnel)
+//   ranked-bar-chart    ← rankedBarChart   (horizontal ranked bar)
 // ─────────────────────────────────────────────────────────────────────────────
 export type DashboardChartType =
-  | 'line-chart' // timeAnalysisChart (single line)
-  | 'multi-line-chart' // viewershipByRunsChart (area chart - follower growth)
-  | 'dual-line-chart' // reachImpressionsChart (2 lines: Reach vs Impressions)
-  | 'gauge-chart' // genderChart
-  | 'donut-chart' // sentimentAnalysisChart
-  | 'rose-chart' // emotionDonutChart
-  | 'stacked-bar-chart' // ageBracketsChart
-  | 'grouped-bar-chart' // politicalSentimentChart
-  | 'bar-chart' // electionPollChart
-  | 'map-chart' // regionalSentimentChart
-  | 'pie-chart' // socialClassChart
-  | 'horizontal-bar-chart' // buyingCycleChart
-  | 'ranked-bar-chart'; // watchingTriggersChart
+  | 'line-chart' // lineChart (single line)
+  | 'multi-line-chart' // multiLineChart (area chart - follower growth)
+  | 'dual-line-chart' // dualLineChart (2 lines: Reach vs Impressions)
+  | 'gauge-chart' // gaugeChart
+  | 'donut-chart' // donutChart
+  | 'rose-chart' // roseChart
+  | 'stacked-bar-chart' // stackedBarChart
+  | 'grouped-bar-chart' // groupedBarChart
+  | 'bar-chart' // barChart
+  | 'map-chart' // mapChart
+  | 'pie-chart' // pieChart
+  | 'horizontal-bar-chart' // horizontalBarChart
+  | 'ranked-bar-chart'; // rankedBarChart
 
 export function getChartOption(type: DashboardChartType, dark = false): EChartsOption {
   switch (type) {
     case 'line-chart':
-      return timeAnalysisChart(dark);
+      return lineChart(dark);
     case 'multi-line-chart':
-      return viewershipByRunsChart(dark);
+      return multiLineChart(dark);
     case 'dual-line-chart':
-      return reachImpressionsChart(dark);
+      return dualLineChart(dark);
     case 'gauge-chart':
-      return genderChart(dark);
+      return gaugeChart(dark);
     case 'donut-chart':
-      return sentimentAnalysisChart(dark);
+      return donutChart(dark);
     case 'rose-chart':
-      return emotionDonutChart(dark);
+      return roseChart(dark);
     case 'stacked-bar-chart':
-      return ageBracketsChart(dark);
+      return stackedBarChart(dark);
     case 'grouped-bar-chart':
-      return politicalSentimentChart(dark);
+      return groupedBarChart(dark);
     case 'bar-chart':
-      return electionPollChart(dark);
+      return barChart(dark);
     case 'map-chart':
-      return regionalSentimentChart(dark);
+      return mapChart(dark);
     case 'pie-chart':
-      return socialClassChart(dark);
+      return pieChart(dark);
     case 'horizontal-bar-chart':
-      return buyingCycleChart(dark);
+      return horizontalBarChart(dark);
     case 'ranked-bar-chart':
-      return watchingTriggersChart(dark);
+      return rankedBarChart(dark);
     default:
-      return timeAnalysisChart(dark);
+      return lineChart(dark);
   }
 }
 

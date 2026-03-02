@@ -211,15 +211,77 @@
                 </p>
               </div>
 
+              <!-- Stat Card preview — animated glowy mockup -->
+              <div
+                *ngIf="template.id === 'stat-card'"
+                class="sc-preview-wrap w-full h-full relative overflow-hidden"
+              >
+                <!-- Animated ambient orbs -->
+                <div class="sc-orb sc-orb-1"></div>
+                <div class="sc-orb sc-orb-2"></div>
+                <div class="sc-orb sc-orb-3"></div>
+                <!-- Grid scanline overlay -->
+                <div class="sc-grid-overlay"></div>
+                <!-- Content -->
+                <div class="relative z-10 w-full h-full flex flex-col justify-between p-4">
+                  <!-- Top: logo + label -->
+                  <div class="flex items-center gap-2">
+                    <div class="sc-logo-badge">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                        <path
+                          d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.791-4.697 4.533-4.697 1.313 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"
+                        />
+                      </svg>
+                    </div>
+                    <span class="sc-label-text">Facebook Conversations</span>
+                  </div>
+                  <!-- Middle: big animated number -->
+                  <div class="flex flex-col gap-0.5">
+                    <span class="sc-sublabel">Total Mentions</span>
+                    <span class="sc-big-number sc-count-anim">39,571</span>
+                  </div>
+                  <!-- Bottom: change pill + sparkline dots -->
+                  <div class="flex items-center justify-between">
+                    <div class="sc-change-pill sc-change-down">
+                      <svg
+                        class="w-2.5 h-2.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="3"
+                          d="M19 14l-7 7-7-7"
+                        />
+                      </svg>
+                      <span>-2%</span>
+                    </div>
+                    <!-- Tiny sparkline dots -->
+                    <div class="flex items-end gap-0.5 h-4">
+                      <div class="sc-spark" style="height: 40%"></div>
+                      <div class="sc-spark" style="height: 65%"></div>
+                      <div class="sc-spark" style="height: 50%"></div>
+                      <div class="sc-spark" style="height: 80%"></div>
+                      <div class="sc-spark" style="height: 60%"></div>
+                      <div class="sc-spark" style="height: 90%"></div>
+                      <div class="sc-spark sc-spark-active" style="height: 70%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- All other charts: ECharts preview -->
               <div
-                *ngIf="template.id !== 'custom'"
+                *ngIf="template.id !== 'custom' && template.id !== 'stat-card'"
                 echarts
                 [options]="previewOptions[template.preview] || {}"
                 [initOpts]="svgOpts"
                 [autoResize]="true"
                 class="tpl-chart-host"
               ></div>
+
               <!-- Chart-type badge — identical position to original -->
               <span
                 class="absolute top-3 right-3 px-2 py-1 text-[10px] font-semibold rounded shadow text-white"
@@ -411,8 +473,12 @@
                     Add to Dashboard
                   </button>
                 </div>
-                <!-- 200px height matches original box; ECharts fills it -->
-                <div class="rounded-lg overflow-hidden" style="height: 200px">
+                <!-- ECharts preview (chart templates) -->
+                <div
+                  *ngIf="selectedTemplate?.gridItemType !== 'count-card'"
+                  class="rounded-lg overflow-hidden"
+                  style="height: 200px"
+                >
                   <div
                     echarts
                     [options]="chatPreviewOption"
@@ -420,6 +486,72 @@
                     [autoResize]="true"
                     class="chat-chart-host"
                   ></div>
+                </div>
+                <!-- Stat-card chat preview — animated glowy mockup -->
+                <div
+                  *ngIf="selectedTemplate?.gridItemType === 'count-card'"
+                  class="sc-chat-preview-wrap rounded-lg overflow-hidden relative"
+                  style="height: 200px"
+                >
+                  <!-- Ambient orbs -->
+                  <div class="sc-orb sc-orb-1"></div>
+                  <div class="sc-orb sc-orb-2"></div>
+                  <div class="sc-orb sc-orb-3"></div>
+                  <div class="sc-grid-overlay"></div>
+                  <!-- Content -->
+                  <div class="relative z-10 w-full h-full flex flex-col justify-between p-5">
+                    <!-- Top row: logo + platform label + subtitle -->
+                    <div class="flex items-start justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <div class="sc-logo-badge sc-logo-badge-lg">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                            <path
+                              d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.791-4.697 4.533-4.697 1.313 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="sc-label-text sc-label-text-lg">Facebook</p>
+                          <p class="sc-sublabel">Total Conversations</p>
+                        </div>
+                      </div>
+                      <!-- Live pulse indicator -->
+                      <div class="flex items-center gap-1">
+                        <div class="sc-live-dot"></div>
+                        <span class="sc-sublabel">Live</span>
+                      </div>
+                    </div>
+                    <!-- Big animated number -->
+                    <div class="flex flex-col gap-1">
+                      <span class="sc-big-number sc-big-number-xl sc-count-anim">39,571</span>
+                      <div class="sc-number-underline"></div>
+                    </div>
+                    <!-- Bottom: change pill + mini bar chart -->
+                    <div class="flex items-center justify-between">
+                      <div class="sc-change-pill sc-change-down">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="3"
+                            d="M19 14l-7 7-7-7"
+                          />
+                        </svg>
+                        <span>-2% vs last week</span>
+                      </div>
+                      <!-- Mini bar chart -->
+                      <div class="flex items-end gap-0.5 h-6">
+                        <div class="sc-bar" style="height: 35%"></div>
+                        <div class="sc-bar" style="height: 55%"></div>
+                        <div class="sc-bar" style="height: 45%"></div>
+                        <div class="sc-bar" style="height: 75%"></div>
+                        <div class="sc-bar" style="height: 60%"></div>
+                        <div class="sc-bar" style="height: 85%"></div>
+                        <div class="sc-bar sc-bar-active" style="height: 65%"></div>
+                        <div class="sc-bar" style="height: 90%"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <!-- ── END CHANGED ── -->

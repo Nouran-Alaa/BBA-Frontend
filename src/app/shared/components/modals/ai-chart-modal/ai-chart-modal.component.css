@@ -25,7 +25,7 @@
   }
 }
 
-/* Search input inside the gradient header — must override global input{background:var(--bg-input)!important} */
+/* Search input inside the gradient header */
 .modal-search-input,
 .modal-search-input:focus {
   background: rgba(255, 255, 255, 0.25) !important;
@@ -33,6 +33,7 @@
   border-color: rgba(255, 255, 255, 0.4) !important;
   box-shadow: none !important;
 }
+
 .overflow-y-auto::-webkit-scrollbar {
   width: 6px;
 }
@@ -53,7 +54,6 @@
   display: block;
   width: 100%;
   height: 100%;
-  /* Remove any inherited padding that could shrink the canvas */
   padding: 0 !important;
   margin: 0 !important;
 }
@@ -62,4 +62,339 @@
 .chat-chart-host ::ng-deep > div {
   width: 100% !important;
   height: 100% !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STAT-CARD PREVIEW — animated, glowy, dark
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper backgrounds ─────────────────────────────────────────────────── */
+.sc-preview-wrap,
+.sc-chat-preview-wrap {
+  background: linear-gradient(135deg, #060e1a 0%, #091525 50%, #060d18 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Animated ambient orbs ───────────────────────────────────────────────── */
+.sc-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(28px);
+  pointer-events: none;
+  animation: scOrbDrift 6s ease-in-out infinite alternate;
+}
+.sc-orb-1 {
+  width: 90px;
+  height: 90px;
+  top: -20px;
+  left: -20px;
+  background: radial-gradient(circle, rgba(0, 150, 204, 0.45) 0%, transparent 70%);
+  animation-delay: 0s;
+  animation-duration: 5s;
+}
+.sc-orb-2 {
+  width: 70px;
+  height: 70px;
+  bottom: -10px;
+  right: 20px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
+  animation-delay: 1.5s;
+  animation-duration: 7s;
+}
+.sc-orb-3 {
+  width: 50px;
+  height: 50px;
+  top: 40%;
+  right: -10px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
+  animation-delay: 0.8s;
+  animation-duration: 6s;
+}
+@keyframes scOrbDrift {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(8px, -6px) scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-6px, 8px) scale(0.92);
+    opacity: 0.6;
+  }
+}
+
+/* ── Grid scanline overlay ───────────────────────────────────────────────── */
+.sc-grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 150, 204, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 150, 204, 0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ── Logo badge ──────────────────────────────────────────────────────────── */
+.sc-logo-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #1877f2;
+  box-shadow:
+    0 0 10px rgba(24, 119, 242, 0.55),
+    0 0 20px rgba(24, 119, 242, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: scLogoPulse 3s ease-in-out infinite;
+}
+.sc-logo-badge-lg {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+}
+@keyframes scLogoPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px rgba(24, 119, 242, 0.55),
+      0 0 20px rgba(24, 119, 242, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 18px rgba(24, 119, 242, 0.8),
+      0 0 35px rgba(24, 119, 242, 0.4);
+  }
+}
+
+/* ── Label / sublabel text ───────────────────────────────────────────────── */
+.sc-label-text {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.02em;
+}
+.sc-label-text-lg {
+  font-size: 0.78rem;
+}
+
+.sc-sublabel {
+  font-size: 0.58rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+/* ── Big animated number ─────────────────────────────────────────────────── */
+.sc-big-number {
+  font-size: 1.9rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffffff 0%, #0096cc 40%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(0, 150, 204, 0.5));
+}
+.sc-big-number-xl {
+  font-size: 2.4rem;
+}
+
+/* Count-up animation — digits slide in from below */
+.sc-count-anim {
+  animation:
+    scCountSlide 0.7s cubic-bezier(0.22, 1, 0.36, 1) both,
+    scGlowPulse 2.5s ease-in-out 0.7s infinite;
+}
+@keyframes scCountSlide {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: drop-shadow(0 0 0px rgba(0, 150, 204, 0));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: drop-shadow(0 0 8px rgba(0, 150, 204, 0.5));
+  }
+}
+@keyframes scGlowPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(0, 150, 204, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(0, 150, 204, 0.8));
+  }
+}
+
+/* ── Number underline (animated width) ──────────────────────────────────── */
+.sc-number-underline {
+  height: 2px;
+  width: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #0096cc, #8b5cf6, transparent);
+  animation: scUnderlineGrow 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+@keyframes scUnderlineGrow {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 70%;
+    opacity: 1;
+  }
+}
+
+/* ── Change pill ─────────────────────────────────────────────────────────── */
+.sc-change-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  animation: scPillIn 0.5s ease 0.6s both;
+}
+.sc-change-down {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+}
+.sc-change-up {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+}
+@keyframes scPillIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Sparkline dots (template preview) ──────────────────────────────────── */
+.sc-spark {
+  width: 3px;
+  border-radius: 2px;
+  background: rgba(0, 150, 204, 0.35);
+  animation: scSparkIn 0.4s ease both;
+}
+.sc-spark-active {
+  background: linear-gradient(180deg, #0096cc, #8b5cf6);
+  box-shadow: 0 0 6px rgba(0, 150, 204, 0.6);
+}
+.sc-spark:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.sc-spark:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.sc-spark:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.sc-spark:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.sc-spark:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.sc-spark:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.sc-spark:nth-child(7) {
+  animation-delay: 0.35s;
+}
+@keyframes scSparkIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* ── Mini bar chart (chat preview) ──────────────────────────────────────── */
+.sc-bar {
+  width: 5px;
+  border-radius: 2px;
+  background: rgba(0, 150, 204, 0.28);
+  animation: scBarIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: bottom;
+}
+.sc-bar-active {
+  background: linear-gradient(180deg, #0096cc, #8b5cf6);
+  box-shadow: 0 0 8px rgba(0, 150, 204, 0.55);
+}
+.sc-bar:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.sc-bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.sc-bar:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.sc-bar:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.sc-bar:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.sc-bar:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.sc-bar:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.sc-bar:nth-child(8) {
+  animation-delay: 0.4s;
+}
+@keyframes scBarIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* ── Live pulse dot ──────────────────────────────────────────────────────── */
+.sc-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+  animation: scLivePulse 1.4s ease-in-out infinite;
+}
+@keyframes scLivePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
 }

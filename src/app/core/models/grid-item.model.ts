@@ -20,28 +20,32 @@ export type AnyChartType = LegacyChartType | DashboardChartType;
 
 export interface GridItem {
   id: string;
-  type: 'summary' | 'count' | 'chart' | 'news' | 'video' | 'calculation';
+  type:'count-card' | 'chart' | 'news' | 'video' ;
   title: string;
   content?: any;
 
-  // ── Count / KPI arc-gauge ─────────────────────────────────────────────────
-  value?: number;
-  label?: string;
-  /** KPI arc-gauge: upper bound for the progress arc. Auto-scales when omitted. */
-  countMax?: number;
-  /** KPI arc-gauge: accent colour hex. Defaults to PALETTE.primary. */
-  countColor?: string;
+  
+ // ── Count Card ──────────────────────────────────────────────────────────
+  /** Headline number. Auto-formats: 39571 → "39.6K", 1580000 → "1.6M". */
+  cardValue?: number | string;
+  /** Small label above the number, e.g. "All Posts". */
+  cardSubtitle?: string;
+   /** Optional short description shown between subtitle and number. */
+  cardDescription?: string;
+  /** Optional platform icon URL. Hidden when omitted. */
+  cardLogoUrl?: string;
+  /** Change value. Negative = red ↓, positive = green ↑, 0 = neutral —. Omit to hide. */
+  cardChange?: number;
+  /** Unit for cardChange. Defaults to '%'. */
+  cardChangeUnit?: string;
+  /** Hex for the headline number. Defaults to var(--accent-primary). */
+  cardAccentColor?: string;
 
   // ── Chart ─────────────────────────────────────────────────────────────────
   prompt?: string;
-  /** Accepts both legacy ChartType and the newer DashboardChartType tokens. */
   chartType?: AnyChartType;
   chartData?: any;
 
-  // ── Calculation widget ────────────────────────────────────────────────────
-  calcUnit?: string;
-  calcValues?: number[];
-  calcFormula?: 'sum' | 'average' | 'min' | 'max' | 'count';
 
   // ── News / Video ──────────────────────────────────────────────────────────
   newsConfig?: NewsWidgetConfig;
