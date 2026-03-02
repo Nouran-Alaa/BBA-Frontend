@@ -60,16 +60,16 @@
           {{ article.sourceName }}
         </span>
         <span class="text-[0.76rem]" style="color: rgba(255, 255, 255, 0.5)">·</span>
-        <span class="text-[0.76rem]" style="color: rgba(255, 255, 255, 0.6)">
-          {{ getTimeAgo(article.publishedAt) }}
-        </span>
+        <span class="text-[0.76rem]" style="color: rgba(255, 255, 255, 0.6)">{{
+          getTimeAgo(article.publishedAt)
+        }}</span>
       </div>
     </div>
 
     <!-- ── Tab bar ───────────────────────────────────────── -->
     <div
-      class="flex items-center gap-0.5 px-4 flex-shrink-0 overflow-x-auto border-b [scrollbar-width:none]"
-      style="border-color: var(--border-subtle)"
+      class="flex items-center gap-0.5 px-4 flex-shrink-0 overflow-x-auto border-b"
+      style="border-color: var(--border-subtle); scrollbar-width: none"
     >
       <button
         *ngFor="let tab of tabs"
@@ -80,7 +80,7 @@
         [style.border-bottom-color]="
           activeTab === tab.key ? 'var(--accent-primary, #0096cc)' : 'transparent'
         "
-        (click)="activeTab = tab.key"
+        (click)="switchTab(tab.key)"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -96,12 +96,11 @@
 
     <!-- ── Content ───────────────────────────────────────── -->
     <div
-      class="flex-1 overflow-y-auto [scrollbar-width:thin]"
-      style="scrollbar-color: var(--border-subtle) transparent"
+      class="flex-1 overflow-y-auto"
+      style="scrollbar-width: thin; scrollbar-color: var(--border-subtle) transparent"
     >
       <!-- ━━ ARTICLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
       <div *ngIf="activeTab === 'article'" class="p-5 flex flex-col gap-3.5">
-        <!-- Badges -->
         <div class="flex items-center flex-wrap gap-1.5">
           <span
             *ngIf="article.sentiment"
@@ -109,9 +108,8 @@
             [style.color]="getSentimentColor(article.sentiment)"
             [style.background]="getSentimentColor(article.sentiment) + '1a'"
             [style.border-color]="getSentimentColor(article.sentiment) + '44'"
+            >{{ getSentimentLabel(article.sentiment) }}</span
           >
-            {{ getSentimentLabel(article.sentiment) }}
-          </span>
           <span
             *ngIf="article.category"
             class="inline-flex items-center text-[0.76rem] font-bold px-2.5 py-0.5 rounded-full border"
@@ -120,16 +118,14 @@
               color: var(--text-muted);
               border-color: var(--border-subtle);
             "
+            >{{ article.category }}</span
           >
-            {{ article.category }}
-          </span>
           <span
             *ngIf="article.engagementScore"
             class="inline-flex items-center text-[0.76rem] font-bold px-2.5 py-0.5 rounded-full text-white"
             style="background: var(--accent-gradient)"
+            >⚡ {{ formatEngagement(article.engagementScore) }}</span
           >
-            ⚡ {{ formatEngagement(article.engagementScore) }}
-          </span>
           <span
             class="inline-flex items-center text-[0.76rem] font-bold px-2.5 py-0.5 rounded-full border ml-auto"
             style="
@@ -137,9 +133,8 @@
               color: var(--text-muted);
               border-color: var(--border-subtle);
             "
+            >{{ getReadingTime() }}</span
           >
-            {{ getReadingTime() }}
-          </span>
         </div>
 
         <!-- Title -->
@@ -172,9 +167,8 @@
               color: var(--text-muted);
               border-color: var(--border-subtle);
             "
+            >{{ tag }}</span
           >
-            {{ tag }}
-          </span>
         </div>
 
         <!-- Divider -->
@@ -292,83 +286,209 @@
         </div>
       </div>
 
-      <!-- ━━ READ SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-      <div *ngIf="activeTab === 'readscreen'" class="p-5 flex flex-col gap-3.5">
-        <!-- Header card -->
+      <!-- ━━ SCREEN READER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div *ngIf="activeTab === 'screenreader'" class="flex flex-col h-full">
+        <!-- Controls bar -->
         <div
-          class="flex items-start gap-3 p-4 rounded-xl border"
-          style="background: var(--bg-overlay); border-color: var(--border-subtle)"
+          class="flex-shrink-0 px-5 pt-4 pb-3 flex flex-col gap-3 border-b"
+          style="border-color: var(--border-subtle)"
         >
+          <!-- Title + reading time -->
+          <div class="flex items-center gap-2">
+            <div
+              class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style="background: var(--accent-gradient)"
+            >
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15.536 8.464a5 5 0 010 7.072M12 6a7 7 0 010 12M8.464 8.464a5 5 0 000 7.072M3 9v6m18-6v6"
+                />
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-bold truncate" style="color: var(--text-primary)">
+                Screen Reader
+              </h3>
+              <p class="text-[0.72rem]" style="color: var(--text-muted)">
+                {{ sentences.length }} sentences · {{ getReadingTime() }}
+              </p>
+            </div>
+            <!-- Progress badge -->
+            <span
+              class="text-[0.72rem] font-bold px-2.5 py-1 rounded-full tabular-nums"
+              style="
+                background: var(--bg-overlay);
+                color: var(--accent-primary);
+                border: 1px solid var(--border-subtle);
+              "
+            >
+              {{ progressPercent }}%
+            </span>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="h-1.5 rounded-full overflow-hidden" style="background: var(--bg-overlay)">
+            <div
+              class="h-full rounded-full transition-all duration-300 nfm-reader-progress"
+              [style.width]="progressPercent + '%'"
+            ></div>
+          </div>
+
+          <!-- Playback buttons + settings -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <!-- Stop -->
+            <button
+              *ngIf="!isIdle"
+              (click)="stopReader()"
+              title="Stop"
+              class="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer transition-all border hover:scale-105 active:scale-95"
+              style="
+                background: var(--bg-overlay);
+                color: var(--text-muted);
+                border-color: var(--border-subtle);
+              "
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="6" y="6" width="12" height="12" rx="2" />
+              </svg>
+            </button>
+
+            <!-- Play / Pause / Resume -->
+            <button
+              (click)="isIdle ? startReader() : isPlaying ? pauseReader() : resumeReader()"
+              title="{{ isPlaying ? 'Pause' : isPaused ? 'Resume' : 'Play' }}"
+              class="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm cursor-pointer transition-all hover:opacity-90 hover:scale-[1.03] active:scale-95 text-white"
+              style="background: var(--accent-gradient); min-width: 90px; justify-content: center"
+            >
+              <!-- Play icon -->
+              <svg
+                *ngIf="isIdle || isPaused"
+                class="w-4 h-4"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <!-- Pause icon -->
+              <svg *ngIf="isPlaying" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+              </svg>
+              {{ isPlaying ? 'Pause' : isPaused ? 'Resume' : 'Play' }}
+            </button>
+
+            <!-- Rate slider -->
+            <div class="flex items-center gap-2 ml-auto">
+              <svg
+                class="w-3.5 h-3.5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                style="color: var(--text-muted)"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              <input
+                type="range"
+                min="0.5"
+                max="2"
+                step="0.1"
+                [value]="readerRate"
+                (input)="onRateChange($event)"
+                class="nfm-rate-slider w-24"
+                title="Speed: {{ readerRate }}x"
+              />
+              <span
+                class="text-[0.72rem] font-bold tabular-nums w-8"
+                style="color: var(--text-muted)"
+              >
+                {{ readerRate | number: '1.1-1' }}x
+              </span>
+            </div>
+
+            <!-- Voice selector (only if multiple voices available) -->
+            <select
+              *ngIf="availableVoices.length > 1"
+              (change)="onVoiceChange($event)"
+              class="nfm-voice-select text-[0.72rem] px-2 py-1 rounded-lg cursor-pointer border"
+              style="
+                background: var(--bg-overlay);
+                color: var(--text-primary);
+                border-color: var(--border-subtle);
+              "
+            >
+              <option *ngFor="let voice of availableVoices" [value]="voice.name">
+                {{ voice.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Unsupported banner -->
           <div
-            class="w-11 h-11 rounded-[10px] flex-shrink-0 flex items-center justify-center"
-            style="background: var(--accent-gradient)"
+            *ngIf="!speechSupported"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg text-[0.8rem]"
+            style="background: #ef444420; color: #ef4444; border: 1px solid #ef444440"
           >
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-4 h-4 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-          </div>
-          <div>
-            <h3 class="text-[1.05rem] font-bold" style="color: var(--text-primary)">Read Screen</h3>
-            <p class="text-[0.82rem] mt-0.5" style="color: var(--text-muted)">
-              Distraction-free reading mode · {{ getReadingTime() }}
-            </p>
+            Speech synthesis is not supported in this browser. Text is still readable below.
           </div>
         </div>
 
-        <!-- Reader card -->
+        <!-- Sentence list — scrollable, with highlight tracking -->
         <div
-          class="flex flex-col gap-3.5 p-6 rounded-2xl border"
-          style="background: var(--bg-modal, #0d1b2a); border-color: rgba(255, 255, 255, 0.08)"
+          class="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-1"
+          style="scrollbar-width: thin; scrollbar-color: var(--border-subtle) transparent"
         >
-          <!-- Source row -->
-          <div class="flex items-center gap-1.5">
-            <img
-              *ngIf="article.sourceFaviconUrl"
-              [src]="article.sourceFaviconUrl"
-              class="w-4 h-4 rounded-[3px] object-cover"
-              onerror="this.style.display = 'none'"
-            />
-            <span class="text-[0.82rem] font-bold" style="color: var(--accent-primary, #0096cc)">
-              {{ article.sourceName }}
-            </span>
-            <span class="text-[0.76rem]" style="color: rgba(255, 255, 255, 0.5)">·</span>
-            <span class="text-[0.76rem]" style="color: var(--text-muted)">
-              {{ getTimeAgo(article.publishedAt) }}
-            </span>
-          </div>
-
-          <h2
-            class="text-[1.25rem] font-extrabold leading-snug tracking-[-0.015em]"
-            style="color: var(--text-primary)"
+          <p
+            *ngFor="let s of sentences"
+            [id]="'nfm-sentence-' + s.index"
+            class="nfm-sentence text-[0.96rem] leading-[1.85] px-3 py-2 rounded-xl cursor-pointer transition-all duration-200"
+            [class.nfm-sentence-active]="activeSentenceIndex === s.index"
+            [class.nfm-sentence-read]="activeSentenceIndex > s.index"
+            (click)="readFromSentence(s.index)"
             dir="auto"
           >
-            {{ article.title }}
-          </h2>
+            {{ s.text }}
+          </p>
 
-          <div class="h-px" style="background: var(--border-subtle)"></div>
-
-          <div class="flex flex-col gap-3" dir="auto">
-            <ng-container *ngIf="article.fullContent">
-              <p
-                *ngFor="let para of article.fullContent.split('\n\n')"
-                class="text-[0.95rem] leading-[1.85]"
-                style="color: var(--text-primary)"
-              >
-                {{ para }}
-              </p>
-            </ng-container>
-            <p
-              *ngIf="!article.fullContent"
-              class="text-[0.95rem] leading-[1.85]"
-              style="color: var(--text-primary)"
+          <div
+            *ngIf="sentences.length === 0"
+            class="flex flex-col items-center justify-center py-12 gap-3"
+          >
+            <svg
+              class="w-12 h-12 opacity-20"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              style="color: var(--text-muted)"
             >
-              {{ article.summary }}
-            </p>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <p class="text-sm" style="color: var(--text-muted)">No content to read</p>
           </div>
         </div>
       </div>

@@ -12,3 +12,69 @@
     transform: scale(1) translateY(0);
   }
 }
+
+/* ── Screen Reader — progress bar fill ───────────────────────────────────── */
+.nfm-reader-progress {
+  background: var(--accent-gradient);
+  transition: width 0.4s ease;
+}
+
+/* ── Sentence states ─────────────────────────────────────────────────────── */
+.nfm-sentence {
+  color: var(--text-secondary);
+}
+
+.nfm-sentence:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+}
+
+/* Already-read sentences — dimmed */
+.nfm-sentence-read {
+  color: var(--text-muted) !important;
+  opacity: 0.55;
+}
+
+/* Active / currently-speaking sentence */
+.nfm-sentence-active {
+  background: color-mix(in srgb, var(--accent-primary, #0096cc) 12%, transparent) !important;
+  color: var(--text-primary) !important;
+  opacity: 1 !important;
+  box-shadow: inset 3px 0 0 var(--accent-primary, #0096cc);
+  font-weight: 600;
+}
+
+/* ── Rate slider ─────────────────────────────────────────────────────────── */
+.nfm-rate-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--border-subtle);
+  outline: none;
+  cursor: pointer;
+}
+.nfm-rate-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-primary, #0096cc);
+  cursor: pointer;
+  border: 2px solid var(--bg-modal, #0d1b2a);
+  box-shadow: 0 0 0 1px var(--accent-primary, #0096cc);
+}
+.nfm-rate-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-primary, #0096cc);
+  cursor: pointer;
+  border: 2px solid var(--bg-modal, #0d1b2a);
+  box-shadow: 0 0 0 1px var(--accent-primary, #0096cc);
+}
+
+/* ── Voice select ────────────────────────────────────────────────────────── */
+.nfm-voice-select {
+  max-width: 140px;
+}

@@ -1,5 +1,9 @@
+/* ── Original animations (preserved) ────────────────────────────────────── */
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
+}
+.animate-scaleUp {
+  animation: scaleUp 0.3s ease-out;
 }
 
 @keyframes fadeIn {
@@ -10,11 +14,6 @@
     opacity: 1;
   }
 }
-
-.animate-scaleUp {
-  animation: scaleUp 0.3s ease-out;
-}
-
 @keyframes scaleUp {
   from {
     opacity: 0;
@@ -30,17 +29,140 @@
 .overflow-auto::-webkit-scrollbar {
   width: 8px;
 }
-
 .overflow-auto::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 10px;
 }
-
 .overflow-auto::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
 }
-
 .overflow-auto::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* ── Gradient header (replaces the gray bar) ─────────────────────────────── */
+.fwm-header {
+  background: var(--accent-gradient);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.fwm-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.fwm-header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fwm-header-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.fwm-header-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Story divider ───────────────────────────────────────────────────────── */
+.fwm-story-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.fwm-story-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+.fwm-story-divider-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-primary, #0096cc);
+  background: rgba(0, 150, 204, 0.08);
+  border: 1px solid rgba(0, 150, 204, 0.2);
+  flex-shrink: 0;
+}
+
+/* ── Story section cards ─────────────────────────────────────────────────── */
+.fwm-story-card {
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-overlay);
+  animation: fwmCardIn 0.35s ease both;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.fwm-story-card:hover {
+  border-color: rgba(0, 150, 204, 0.22);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+@keyframes fwmCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section icon colours — 3 cycle */
+.fwm-story-section-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fwm-icon-0 {
+  background: var(--accent-gradient);
+}
+.fwm-icon-1 {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+.fwm-icon-2 {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Left border accent per card — uses border utility class from HTML */
+.fwm-story-border-0 {
+  border-color: var(--accent-primary, #0096cc);
+}
+.fwm-story-border-1 {
+  border-color: #6366f1;
+}
+.fwm-story-border-2 {
+  border-color: #10b981;
 }
