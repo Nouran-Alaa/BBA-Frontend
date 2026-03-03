@@ -1,14 +1,205 @@
-.animate-slideUp {
-  animation: slideUp 0.3s ease-out;
+/* confirm-delete — only: :host, @keyframes, pseudo-elements, complex shadows */
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+:host > * {
+  pointer-events: auto;
 }
 
-@keyframes slideUp {
+/* Panel — uses theme vars so it works in light + dark */
+.cd-panel {
+  background: var(--bg-modal);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.08),
+    0 0 40px rgba(239, 68, 68, 0.06),
+    0 24px 60px rgba(0, 0, 0, 0.3);
+  animation: cdEnter 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes cdEnter {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: scale(0.9) translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1) translateY(0);
   }
+}
+
+/* HUD corner brackets */
+.cd-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
+.cd-corner::before,
+.cd-corner::after {
+  content: '';
+  position: absolute;
+  background: rgba(239, 68, 68, 0.5);
+  border-radius: 1px;
+}
+.cd-corner::before {
+  width: 100%;
+  height: 1.5px;
+}
+.cd-corner::after {
+  width: 1.5px;
+  height: 100%;
+}
+.cd-tl {
+  top: 8px;
+  left: 8px;
+}
+.cd-tl::before {
+  top: 0;
+  left: 0;
+}
+.cd-tl::after {
+  top: 0;
+  left: 0;
+}
+.cd-tr {
+  top: 8px;
+  right: 8px;
+}
+.cd-tr::before {
+  top: 0;
+  right: 0;
+}
+.cd-tr::after {
+  top: 0;
+  right: 0;
+}
+.cd-bl {
+  bottom: 8px;
+  left: 8px;
+}
+.cd-bl::before {
+  bottom: 0;
+  left: 0;
+}
+.cd-bl::after {
+  bottom: 0;
+  left: 0;
+}
+.cd-br {
+  bottom: 8px;
+  right: 8px;
+}
+.cd-br::before {
+  bottom: 0;
+  right: 0;
+}
+.cd-br::after {
+  bottom: 0;
+  right: 0;
+}
+
+/* Scan-line */
+.cd-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  top: -1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(239, 68, 68, 0.6) 40%,
+    rgba(239, 68, 68, 0.8) 50%,
+    rgba(239, 68, 68, 0.6) 60%,
+    transparent
+  );
+  animation: cdScan 5s ease-in-out infinite;
+}
+@keyframes cdScan {
+  0% {
+    top: -1px;
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.9;
+  }
+  92% {
+    opacity: 0.15;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* Icon badge */
+.cd-icon-badge {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  animation: cdBadgePulse 3s ease-in-out infinite;
+}
+@keyframes cdBadgePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Status dot */
+.cd-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #ef4444;
+  animation: cdDot 1.4s ease-in-out infinite;
+}
+@keyframes cdDot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.5);
+  }
+}
+
+/* Item card */
+.cd-item-card {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+}
+
+/* Delete button */
+.cd-delete-btn {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  box-shadow:
+    0 0 16px rgba(239, 68, 68, 0.3),
+    0 4px 12px rgba(220, 38, 38, 0.4);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+.cd-delete-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 55%);
+  pointer-events: none;
+}
+.cd-delete-btn:hover {
+  box-shadow:
+    0 0 28px rgba(239, 68, 68, 0.45),
+    0 4px 16px rgba(220, 38, 38, 0.55);
 }

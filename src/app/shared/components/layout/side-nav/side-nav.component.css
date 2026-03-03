@@ -1,52 +1,202 @@
-/* Custom Scrollbar for Dashboard List */
-nav::-webkit-scrollbar {
-  width: 6px;
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
-nav::-webkit-scrollbar-track {
+/* ── Scan line (dark mode only) ───────────────────────────────── */
+.sn-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  top: -2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-primary) 30%,
+    rgba(0, 200, 255, 0.9) 50%,
+    var(--accent-primary) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  animation: snScan 8s ease-in-out infinite;
+}
+[data-theme='light'] .sn-scanline {
+  display: none;
+}
+@keyframes snScan {
+  0% {
+    top: -2px;
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.55;
+  }
+  96% {
+    opacity: 0.12;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* ── Logo ring ────────────────────────────────────────────────── */
+.sn-logo-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 12px;
+  background: var(--accent-gradient);
+  opacity: 0.4;
+  z-index: 0;
+  animation: ringPulse 3.5s ease-in-out infinite;
+}
+@keyframes ringPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.62;
+    transform: scale(1.06);
+  }
+}
+[data-theme='light'] .sn-logo-ring {
+  opacity: 0.22;
+}
+
+/* ── Company name ─────────────────────────────────────────────── */
+.sn-company-name {
+  font-family: 'Exo 2', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.2;
+  background: linear-gradient(90deg, var(--text-primary) 0%, var(--accent-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sn-company-sub {
+  font-size: 0.58rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+/* ── Nav items ────────────────────────────────────────────────── */
+.sn-nav-item:hover {
+  background: var(--bg-overlay) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--text-primary) !important;
+}
+.sn-nav-item-active {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 180, 255, 0.14) 0%,
+    rgba(139, 92, 246, 0.09) 100%
+  ) !important;
+  border-color: rgba(0, 200, 255, 0.22) !important;
+  box-shadow: 0 0 16px rgba(0, 200, 255, 0.1);
+}
+/* Shimmer on active item */
+.sn-nav-item-active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 200, 255, 0.07) 50%, transparent 100%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+[data-theme='light'] .sn-nav-item-active {
+  background: linear-gradient(135deg, rgba(0, 120, 200, 0.09), rgba(124, 58, 237, 0.06)) !important;
+  border-color: rgba(0, 120, 200, 0.18) !important;
+}
+[data-theme='light'] .sn-nav-item-active::after {
+  display: none;
+}
+
+/* ── Active left bar ──────────────────────────────────────────── */
+.sn-active-bar {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 52%;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent-primary);
+  box-shadow:
+    0 0 10px rgba(0, 200, 255, 0.7),
+    0 0 20px rgba(0, 200, 255, 0.28);
+}
+
+/* ── 3-dot menu (show on group hover) ────────────────────────── */
+.sn-dot-menu {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+}
+.sn-group:hover .sn-dot-menu {
+  opacity: 1;
+}
+.sn-dot-menu:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+}
+
+/* ── Add button ───────────────────────────────────────────────── */
+.sn-add-btn:hover {
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+  background: rgba(0, 200, 255, 0.05) !important;
+  box-shadow: 0 0 14px rgba(0, 200, 255, 0.08);
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────── */
+.sn-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+.sn-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
-
-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+.sn-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 200, 255, 0.18);
+  border-radius: 3px;
 }
-
-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+.sn-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 200, 255, 0.38);
 }
-
-/* Smooth transitions */
-button {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Logo upload button hover effect */
-.relative button:hover {
-  transform: scale(1.1);
-}
-
-/* Dashboard item hover animation */
-nav > button:hover {
-  transform: translateX(4px);
-}
-
-nav > button.justify-center:hover {
-  transform: scale(1.05);
-}
-
-/* Active dashboard glow effect */
-nav > button.bg-blue-600 {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-}
-
-/* Ripple effect on click */
-button:active {
-  transform: scale(0.98);
-}
-
-/* Smooth overflow scrolling */
-.overflow-y-auto {
+.sn-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: rgba(0, 200, 255, 0.18) transparent;
 }

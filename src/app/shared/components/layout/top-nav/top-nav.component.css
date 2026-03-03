@@ -1,49 +1,65 @@
-/* Dropdown Animation */
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-in-out;
+/* top-nav.component.css — only what Tailwind cannot do */
+
+:host {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  position: relative;
+  z-index: 30;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Notification dot — CSS animation + box-shadow */
+.tn-notif-dot {
+  background: #f43f5e;
+  box-shadow: 0 0 6px rgba(244, 63, 94, 0.75);
+  animation: notifPulse 2s ease-in-out infinite;
 }
-
-/* Profile Image Hover Effect */
-img:hover {
-  transform: scale(1.05);
-  transition: transform 0.2s ease-in-out;
-}
-
-/* Notification Badge Pulse */
-.relative span {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
+@keyframes notifPulse {
   0%,
   100% {
+    transform: scale(1);
     opacity: 1;
   }
   50% {
+    transform: scale(1.5);
     opacity: 0.5;
   }
 }
 
-/* Custom focus styles */
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+/* Avatar — teal glow (box-shadow not expressible in Tailwind) */
+.tn-avatar {
+  background: #0099cc;
+  box-shadow: 0 0 10px rgba(0, 153, 204, 0.35);
 }
 
-/* Smooth transitions for all interactive elements */
-button,
-a {
-  transition: all 0.2s ease-in-out;
+/* Dropdown — glass blur + slide-in animation */
+.tn-dropdown {
+  background: var(--bg-modal);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 0 1px rgba(0, 153, 204, 0.06);
+  animation: dropIn 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Hamburger — hidden by default (desktop-first), shown only on mobile */
+.tn-hamburger {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .tn-hamburger {
+    display: flex;
+  }
 }

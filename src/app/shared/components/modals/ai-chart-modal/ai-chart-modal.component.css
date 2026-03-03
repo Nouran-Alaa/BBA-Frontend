@@ -1,4 +1,19 @@
-/* ── Exact original CSS, unchanged ───────────────────────────────────────── */
+/* ai-chart-modal.component.css */
+/* :host — fixed overlay, escapes sidebar stacking context */
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+:host > * {
+  pointer-events: auto;
+}
+
+/* ── Modal entrance ─────────────────────────────────────────────── */
 .animate-slideUp {
   animation: slideUp 0.3s ease-out;
 }
@@ -13,10 +28,11 @@
   }
 }
 
+/* ── AI spinner (counter-clockwise) ─────────────────────────────── */
 .animate-spin {
-  animation: spinCounterClockwise 1s linear infinite;
+  animation: spinCCW 1s linear infinite;
 }
-@keyframes spinCounterClockwise {
+@keyframes spinCCW {
   from {
     transform: rotate(360deg);
   }
@@ -25,30 +41,35 @@
   }
 }
 
-/* Search input inside the gradient header */
+/* ── Search input inside gradient header ────────────────────────── */
 .modal-search-input,
 .modal-search-input:focus {
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.38) !important;
   box-shadow: none !important;
+  outline: none !important;
+}
+.modal-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.65) !important;
 }
 
+/* ── Space-themed scrollbar ─────────────────────────────────────── */
 .overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
+  background: rgba(0, 200, 255, 0.22);
+  border-radius: 4px;
 }
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(0, 200, 255, 0.44);
 }
 
-/* ── ECharts sizing — fills container completely, no gaps ────────────────── */
+/* ── ECharts sizing — fills container, no gaps ──────────────────── */
 .tpl-chart-host,
 .chat-chart-host {
   display: block;
@@ -57,18 +78,15 @@
   padding: 0 !important;
   margin: 0 !important;
 }
-/* ngx-echarts wraps the canvas in an extra div — pierce it */
 .tpl-chart-host ::ng-deep > div,
 .chat-chart-host ::ng-deep > div {
   width: 100% !important;
   height: 100% !important;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   STAT-CARD PREVIEW — animated, glowy, dark
-══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Wrapper backgrounds ─────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════
+   STAT-CARD PREVIEW — animated NASA space aesthetic
+══════════════════════════════════════════════════════════════════ */
 .sc-preview-wrap,
 .sc-chat-preview-wrap {
   background: linear-gradient(135deg, #060e1a 0%, #091525 50%, #060d18 100%);
@@ -76,13 +94,13 @@
   overflow: hidden;
 }
 
-/* ── Animated ambient orbs ───────────────────────────────────────────────── */
+/* Ambient orbs */
 .sc-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(28px);
   pointer-events: none;
-  animation: scOrbDrift 6s ease-in-out infinite alternate;
+  animation: scOrbDrift ease-in-out infinite alternate;
 }
 .sc-orb-1 {
   width: 90px;
@@ -90,7 +108,6 @@
   top: -20px;
   left: -20px;
   background: radial-gradient(circle, rgba(0, 150, 204, 0.45) 0%, transparent 70%);
-  animation-delay: 0s;
   animation-duration: 5s;
 }
 .sc-orb-2 {
@@ -99,8 +116,8 @@
   bottom: -10px;
   right: 20px;
   background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
-  animation-delay: 1.5s;
   animation-duration: 7s;
+  animation-delay: 1.5s;
 }
 .sc-orb-3 {
   width: 50px;
@@ -108,8 +125,8 @@
   top: 40%;
   right: -10px;
   background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
-  animation-delay: 0.8s;
   animation-duration: 6s;
+  animation-delay: 0.8s;
 }
 @keyframes scOrbDrift {
   0% {
@@ -126,7 +143,7 @@
   }
 }
 
-/* ── Grid scanline overlay ───────────────────────────────────────────────── */
+/* Grid scanline overlay */
 .sc-grid-overlay {
   position: absolute;
   inset: 0;
@@ -137,7 +154,7 @@
   background-size: 20px 20px;
 }
 
-/* ── Logo badge ──────────────────────────────────────────────────────────── */
+/* Logo badge */
 .sc-logo-badge {
   width: 28px;
   height: 28px;
@@ -171,7 +188,7 @@
   }
 }
 
-/* ── Label / sublabel text ───────────────────────────────────────────────── */
+/* Text */
 .sc-label-text {
   font-size: 0.68rem;
   font-weight: 700;
@@ -181,7 +198,6 @@
 .sc-label-text-lg {
   font-size: 0.78rem;
 }
-
 .sc-sublabel {
   font-size: 0.58rem;
   font-weight: 600;
@@ -190,13 +206,13 @@
   color: rgba(255, 255, 255, 0.38);
 }
 
-/* ── Big animated number ─────────────────────────────────────────────────── */
+/* Big number */
 .sc-big-number {
   font-size: 1.9rem;
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1;
-  background: linear-gradient(135deg, #ffffff 0%, #0096cc 40%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #fff 0%, #0096cc 40%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -205,8 +221,6 @@
 .sc-big-number-xl {
   font-size: 2.4rem;
 }
-
-/* Count-up animation — digits slide in from below */
 .sc-count-anim {
   animation:
     scCountSlide 0.7s cubic-bezier(0.22, 1, 0.36, 1) both,
@@ -234,7 +248,7 @@
   }
 }
 
-/* ── Number underline (animated width) ──────────────────────────────────── */
+/* Number underline */
 .sc-number-underline {
   height: 2px;
   width: 0;
@@ -253,7 +267,7 @@
   }
 }
 
-/* ── Change pill ─────────────────────────────────────────────────────────── */
+/* Change pill */
 .sc-change-pill {
   display: inline-flex;
   align-items: center;
@@ -287,7 +301,7 @@
   }
 }
 
-/* ── Sparkline dots (template preview) ──────────────────────────────────── */
+/* Sparklines */
 .sc-spark {
   width: 3px;
   border-radius: 2px;
@@ -331,7 +345,7 @@
   }
 }
 
-/* ── Mini bar chart (chat preview) ──────────────────────────────────────── */
+/* Mini bars */
 .sc-bar {
   width: 5px;
   border-radius: 2px;
@@ -378,7 +392,7 @@
   }
 }
 
-/* ── Live pulse dot ──────────────────────────────────────────────────────── */
+/* Live dot */
 .sc-live-dot {
   width: 6px;
   height: 6px;

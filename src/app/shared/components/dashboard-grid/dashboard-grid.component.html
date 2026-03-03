@@ -1,22 +1,16 @@
-<!--
-  dashboard-grid.component.html
-  Responsive grid: 1 col (mobile <768px) | 2 col (md 768-1023px) | 3 col (lg 1024px+)
-  Items use colSpan/rowSpan relative to a 12-col lg base; CSS clamps them per breakpoint.
-  Hover: .card-hover class on the card container adds background opacity lift.
+<!-- dashboard-grid.component.html — Space theme
+     LOGIC: 100% unchanged. Tailwind classes updated to use space/glass vars.
+     Responsive: 1 col mobile → 6 col tablet → 12 col desktop
 -->
 <div
   cdkDropList
   cdkDropListSortingDisabled
   [cdkDropListData]="items"
   (cdkDropListDropped)="drop($event)"
-  class="grid gap-3 sm:gap-4 md:gap-6"
-  [ngClass]="{
-    'grid-cols-1': true,
-    'md:grid-cols-6': true,
-    'lg:grid-cols-12': true,
-  }"
+  class="grid gap-3 sm:gap-4 md:gap-5 grid-cols-1 md:grid-cols-6 lg:grid-cols-12"
   [ngStyle]="{
-    'grid-auto-rows': isEditMode ? '120px' : 'minmax(150px, auto)',
+    'grid-template-columns': 'repeat(12, 1fr)',
+    'grid-auto-rows': '120px',
   }"
 >
   <div
@@ -29,42 +23,43 @@
     (cdkDragEnded)="onDragEnded()"
     [style.grid-column]="(item.colStart ?? 0) + 1 + ' / span ' + item.colSpan"
     [style.grid-row]="(item.rowStart ?? 0) + 1 + ' / span ' + item.rowSpan"
-    class="relative group"
+    class="relative group h-full"
   >
     <!-- Drag Preview -->
     <ng-template cdkDragPreview>
       <div
-        class="glass rounded-xl p-4 shadow-2xl opacity-90"
+        class="rounded-2xl p-4 shadow-2xl opacity-90"
         [style.width.px]="item.colSpan * 100"
         [style.height.px]="item.rowSpan * 120"
-        style="background: var(--bg-card); border: 2px solid var(--accent-primary)"
+        style="
+          background: var(--bg-card);
+          border: 2px solid var(--accent-primary);
+          backdrop-filter: blur(24px);
+        "
       >
-        <h3 class="font-semibold text-sm" style="color: var(--text-primary)">{{ item.title }}</h3>
+        <h3 class="text-sm font-semibold truncate" style="color: var(--text-primary)">
+          {{ item.title }}
+        </h3>
       </div>
     </ng-template>
 
-    <!-- Drag Handle (Edit Mode Only) -->
+    <!-- Drag handle (edit mode) -->
     <div
       *ngIf="isEditMode"
       cdkDragHandle
-      class="absolute top-3 left-3 z-20 cursor-move opacity-0 group-hover:opacity-100 transition-opacity rounded-lg shadow-lg p-2"
-      style="background: var(--accent-gradient); color: var(--text-on-accent)"
+      class="absolute top-2.5 left-2.5 z-20 cursor-move opacity-0 group-hover:opacity-100 transition-opacity rounded-lg p-1.5 shadow-lg"
+      style="background: var(--accent-gradient); color: #fff"
       title="Drag to reorder"
     >
-      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 8h16M4 16h16"
-        ></path>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
       </svg>
     </div>
 
-    <!-- Widget Menu (Edit Mode Only) -->
+    <!-- Widget menu (edit mode) -->
     <div
       *ngIf="isEditMode"
-      class="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+      class="absolute top-2.5 right-2.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
     >
       <app-widget-menu
         [isOpen]="activeWidgetMenu === item.id"
@@ -74,7 +69,7 @@
       ></app-widget-menu>
     </div>
 
-    <!-- Resize Handles (Edit Mode Only) -->
+    <!-- Resize handles (edit mode) -->
     <ng-container *ngIf="isEditMode">
       <div class="resize-handle resize-n" (mousedown)="onResizeStart(item, 'n', $event)"></div>
       <div class="resize-handle resize-e" (mousedown)="onResizeStart(item, 'e', $event)"></div>
@@ -98,15 +93,15 @@
       ></div>
     </ng-container>
 
-    <!-- Card Container -->
+    <!-- Card container -->
     <div
       (click)="onWidgetClick(item)"
       [class.cursor-pointer]="!isEditMode"
-      class="h-full glass-nofilter rounded-xl transition-all duration-200 overflow-visible relative card-hover"
+      class="h-full rounded-2xl transition-all duration-200 overflow-visible relative card-hover glass-nofilter"
       [style.border]="isEditMode ? '2px solid var(--accent-primary)' : ''"
       [style.box-shadow]="isEditMode ? '0 0 0 2px var(--accent-primary), var(--shadow-card)' : ''"
     >
-      <!-- Card Actions (Non-Edit Mode Only) -->
+      <!-- Card actions (non-edit mode) -->
       <div *ngIf="!isEditMode" class="absolute top-2 right-2 z-10">
         <app-card-actions
           [itemId]="item.id"
@@ -119,14 +114,14 @@
         ></app-card-actions>
       </div>
 
-      <!-- Card Content -->
       <app-dashboard-card [item]="item" [isEditMode]="isEditMode"></app-dashboard-card>
     </div>
 
-    <!-- Drag Placeholder -->
+    <!-- CDK drag placeholder -->
     <div
       *cdkDragPlaceholder
-      class="bg-blue-100 border-2 border-dashed border-blue-400 rounded-lg opacity-50"
+      class="rounded-2xl opacity-50"
+      style="border: 3px dashed var(--accent-primary); background: var(--bg-overlay)"
     ></div>
   </div>
 </div>

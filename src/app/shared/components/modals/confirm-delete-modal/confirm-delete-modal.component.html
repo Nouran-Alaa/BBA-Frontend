@@ -1,59 +1,83 @@
+<!-- confirm-delete.component.html — space theme, light/dark safe -->
 <div
   class="fixed inset-0 z-50 flex items-center justify-center p-4"
-  style="background-color: rgba(0, 0, 0, 0.3)"
+  style="
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  "
   (click)="onCancel()"
 >
   <div
-    class="rounded-xl shadow-2xl max-w-md w-full animate-scaleUp overflow-hidden"
-    style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
+    class="cd-panel relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl"
     (click)="$event.stopPropagation()"
   >
-    <!-- Header -->
-    <div class="px-6 py-4 rounded-t-xl">
-      <div class="flex items-center gap-3">
-        <div
-          class="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0"
-        >
-          <svg class="w-9 h-9 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            ></path>
-          </svg>
+    <!-- HUD corner brackets -->
+    <div class="cd-corner cd-tl" aria-hidden="true"></div>
+    <div class="cd-corner cd-tr" aria-hidden="true"></div>
+    <div class="cd-corner cd-bl" aria-hidden="true"></div>
+    <div class="cd-corner cd-br" aria-hidden="true"></div>
+
+    <!-- Scan-line sweep -->
+    <div class="cd-scanline" aria-hidden="true"></div>
+
+    <!-- ── Header ───────────────────────────────────────────────── -->
+    <div
+      class="relative flex items-center gap-4 px-6 pt-6 pb-5"
+      style="border-bottom: 1px solid var(--border-subtle)"
+    >
+      <!-- Warning icon badge -->
+      <div
+        class="cd-icon-badge flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center"
+      >
+        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5 mb-1">
+          <div class="cd-dot"></div>
+          <span class="text-[0.6rem] font-bold uppercase tracking-[0.13em] text-red-500"
+            >Destructive Action</span
+          >
         </div>
-        <div class="flex-1">
-          <h2 class="text-xl font-bold" style="color: var(--text-primary)">Confirm Delete</h2>
-          <p class="text-sm" style="color: var(--text-secondary)">This action cannot be undone</p>
-        </div>
+        <h2 class="text-lg font-extrabold" style="color: var(--text-primary)">Confirm Delete</h2>
+        <p class="text-xs mt-0.5" style="color: var(--text-muted)">This action cannot be undone</p>
       </div>
     </div>
 
-    <!-- Body -->
-    <div class="p-6">
-      <p class="mb-2" style="color: var(--text-secondary)">
-        Are you sure you want to delete this {{ itemType }}?
+    <!-- ── Body ─────────────────────────────────────────────────── -->
+    <div class="relative px-6 py-5">
+      <p class="text-sm mb-3" style="color: var(--text-secondary)">
+        Are you sure you want to delete this
+        <span class="font-semibold" style="color: var(--text-primary)">{{ itemType }}</span
+        >?
       </p>
-      <div
-        class="rounded-lg p-3"
-        style="background: var(--bg-hover); border: 1px solid var(--border-subtle)"
-      >
-        <p class="font-semibold" style="color: var(--text-primary)">"{{ itemName }}"</p>
+
+      <!-- Item name card -->
+      <div class="cd-item-card flex items-center gap-2.5 rounded-xl px-4 py-3 mb-4">
+        <div class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-red-500"></div>
+        <p class="font-semibold text-sm truncate" style="color: var(--text-primary)">
+          "{{ itemName }}"
+        </p>
       </div>
-      <p class="text-sm mt-3" style="color: var(--text-muted)">
+
+      <p class="text-xs leading-relaxed" style="color: var(--text-muted)">
         All associated data and configurations will be permanently removed.
       </p>
     </div>
 
-    <!-- Footer -->
-    <div
-      class="px-6 py-4 flex justify-end gap-3"
-      style="border-top: 1px solid var(--border-subtle)"
-    >
+    <!-- ── Footer ───────────────────────────────────────────────── -->
+    <div class="flex justify-end gap-3 px-6 pb-6">
       <button
         (click)="onCancel()"
-        class="px-5 py-2 rounded-lg font-medium cursor-pointer transition-colors hover-glass"
+        class="px-5 py-2 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-150 hover:opacity-80"
         style="
           background: var(--bg-overlay);
           color: var(--text-secondary);
@@ -64,10 +88,19 @@
       </button>
       <button
         (click)="onConfirm()"
-        class="px-5 py-2 bg-red-600 text-white rounded-lg font-medium cursor-pointer transition-all hover:bg-red-700"
-        style="box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25)"
+        class="cd-delete-btn relative px-5 py-2 rounded-xl text-sm font-bold text-white cursor-pointer overflow-hidden transition-all duration-150 hover:-translate-y-px"
       >
-        Delete {{ itemType }}
+        <span class="relative z-10 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+          Delete {{ itemType }}
+        </span>
       </button>
     </div>
   </div>

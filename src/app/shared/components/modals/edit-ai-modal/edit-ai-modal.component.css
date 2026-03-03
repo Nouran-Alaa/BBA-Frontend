@@ -1,7 +1,22 @@
+/* edit-ai-modal.component.css — only what Tailwind cannot express */
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+:host > * {
+  pointer-events: auto;
+}
+
+/* Modal entrance */
 .animate-slideUp {
   animation: slideUp 0.3s ease-out;
 }
-
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -13,15 +28,36 @@
   }
 }
 
+/* AI spinner (counter-clockwise) */
 .animate-spin {
-  animation: spinCounterClockwise 1s linear infinite;
+  animation: spinCCW 1s linear infinite;
 }
-
-@keyframes spinCounterClockwise {
+@keyframes spinCCW {
   from {
     transform: rotate(360deg);
   }
   to {
     transform: rotate(0deg);
   }
+}
+
+/* Space scrollbar */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(0, 200, 255, 0.2);
+  border-radius: 4px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 200, 255, 0.4);
+}
+
+/* Textarea focus ring */
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(0, 153, 204, 0.2);
+  border-color: var(--accent-primary) !important;
 }

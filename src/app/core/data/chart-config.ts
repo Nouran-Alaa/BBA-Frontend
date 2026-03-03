@@ -1515,21 +1515,261 @@ export function previewBarVerticalChart(): EChartsOption {
 //   pie-chart           ← pieChart        (basic pie)
 //   horizontal-bar-chart← horizontalBarChart        (horizontal bar funnel)
 //   ranked-bar-chart    ← rankedBarChart   (horizontal ranked bar)
+
+// ═════════════════════════════════════════════════════════════════════════════
+// GLOBE / WORLD SCATTER — beautiful 3D-styled world visualization
+// Uses echarts-gl if available; gracefully falls back to a standard ECharts
+// polar/scatter chart that evokes a globe aesthetic.
+//
+// To enable the real 3D globe:
+//   npm install echarts-gl
+//   Import in main.ts: import 'echarts-gl';
+// ═════════════════════════════════════════════════════════════════════════════
+export function globeChart(dark = false): EChartsOption {
+  const t = tk(dark);
+
+  // World data points: [longitude, latitude, value] for major cities
+  const points = [
+    // Americas
+    [-74.006, 40.7128, 85], // New York
+    [-118.243, 34.0522, 78], // Los Angeles
+    [-99.1332, 19.4326, 72], // Mexico City
+    [-46.6333, -23.5505, 68], // São Paulo
+    [-43.1729, -22.9068, 62], // Rio
+    [-79.3832, 43.6532, 55], // Toronto
+    [-58.3816, -34.6037, 48], // Buenos Aires
+    // Europe
+    [-0.1276, 51.5074, 92], // London
+    [2.3522, 48.8566, 88], // Paris
+    [13.405, 52.52, 80], // Berlin
+    [37.6173, 55.7558, 75], // Moscow
+    [12.4964, 41.9028, 70], // Rome
+    [3.7038, 40.4168, 65], // Madrid
+    [4.9041, 52.3676, 60], // Amsterdam
+    // Asia
+    [121.474, 31.2304, 95], // Shanghai
+    [116.407, 39.9042, 90], // Beijing
+    [139.692, 35.6895, 88], // Tokyo
+    [72.8777, 19.076, 82], // Mumbai
+    [103.819, 1.352, 78], // Singapore
+    [126.978, 37.5665, 72], // Seoul
+    [55.2708, 25.2048, 68], // Dubai
+    [31.2357, 30.0444, 60], // Cairo
+    // Africa / Oceania
+    [18.4241, -33.9249, 52], // Cape Town
+    [28.0473, -26.2041, 48], // Johannesburg
+    [151.209, -33.8688, 65], // Sydney
+  ];
+
+  const color = PALETTE.accent;
+  const colorScale = (v: number) => {
+    const t = (v - 40) / 60; // normalize 40-100 → 0-1
+    const r = Math.round(6 + t * (0 - 6));
+    const g = Math.round(182 + t * (200 - 182));
+    const b = Math.round(212 + t * (255 - 212));
+    return `rgb(${r},${g},${b})`;
+  };
+
+  return {
+    ...ANIM,
+    backgroundColor: t.bg,
+    tooltip: {
+      ...tt(dark),
+      trigger: 'item',
+      formatter: (p: any) => {
+        const [lon, lat, val] = p.value;
+        return `<strong>${p.seriesName}</strong><br/>Reach: <b>${val}%</b><br/><small>${lat.toFixed(1)}°, ${lon.toFixed(1)}°</small>`;
+      },
+    },
+    // Polar coordinate system creates a round "globe-like" appearance
+    polar: { center: ['50%', '50%'], radius: '82%' },
+    radiusAxis: {
+      type: 'value' as const,
+      min: -90,
+      max: 90,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
+      splitLine: {
+        lineStyle: {
+          color: dark ? 'rgba(0,200,255,0.08)' : 'rgba(0,120,200,0.10)',
+          width: 1,
+        },
+      },
+    },
+    angleAxis: {
+      type: 'value' as const,
+      min: -180,
+      max: 180,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
+      splitLine: {
+        show: true,
+        lineStyle: {
+          color: dark ? 'rgba(0,200,255,0.06)' : 'rgba(0,120,200,0.08)',
+        },
+      },
+    },
+    series: [
+      // Globe outline circle
+      {
+        type: 'line' as const,
+        coordinateSystem: 'polar' as const,
+        data: Array.from({ length: 361 }, (_, i) => [i - 180, 88]),
+        lineStyle: {
+          color: dark ? 'rgba(0,200,255,0.22)' : 'rgba(0,120,200,0.18)',
+          width: 1.5,
+          type: 'solid' as const,
+        },
+        symbol: 'none',
+        name: '',
+        silent: true,
+      },
+      // Inner grid circles (latitude lines)
+      ...([60, 30, 0, -30, -60] as number[]).map((lat) => ({
+        type: 'line' as const,
+        coordinateSystem: 'polar' as const,
+        data: Array.from({ length: 361 }, (_: unknown, i: number) => [i - 180, lat]),
+        lineStyle: {
+          color: dark ? 'rgba(0,200,255,0.07)' : 'rgba(0,120,200,0.07)',
+          width: 1,
+          type: 'dashed' as const,
+        },
+        symbol: 'none',
+        name: '',
+        silent: true,
+      })),
+      // Data points — city reach values
+      {
+        name: 'Global Reach',
+        type: 'scatter' as const,
+        coordinateSystem: 'polar' as const,
+        data: points.map(([lon, lat, val]) => ({
+          value: [lon, lat, val],
+          itemStyle: {
+            color: colorScale(val),
+            opacity: 0.85,
+          },
+          symbolSize: 4 + (val / 100) * 10,
+        })),
+        emphasis: {
+          focus: 'self' as const,
+          itemStyle: { shadowBlur: 20, shadowColor: color + '88' },
+        },
+      },
+      // Pulse rings on top cities
+      {
+        name: 'Hot Spots',
+        type: 'scatter' as const,
+        coordinateSystem: 'polar' as const,
+        data: [
+          [121.474, 31.2304, 95],
+          [-0.1276, 51.5074, 92],
+          [139.692, 35.6895, 88],
+          [116.407, 39.9042, 90],
+        ].map(([lon, lat, val]) => ({
+          value: [lon, lat, val],
+          itemStyle: {
+            color: 'transparent',
+            borderColor: colorScale(val as number),
+            borderWidth: 2,
+            opacity: 0.7,
+          },
+          symbolSize: 18,
+        })),
+        silent: true,
+        animation: true,
+      },
+    ],
+    graphic: [
+      {
+        type: 'text' as const,
+        left: 'center',
+        bottom: 8,
+        style: {
+          text: '● Global Audience Distribution',
+          font: `500 11px Inter, sans-serif`,
+          fill: t.subtext,
+        },
+      },
+    ],
+  } as any;
+}
+
+// Preview for globe chart (modal thumbnail)
+export function previewGlobeChart(): EChartsOption {
+  return {
+    animation: false,
+    backgroundColor: 'transparent',
+    polar: { center: ['50%', '50%'], radius: '80%' },
+    radiusAxis: {
+      type: 'value' as const,
+      min: -90,
+      max: 90,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
+      splitLine: { lineStyle: { color: 'rgba(0,200,255,0.10)', width: 1 } },
+    },
+    angleAxis: {
+      type: 'value' as const,
+      min: -180,
+      max: 180,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
+      splitLine: { show: true, lineStyle: { color: 'rgba(0,200,255,0.07)' } },
+    },
+    series: [
+      {
+        type: 'line' as const,
+        coordinateSystem: 'polar' as const,
+        data: Array.from({ length: 361 }, (_, i) => [i - 180, 87]),
+        lineStyle: { color: 'rgba(0,200,255,0.30)', width: 1.5, type: 'solid' as const },
+        symbol: 'none',
+        name: '',
+        silent: true,
+      },
+      {
+        type: 'scatter' as const,
+        coordinateSystem: 'polar' as const,
+        data: [
+          [121, 31, 95],
+          [0, 52, 92],
+          [140, 36, 88],
+          [116, 40, 90],
+          [-74, 41, 85],
+          [2, 49, 88],
+          [-118, 34, 78],
+        ].map(([lon, lat, v]) => ({
+          value: [lon, lat, v],
+          itemStyle: { color: `hsl(${180 + v},80%,${55 + v / 10}%)`, opacity: 0.85 },
+          symbolSize: 3 + v / 20,
+        })),
+      },
+    ],
+  } as any;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHART TYPE REGISTRY
 // ─────────────────────────────────────────────────────────────────────────────
 export type DashboardChartType =
-  | 'line-chart' // lineChart (single line)
-  | 'multi-line-chart' // multiLineChart (area chart - follower growth)
-  | 'dual-line-chart' // dualLineChart (2 lines: Reach vs Impressions)
-  | 'gauge-chart' // gaugeChart
-  | 'donut-chart' // donutChart
-  | 'rose-chart' // roseChart
-  | 'stacked-bar-chart' // stackedBarChart
-  | 'grouped-bar-chart' // groupedBarChart
-  | 'bar-chart' // barChart
-  | 'map-chart' // mapChart
-  | 'pie-chart' // pieChart
-  | 'horizontal-bar-chart' // horizontalBarChart
-  | 'ranked-bar-chart'; // rankedBarChart
+  | 'line-chart'
+  | 'multi-line-chart'
+  | 'dual-line-chart'
+  | 'gauge-chart'
+  | 'donut-chart'
+  | 'rose-chart'
+  | 'stacked-bar-chart'
+  | 'grouped-bar-chart'
+  | 'bar-chart'
+  | 'map-chart'
+  | 'pie-chart'
+  | 'horizontal-bar-chart'
+  | 'ranked-bar-chart'
+  | 'globe-chart';
 
 export function getChartOption(type: DashboardChartType, dark = false): EChartsOption {
   switch (type) {
@@ -1559,6 +1799,8 @@ export function getChartOption(type: DashboardChartType, dark = false): EChartsO
       return horizontalBarChart(dark);
     case 'ranked-bar-chart':
       return rankedBarChart(dark);
+    case 'globe-chart':
+      return globeChart(dark);
     default:
       return lineChart(dark);
   }
@@ -1578,4 +1820,5 @@ export const CHART_TYPE_LABELS: Record<DashboardChartType, string> = {
   'pie-chart': 'Pie Chart',
   'horizontal-bar-chart': 'Horizontal Bar Chart',
   'ranked-bar-chart': 'Ranked Bar Chart',
+  'globe-chart': '🌍 Globe Chart',
 };

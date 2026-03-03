@@ -1,11 +1,25 @@
-/* ── Animations ──────────────────────────────────────────────────────────── */
+/* fullscreen-widget-modal.component.css — NASA space theme, Tailwind-first */
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+:host > * {
+  pointer-events: auto;
+}
+
+/* ── Entrance animations ──────────────────────────────────────────── */
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
 }
 .animate-scaleUp {
-  animation: scaleUp 0.3s ease-out;
+  animation: fwmEnter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -14,33 +28,33 @@
     opacity: 1;
   }
 }
-@keyframes scaleUp {
+@keyframes fwmEnter {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.9) translateY(20px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
+/* ── Space scrollbar ──────────────────────────────────────────────── */
 .overflow-y-auto::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
 }
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
+  background: transparent;
 }
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
+  background: rgba(0, 200, 255, 0.2);
+  border-radius: 4px;
 }
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(0, 200, 255, 0.4);
 }
 
-/* ── Gradient header ─────────────────────────────────────────────────────── */
+/* ── Gradient header ──────────────────────────────────────────────── */
 .fwm-header {
   background: var(--accent-gradient);
   flex-shrink: 0;
@@ -51,36 +65,59 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
   pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+}
+/* Nebula orb inside header */
+.fwm-header::before {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  pointer-events: none;
+  top: -100px;
+  right: -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+  filter: blur(50px);
 }
 .fwm-header-icon {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition:
+    transform 0.2s,
+    background 0.2s;
+}
+.fwm-header-icon:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: scale(1.06);
 }
 .fwm-header-btn {
   padding: 6px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   color: white;
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  transition: background 0.15s;
+  transition:
+    background 0.15s,
+    transform 0.15s;
 }
 .fwm-header-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
 }
 
-/* ── Story divider ───────────────────────────────────────────────────────── */
+/* ── Story divider ────────────────────────────────────────────────── */
 .fwm-story-divider {
   display: flex;
   align-items: center;
@@ -107,7 +144,7 @@
   flex-shrink: 0;
 }
 
-/* ── Story section cards ─────────────────────────────────────────────────── */
+/* ── Story section cards ──────────────────────────────────────────── */
 .fwm-story-card {
   padding: 18px 20px;
   border-radius: 14px;
@@ -119,8 +156,10 @@
     box-shadow 0.2s;
 }
 .fwm-story-card:hover {
-  border-color: rgba(0, 150, 204, 0.22);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 200, 255, 0.22);
+  box-shadow:
+    0 0 24px rgba(0, 200, 255, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.15);
 }
 @keyframes fwmCardIn {
   from {
@@ -151,25 +190,36 @@
   background: linear-gradient(135deg, #10b981, #059669);
 }
 .fwm-story-border-0 {
-  border-color: var(--accent-primary, #0096cc);
+  border-color: rgba(0, 200, 255, 0.3) !important;
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.06);
 }
 .fwm-story-border-1 {
-  border-color: #6366f1;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.06);
 }
 .fwm-story-border-2 {
-  border-color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.06);
 }
 
-/* ══════════════════════════════════════════════════════════════════════
-   COUNT-CARD (stat box)
-══════════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════
+   COUNT-CARD (stat box) — NASA mission control aesthetic
+══════════════════════════════════════════════════════════════════ */
 
-/* Primary strip (top block) */
+/* Primary strip */
 .fwm-count-card-primary {
   padding: 24px 28px;
   border-radius: 16px;
   background: var(--bg-overlay);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(0, 200, 255, 0.14);
+  box-shadow: 0 0 30px rgba(0, 200, 255, 0.06);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.fwm-count-card-primary:hover {
+  border-color: rgba(0, 200, 255, 0.28);
+  box-shadow: 0 0 40px rgba(0, 200, 255, 0.12);
 }
 .fwm-count-card-subtitle {
   font-size: 0.78rem;
@@ -184,20 +234,26 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1;
+  background: linear-gradient(135deg, #fff 0%, #0096cc 60%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(0, 150, 204, 0.4));
 }
 
-/* Detail card (logo + big number + change) */
+/* Detail card */
 .fwm-count-card-detail {
   padding: 32px 28px;
   border-radius: 20px;
   background: var(--bg-overlay);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(0, 200, 255, 0.14);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 40px rgba(0, 200, 255, 0.05);
 }
 .fwm-count-card-detail::before {
   content: '';
@@ -209,6 +265,20 @@
   background: var(--accent-gradient);
   border-radius: 20px 20px 0 0;
 }
+/* Ambient glow orb inside detail card */
+.fwm-count-card-detail::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(0, 200, 255, 0.12) 0%, transparent 70%);
+  filter: blur(20px);
+}
 .fwm-count-card-logo-wrap {
   width: 72px;
   height: 72px;
@@ -217,8 +287,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 200, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.1);
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 .fwm-count-card-logo {
   width: 48px;
@@ -238,6 +311,13 @@
   letter-spacing: -0.02em;
   line-height: 1;
   margin-bottom: 14px;
+  background: linear-gradient(135deg, #fff 0%, #0096cc 50%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 14px rgba(0, 150, 204, 0.5));
+  position: relative;
+  z-index: 1;
 }
 .fwm-count-card-change {
   display: inline-flex;
@@ -247,29 +327,42 @@
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 99px;
+  position: relative;
+  z-index: 1;
 }
 .fwm-change-up {
   color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
 }
 .fwm-change-down {
   color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
 }
 .fwm-change-neutral {
   color: var(--text-muted);
   background: var(--bg-overlay);
 }
 
-/* Context mini-cards grid */
+/* Context mini-cards */
 .fwm-stat-context-card {
   padding: 16px 18px;
   border-radius: 12px;
   background: var(--bg-overlay);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(0, 200, 255, 0.12);
   display: flex;
   flex-direction: column;
   gap: 6px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.fwm-stat-context-card:hover {
+  border-color: rgba(0, 200, 255, 0.25);
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.08);
 }
 .fwm-stat-context-label {
   font-size: 0.72rem;
@@ -283,4 +376,8 @@
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

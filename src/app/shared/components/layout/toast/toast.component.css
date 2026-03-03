@@ -1,3 +1,34 @@
+/* toast.component.css — only what Tailwind cannot express */
+
+/* :host — fixed overlay layer, full-screen pointer-events:none */
+:host {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+  max-width: 22rem;
+}
+
+/* Glass panel — backdrop-filter + CSS vars not in Tailwind */
+.glass-heavy {
+  background: var(--bg-modal) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid var(--border-glass) !important;
+}
+
+/* ── Slide-in / slide-out animations ───────────────────────────── */
+.animate-slideIn {
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-slideOut {
+  animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -8,7 +39,6 @@
     transform: translateX(0);
   }
 }
-
 @keyframes slideOut {
   from {
     opacity: 1;
@@ -16,11 +46,15 @@
   }
   to {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(110%);
   }
 }
 
-@keyframes progress {
+/* ── Progress bar depletion ─────────────────────────────────────── */
+.animate-progress {
+  animation: progressBar linear forwards;
+}
+@keyframes progressBar {
   from {
     width: 100%;
   }
@@ -29,21 +63,12 @@
   }
 }
 
-.animate-slideIn {
-  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* ── Glow on the left accent border ─────────────────────────────── */
+.toast-inner {
+  transition: box-shadow 0.2s;
 }
-
-.animate-slideOut {
-  animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-progress {
-  animation: progress linear;
-}
-
-.glass-heavy {
-  background: var(--bg-modal) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border: 1px solid var(--border-glass) !important;
+.toast-inner:hover {
+  box-shadow:
+    0 0 24px rgba(0, 200, 255, 0.12),
+    0 8px 32px rgba(0, 0, 0, 0.5);
 }

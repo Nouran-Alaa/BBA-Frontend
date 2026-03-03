@@ -1,32 +1,238 @@
-.animate-slideUp {
-  animation: slideUp 0.3s ease-out;
+/* dashboard-templates-modal.component.css — NASA space, Tailwind-first */
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+:host > * {
+  pointer-events: auto;
 }
 
-@keyframes slideUp {
+/* ── Main panel ──────────────────────────────────────────────────── */
+.dtm-panel {
+  background: var(--bg-modal);
+  border: 1px solid var(--border-glass);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 255, 0.08),
+    0 32px 80px rgba(0, 0, 0, 0.65);
+  animation: dtmEnter 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes dtmEnter {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: scale(0.94) translateY(28px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1) translateY(0);
   }
 }
 
-/* Add glow effect on hover for template cards */
-button:hover .w-14.h-14 {
+/* ── Preview panel ───────────────────────────────────────────────── */
+.dtm-preview-panel {
+  background: var(--bg-modal);
+  border: 1px solid rgba(0, 200, 255, 0.2);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  transform: scale(1.05);
-  transition: all 0.2s ease-out;
+    0 0 60px rgba(0, 200, 255, 0.08),
+    0 40px 100px rgba(0, 0, 0, 0.75);
+  animation: dtmScaleIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes dtmScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.w-14.h-14 {
-  transition: all 0.2s ease-out;
+/* ── HUD corner brackets ─────────────────────────────────────────── */
+.dtm-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  z-index: 10;
+}
+.dtm-corner::before,
+.dtm-corner::after {
+  content: '';
+  position: absolute;
+  background: rgba(0, 200, 255, 0.6);
+  border-radius: 1px;
+}
+.dtm-corner::before {
+  width: 100%;
+  height: 1.5px;
+}
+.dtm-corner::after {
+  width: 1.5px;
+  height: 100%;
+}
+.dtm-tl {
+  top: 10px;
+  left: 10px;
+}
+.dtm-tl::before {
+  top: 0;
+  left: 0;
+}
+.dtm-tl::after {
+  top: 0;
+  left: 0;
+}
+.dtm-tr {
+  top: 10px;
+  right: 10px;
+}
+.dtm-tr::before {
+  top: 0;
+  right: 0;
+}
+.dtm-tr::after {
+  top: 0;
+  right: 0;
+}
+.dtm-bl {
+  bottom: 10px;
+  left: 10px;
+}
+.dtm-bl::before {
+  bottom: 0;
+  left: 0;
+}
+.dtm-bl::after {
+  bottom: 0;
+  left: 0;
+}
+.dtm-br {
+  bottom: 10px;
+  right: 10px;
+}
+.dtm-br::before {
+  bottom: 0;
+  right: 0;
+}
+.dtm-br::after {
+  bottom: 0;
+  right: 0;
 }
 
-/* Force ngx-echarts to fill the flex container in the preview grid */
+/* ── Header shimmer ──────────────────────────────────────────────── */
+.dtm-header-shimmer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+}
+
+/* ── Header nebula orbs ──────────────────────────────────────────── */
+.dtm-header-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(40px);
+}
+.dtm-orb-1 {
+  width: 200px;
+  height: 200px;
+  top: -80px;
+  right: -40px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
+  animation: dtmOrb 8s ease-in-out infinite alternate;
+}
+.dtm-orb-2 {
+  width: 160px;
+  height: 160px;
+  bottom: -60px;
+  left: 60px;
+  background: radial-gradient(circle, rgba(0, 200, 255, 0.25) 0%, transparent 70%);
+  animation: dtmOrb 11s ease-in-out infinite alternate-reverse;
+}
+@keyframes dtmOrb {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.2) translate(10px, -8px);
+  }
+}
+
+/* ── Live dot ────────────────────────────────────────────────────── */
+.dtm-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00e5cc;
+  box-shadow: 0 0 6px #00e5cc;
+  animation: dtmLive 1.4s ease-in-out infinite;
+}
+@keyframes dtmLive {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.5;
+  }
+}
+
+/* ── Search input ────────────────────────────────────────────────── */
+.modal-search-input,
+.modal-search-input:focus {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.modal-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ── Template card ───────────────────────────────────────────────── */
+.dtm-card {
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.dtm-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 200, 255, 0.35) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 255, 0.18),
+    0 0 28px rgba(0, 200, 255, 0.12),
+    0 12px 32px rgba(0, 0, 0, 0.5);
+}
+.dtm-card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 200, 255, 0.08) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.dtm-card:hover .dtm-card-glow {
+  opacity: 1;
+}
+
+/* ── ECharts fill ────────────────────────────────────────────────── */
+.echarts-preview-host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .echarts-preview-host ::ng-deep > div,
 .echarts-preview-host ::ng-deep .echarts {
   width: 100% !important;
@@ -34,11 +240,17 @@ button:hover .w-14.h-14 {
   min-height: 0 !important;
 }
 
-/* for search bar */
-.modal-search-input,
-.modal-search-input:focus {
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
-  box-shadow: none !important;
+/* ── Scrollbar ───────────────────────────────────────────────────── */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(0, 200, 255, 0.2);
+  border-radius: 4px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 200, 255, 0.4);
 }

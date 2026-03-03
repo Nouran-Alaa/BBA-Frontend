@@ -1,5 +1,8 @@
+<!-- dashboard-container.component.html — Space theme
+     LOGIC: 100% unchanged. Visual: space/glass theme applied throughout.
+-->
 <div class="h-full flex flex-col" style="background: transparent">
-  <!-- Top Action Bar — delegated to DashboardToolbarComponent -->
+  <!-- Toolbar -->
   <app-dashboard-toolbar
     [isEditMode]="isEditMode"
     [canUndo]="getUndoRedoStatus().canUndo"
@@ -8,13 +11,12 @@
     (undoClick)="undo()"
     (redoClick)="redo()"
     (dateRangeChange)="chartDateRanges['global'] = $event"
-  >
-  </app-dashboard-toolbar>
+  ></app-dashboard-toolbar>
 
-  <!-- Dashboard Content -->
-  <div class="flex-1 px-3 sm:px-4 md:px-6 py-4 sm:py-6 overflow-y-auto overflow-x-hidden">
-    <div class="space-y-4 sm:space-y-6 w-full max-w-[1800px] mx-auto">
-      <!-- Dashboard Grid -->
+  <!-- Scrollable content -->
+  <div class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 lg:px-6 py-4 sm:py-5">
+    <div class="w-full max-w-[1800px] mx-auto space-y-4 sm:space-y-5">
+      <!-- Grid -->
       <app-dashboard-grid
         [items]="gridItems"
         [isEditMode]="isEditMode"
@@ -24,19 +26,23 @@
         (chartDateRangeClick)="onChartDateRangeClick($event)"
         (widgetClick)="onWidgetClick($event)"
         (editWithAI)="onEditWithAI($event)"
-      >
-      </app-dashboard-grid>
+      ></app-dashboard-grid>
 
-      <!-- Add Card Button -->
-      <div class="mt-6 sm:mt-8 pb-6">
-        <!-- Picker dropdown -->
+      <!-- Add card area -->
+      <div class="pb-6 mt-5 sm:mt-6">
+        <!-- Widget type picker (shown when isAddCardOpen) -->
         <div
           *ngIf="isAddCardOpen"
-          class="glass rounded-xl mb-3 overflow-hidden"
-          style="border: 1px solid var(--border-subtle)"
+          class="rounded-2xl mb-3 overflow-hidden animate-fadeIn"
+          style="
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(24px);
+          "
         >
           <p
-            class="text-xs font-semibold uppercase tracking-widest px-5 pt-4 pb-2"
+            class="px-5 pt-4 pb-2 text-[0.60rem] font-bold uppercase tracking-widest"
             style="color: var(--text-muted)"
           >
             Choose widget type
@@ -45,11 +51,11 @@
           <!-- AI Chart -->
           <button
             (click)="openAiChartModal()"
-            class="w-full flex items-center gap-4 px-5 py-3 transition-colors text-left hover-glass"
+            class="w-full flex items-center gap-4 px-5 py-3 text-left transition-all hover-glass group"
           >
             <div
-              class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-              style="background: var(--accent-gradient)"
+              class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+              style="background: var(--accent-gradient); box-shadow: var(--shadow-md)"
             >
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -62,18 +68,21 @@
             </div>
             <div>
               <p class="text-sm font-semibold" style="color: var(--text-primary)">AI Chart</p>
-              <p class="text-xs" style="color: var(--text-muted)">Generate analytics with AI</p>
+              <p class="text-xs mt-0.5" style="color: var(--text-muted)">
+                Generate analytics with AI
+              </p>
             </div>
           </button>
 
-          <!-- News Widget -->
+          <!-- News -->
           <button
             (click)="onNewsWidgetAdd()"
-            class="w-full flex items-center gap-4 px-5 py-3 transition-colors text-left hover-glass"
+            class="w-full flex items-center gap-4 px-5 py-3 text-left transition-all hover-glass group"
+            style="border-top: 1px solid var(--border-subtle)"
           >
             <div
-              class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-              style="background: var(--accent-gradient)"
+              class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+              style="background: var(--accent-gradient); box-shadow: var(--shadow-md)"
             >
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -86,20 +95,21 @@
             </div>
             <div>
               <p class="text-sm font-semibold" style="color: var(--text-primary)">News Feed</p>
-              <p class="text-xs" style="color: var(--text-muted)">
+              <p class="text-xs mt-0.5" style="color: var(--text-muted)">
                 Responsive grid of news articles
               </p>
             </div>
           </button>
 
-          <!-- Video Widget -->
+          <!-- Video -->
           <button
             (click)="onVideoWidgetAdd()"
-            class="w-full flex items-center gap-4 px-5 py-3 transition-colors text-left hover-glass"
+            class="w-full flex items-center gap-4 px-5 py-3 text-left transition-all hover-glass group"
+            style="border-top: 1px solid var(--border-subtle)"
           >
             <div
-              class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-              style="background: var(--accent-gradient)"
+              class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+              style="background: var(--accent-gradient); box-shadow: var(--shadow-md)"
             >
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -112,83 +122,84 @@
             </div>
             <div>
               <p class="text-sm font-semibold" style="color: var(--text-primary)">Video</p>
-              <p class="text-xs" style="color: var(--text-muted)">Embed & analyze a video</p>
+              <p class="text-xs mt-0.5" style="color: var(--text-muted)">
+                Embed &amp; analyze a video
+              </p>
             </div>
           </button>
 
           <!-- Cancel -->
           <button
             (click)="closeAddCard()"
-            class="w-full px-5 py-3 text-xs font-semibold text-left transition-colors hover-glass"
+            class="w-full px-5 py-3 text-left text-xs font-semibold transition-all hover-glass"
             style="color: var(--text-muted); border-top: 1px solid var(--border-subtle)"
           >
             Cancel
           </button>
         </div>
 
-        <!-- The main + button -->
+        <!-- Add New Card button -->
         <button
           (click)="openAiChat()"
-          class="w-full glass rounded-xl p-4 sm:p-6 transition-all duration-200 group cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
-          style="border: 2px dashed var(--border-subtle) !important"
+          class="w-full rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 group cursor-pointer transition-all duration-200"
+          style="
+            background: var(--bg-card);
+            border: 2px dashed var(--border-glass);
+            box-shadow: var(--shadow-sm);
+          "
+          onmouseover="
+            this.style.borderColor = 'var(--accent-primary)';
+            this.style.boxShadow = '0 0 20px rgba(0,200,255,0.12)';
+          "
+          onmouseout="
+            this.style.borderColor = 'var(--border-glass)';
+            this.style.boxShadow = 'var(--shadow-sm)';
+          "
         >
           <div
-            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-110"
+            class="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
             style="background: var(--accent-gradient); box-shadow: var(--shadow-md)"
           >
-            <svg
-              class="w-5 h-5 sm:w-6 sm:h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2.5"
                 d="M12 4v16m8-8H4"
-              ></path>
+              />
             </svg>
           </div>
           <div class="text-center sm:text-left">
-            <p class="text-base sm:text-lg font-semibold" style="color: var(--text-primary)">
+            <p
+              class="text-sm sm:text-base font-semibold font-['Exo_2',system-ui]"
+              style="color: var(--text-primary)"
+            >
               Add New Card
             </p>
-            <p class="text-xs sm:text-sm mt-1" style="color: var(--text-muted)">
-              Chart · News Feed · Video
-            </p>
+            <p class="text-xs mt-0.5" style="color: var(--text-muted)">Chart · News Feed · Video</p>
           </div>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- AI Chart Modal -->
+  <!-- Modals — LOGIC UNCHANGED -->
   <app-ai-chart-modal
     *ngIf="isAiChatOpen"
     (close)="closeAiChat()"
     (generate)="onChartGenerated($event)"
-  >
-  </app-ai-chart-modal>
-
-  <!-- Fullscreen Widget Modal -->
+  ></app-ai-chart-modal>
   <app-fullscreen-widget-modal
     *ngIf="fullscreenWidget"
     [widget]="fullscreenWidget"
     (close)="closeFullscreen()"
-  >
-  </app-fullscreen-widget-modal>
-
-  <!-- Edit AI Modal -->
+  ></app-fullscreen-widget-modal>
   <app-edit-ai-modal
     *ngIf="showEditAiModal && editingWidget"
     [widget]="editingWidget"
     (close)="closeEditAiModal()"
     (save)="onSaveEditedWidget($event)"
-  >
-  </app-edit-ai-modal>
-
-  <!-- Chatbot -->
+  ></app-edit-ai-modal>
   <app-chatbot
     *ngIf="isChatbotOpen"
     [availableDashboards]="getDashboardsList()"
@@ -198,21 +209,29 @@
     (addChartToDashboard)="onAddChartFromChat($event)"
   ></app-chatbot>
 
-  <!-- Chatbot Toggle Button (when closed) -->
+  <!-- Chatbot FAB -->
   <button
     *ngIf="!isChatbotOpen"
     (click)="toggleChatbot()"
-    class="fixed bottom-4 right-4 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl cursor-pointer transition-transform hover:scale-110 z-[9998]"
-    style="background: var(--accent-gradient); color: var(--text-on-accent)"
+    class="fixed bottom-5 right-5 w-13 h-13 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 z-[9998]"
+    style="
+      width: 52px;
+      height: 52px;
+      background: var(--accent-gradient);
+      color: #fff;
+      box-shadow:
+        0 0 24px rgba(0, 200, 255, 0.45),
+        var(--shadow-lg);
+    "
     title="Open Assistant"
   >
-    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
         stroke-width="2"
         d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-      ></path>
+      />
     </svg>
   </button>
 </div>

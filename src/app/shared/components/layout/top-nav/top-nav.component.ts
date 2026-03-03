@@ -2,71 +2,100 @@ import {
   Component,
   Output,
   EventEmitter,
+  OnInit,
+  OnDestroy,
   HostListener,
-  ViewChild,
-  ElementRef,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule, AsyncPipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-top-nav',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, AsyncPipe],
   templateUrl: './top-nav.component.html',
   styleUrls: ['./top-nav.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TopNavComponent {
+export class TopNavComponent implements OnInit, OnDestroy {
   @Output() menuToggle = new EventEmitter<void>();
-  @ViewChild('profileDropdown') profileDropdown?: ElementRef;
 
-  isProfileMenuOpen = false;
+  isDark$!: Observable<boolean>;
+  showUserMenu = false;
+  isMobile = false;
 
-  // Mock user data - replace with real auth service later
-  currentUser = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    role: 'SuperAdmin',
-    profileImage: 'https://ui-avatars.com/api/?name=John+Doe&background=0099cc&color=fff',
-  };
+  userName = 'John Doe';
+  userRole = 'SuperAdmin';
+  get userInitials(): string {
+    return this.userName
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+  }
 
   constructor(
+    private themeService: ThemeService,
+    private cdr: ChangeDetectorRef,
     private router: Router,
-    public themeService: ThemeService,
   ) {}
 
+  ngOnInit(): void {
+    this.isDark$ = this.themeService.isDark$;
+    this.checkMobile();
+  }
+
+  ngOnDestroy(): void {}
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+    this.cdr.markForCheck();
+  }
+
+  closeUserMenu(): void {
+    this.showUserMenu = false;
+    this.cdr.markForCheck();
+  }
+
+  navigateToProfile(): void {
+    this.closeUserMenu();
+    this.router.navigate(['/profile']);
+  }
+
+  navigateToSettings(): void {
+    this.closeUserMenu();
+    this.router.navigate(['/settings']);
+  }
+
+  signOut(): void {
+    this.closeUserMenu();
+    // In a real app: call AuthService.signOut() then redirect
+    this.router.navigate(['/login']);
+  }
+
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (this.isProfileMenuOpen && this.profileDropdown) {
-      const clickedInside = this.profileDropdown.nativeElement.contains(event.target);
-      if (!clickedInside) {
-        this.closeProfileMenu();
+  onDocClick(e: MouseEvent): void {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.tn-user-btn') && !target.closest('.tn-dropdown')) {
+      if (this.showUserMenu) {
+        this.showUserMenu = false;
+        this.cdr.markForCheck();
       }
     }
   }
 
-  onMenuToggle(): void {
-    this.menuToggle.emit();
-  }
-
-  toggleProfileMenu(): void {
-    this.isProfileMenuOpen = !this.isProfileMenuOpen;
-  }
-
-  closeProfileMenu(): void {
-    this.isProfileMenuOpen = false;
-  }
-
-  goToProfile(): void {
-    this.router.navigate(['/profile']);
-    this.closeProfileMenu();
-  }
-
-  logout(): void {
-    // TODO: Implement real logout logic with auth service
-    console.log('Logging out...');
-    this.router.navigate(['/login']);
-    this.closeProfileMenu();
+  @HostListener('window:resize')
+  checkMobile(): void {
+    this.isMobile = window.innerWidth < 640;
+    this.cdr.markForCheck();
   }
 }

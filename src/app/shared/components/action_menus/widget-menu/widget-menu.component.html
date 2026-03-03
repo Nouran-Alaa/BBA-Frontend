@@ -1,52 +1,69 @@
-<!-- Menu Button -->
+<!-- widget-menu.component.html — space theme -->
 <div class="relative">
+  <!-- Trigger button -->
   <button
     (click)="toggle.emit($event)"
-    class="p-2 bg-white rounded-lg shadow-lg hover-glass transition-all border border-gray-200 menu-button"
+    class="wm-trigger p-2 rounded-lg cursor-pointer transition-all duration-150 hover:scale-105 active:scale-95"
+    style="
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    "
     title="Widget options"
   >
-    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
         stroke-width="2"
         d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-      ></path>
+      />
     </svg>
   </button>
 
-  <!-- Dropdown Menu -->
+  <!-- Dropdown -->
   <div
     *ngIf="isOpen"
-    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-30 animate-slideDown"
+    class="wm-dropdown absolute right-0 mt-1.5 w-44 rounded-xl overflow-hidden z-30 shadow-2xl"
+    style="background: var(--bg-modal); border: 1px solid var(--border-glass)"
   >
     <button
       (click)="duplicate.emit()"
-      class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover-glass transition-colors text-left"
+      class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left cursor-pointer transition-all duration-100 hover:bg-[var(--bg-overlay)]"
+      style="color: var(--text-primary)"
     >
-      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg
+        class="w-4 h-4 flex-shrink-0"
+        style="color: var(--text-muted)"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="2"
           d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-        ></path>
+        />
       </svg>
-      Duplicate
+      <span class="font-medium">Duplicate</span>
     </button>
+
+    <div style="height: 1px; background: var(--border-subtle)"></div>
+
     <button
       (click)="delete.emit()"
-      class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+      class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left cursor-pointer transition-all duration-100 hover:bg-red-500/10 text-red-500"
     >
-      <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="2"
           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-        ></path>
+        />
       </svg>
-      Delete
+      <span class="font-medium">Delete</span>
     </button>
   </div>
 </div>

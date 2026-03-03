@@ -1,15 +1,14 @@
-.action-button {
-  transition: all 0.2s ease;
+:host {
+  display: block;
 }
 
-.action-button:hover {
-  transform: translateY(-1px);
+/* Hover border glow — cannot express multi-property !important override in Tailwind */
+.ca-btn:hover {
   border-color: var(--accent-primary) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 150, 204, 0.15);
 }
-
-.action-button:active {
-  transform: translateY(0);
+.ca-btn:active {
+  transform: translateY(0) !important;
 }
 
 @keyframes fadeIn {
@@ -22,7 +21,6 @@
     transform: translateY(0);
   }
 }
-
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
 }

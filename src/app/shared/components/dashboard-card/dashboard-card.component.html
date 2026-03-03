@@ -1,31 +1,57 @@
-<!-- dashboard-card.component.html  v5 -->
+<!-- dashboard-card.component.html  v6 — NASA Space theme
+     COUNT-CARD: Fully animated, holographic, space-tech aesthetic
+     LOGIC: 100% unchanged.
+-->
 <div class="h-full">
-  <!-- ══════════════════════════════════════════════════════════════════════
-       COUNT-CARD — stat box: [logo] / title / description / number / change
-       All fields except title + number are optional.
-  ══════════════════════════════════════════════════════════════════════ -->
-  <div *ngIf="item.type === 'count-card'" class="flex flex-col w-full h-full overflow-hidden">
-    <!-- Header row — identical pattern to chart card: dot + title -->
+  <!-- ══ COUNT-CARD — NASA Mission Control ════════════════════════ -->
+  <div
+    *ngIf="item.type === 'count-card'"
+    class="count-card-outer flex flex-col w-full h-full overflow-hidden relative"
+  >
+    <!-- Animated scan-line sweep -->
+    <div class="cc-scanline" aria-hidden="true"></div>
+
+    <!-- Corner brackets (top-left, top-right, bottom-left, bottom-right) -->
+    <div class="cc-corner cc-corner-tl" aria-hidden="true"></div>
+    <div class="cc-corner cc-corner-tr" aria-hidden="true"></div>
+    <div class="cc-corner cc-corner-bl" aria-hidden="true"></div>
+    <div class="cc-corner cc-corner-br" aria-hidden="true"></div>
+
+    <!-- Glow orb behind number -->
     <div
-      class="flex items-center gap-1.5 px-2.5 pt-2 pb-1 flex-shrink-0"
+      class="cc-glow-orb"
+      aria-hidden="true"
+      [style.background]="
+        'radial-gradient(circle, ' +
+        (item.cardAccentColor || 'rgba(0,200,255,0.22)') +
+        ' 0%, transparent 70%)'
+      "
+    ></div>
+
+    <!-- Header row -->
+    <div
+      class="flex items-center gap-1.5 px-3 pt-2.5 pb-0 flex-shrink-0"
       [class.pr-20]="!isEditMode"
     >
-      <span class="chart-dot w-2 h-2 rounded-full flex-shrink-0"></span>
+      <span class="cc-dot flex-shrink-0" aria-hidden="true"></span>
+      <span class="cc-status-text">LIVE</span>
       <h3
-        class="text-[0.78rem] font-semibold truncate flex-1 m-0"
-        style="color: var(--text-primary)"
+        class="text-[0.75rem] font-semibold truncate flex-1 m-0 ml-1"
+        style="color: var(--text-secondary)"
       >
         {{ item.title }}
       </h3>
     </div>
 
     <!-- Body -->
-    <div class="flex-1 flex flex-col justify-center px-3 pb-3 gap-2 min-h-0">
-      <!-- Optional logo -->
+    <div
+      class="flex-1 flex flex-col justify-center items-center px-3 pb-2 gap-1.5 min-h-0 text-center"
+    >
+      <!-- Logo -->
       <div
         *ngIf="item.cardLogoUrl"
-        class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-        style="background: var(--bg-overlay); border: 1px solid var(--border-subtle)"
+        class="cc-logo-wrap flex-shrink-0"
+        [style.border-color]="item.cardAccentColor || 'rgba(0,200,255,0.3)'"
       >
         <img
           [src]="item.cardLogoUrl"
@@ -35,64 +61,66 @@
         />
       </div>
 
-      <!-- Title (label for what the count is for) -->
-      <p class="text-[0.72rem] font-semibold leading-snug" style="color: var(--text-secondary)">
+      <!-- Subtitle -->
+      <p
+        class="text-[0.70rem] font-semibold leading-snug tracking-wider uppercase"
+        style="color: var(--text-muted); letter-spacing: 0.1em"
+      >
         {{ item.cardSubtitle || item.title }}
       </p>
 
-      <!-- Optional description -->
+      <!-- Main number — huge, glowing -->
+      <div class="cc-number-wrap relative flex items-center justify-center">
+        <p
+          class="cc-number font-extrabold leading-none relative z-[1]"
+          style="
+            font-family: 'Exo 2', system-ui, sans-serif;
+            font-size: clamp(1.8rem, 4.5vw, 3rem);
+            letter-spacing: -0.04em;
+          "
+          [style.color]="item.cardAccentColor || 'var(--accent-primary)'"
+          [style.text-shadow]="
+            '0 0 30px ' +
+            (item.cardAccentColor || 'rgba(0,200,255,0.8)') +
+            ', 0 0 60px ' +
+            (item.cardAccentColor || 'rgba(0,200,255,0.4)')
+          "
+        >
+          {{ formatCardValue(item.cardValue) }}
+        </p>
+      </div>
+
+      <!-- Description -->
       <p
         *ngIf="item.cardDescription"
-        class="text-[0.65rem] leading-relaxed -mt-1"
+        class="text-[0.62rem] leading-relaxed -mt-0.5 max-w-[90%]"
         style="color: var(--text-muted)"
       >
         {{ item.cardDescription }}
       </p>
 
-      <!-- Big number -->
-      <p
-        class="font-extrabold leading-none tracking-tight"
-        style="font-size: clamp(1.6rem, 4vw, 2.6rem); letter-spacing: -0.03em"
-        [style.color]="item.cardAccentColor || 'var(--text-primary)'"
-      >
-        {{ formatCardValue(item.cardValue) }}
-      </p>
-
-      <!-- Optional change pill -->
+      <!-- Change pill — mission-control style -->
       <div
         *ngIf="item.cardChange !== undefined && item.cardChange !== null"
-        class="flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[0.68rem] font-bold"
-        [style.color]="
-          item.cardChange > 0 ? '#10b981' : item.cardChange < 0 ? '#ef4444' : 'var(--text-muted)'
-        "
-        [style.background]="
-          item.cardChange > 0
-            ? 'rgba(16,185,129,0.12)'
-            : item.cardChange < 0
-              ? 'rgba(239,68,68,0.12)'
-              : 'var(--bg-overlay)'
-        "
-        [style.border]="
-          '1px solid ' +
-          (item.cardChange > 0
-            ? 'rgba(16,185,129,0.25)'
-            : item.cardChange < 0
-              ? 'rgba(239,68,68,0.25)'
-              : 'var(--border-subtle)')
-        "
+        class="cc-change-pill flex items-center gap-1"
+        [class.cc-change-up]="item.cardChange > 0"
+        [class.cc-change-down]="item.cardChange < 0"
+        [class.cc-change-flat]="item.cardChange === 0"
       >
+        <!-- Up arrow -->
         <svg
           *ngIf="item.cardChange > 0"
-          class="w-2.5 h-2.5"
+          class="w-2.5 h-2.5 flex-shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7 7 7" />
         </svg>
+        <!-- Down arrow -->
         <svg
           *ngIf="item.cardChange < 0"
-          class="w-2.5 h-2.5"
+          class="w-2.5 h-2.5 flex-shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -104,26 +132,32 @@
             d="M19 14l-7 7-7-7"
           />
         </svg>
+        <!-- Flat -->
         <svg
           *ngIf="item.cardChange === 0"
-          class="w-2.5 h-2.5"
+          class="w-2.5 h-2.5 flex-shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 12h14" />
         </svg>
-        <span
-          >{{ item.cardChange > 0 ? '+' : '' }}{{ item.cardChange
-          }}{{ item.cardChangeUnit || '%' }}</span
-        >
+        <span class="text-[0.68rem] font-bold tracking-wider">
+          {{ item.cardChange > 0 ? '+' : '' }}{{ item.cardChange }}{{ item.cardChangeUnit || '%' }}
+        </span>
       </div>
+    </div>
+
+    <!-- Bottom bar — animated progress line -->
+    <div class="cc-bottom-bar flex-shrink-0">
+      <div
+        class="cc-progress-line"
+        [style.background]="item.cardAccentColor || 'var(--accent-primary)'"
+      ></div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════════════════
-       CHART CARD — unchanged from v4
-  ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ══ CHART CARD ══════════════════════════════════════════════ -->
   <div *ngIf="item.type === 'chart'" class="flex flex-col w-full h-full overflow-hidden">
     <div
       class="flex items-center gap-1.5 px-2.5 pt-2 pb-1 flex-shrink-0"
@@ -148,9 +182,7 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════════════════
-       NEWS WIDGET — unchanged from v4
-  ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ══ NEWS WIDGET ═════════════════════════════════════════════ -->
   <ng-container *ngIf="item.type === 'news'">
     <app-news-widget
       [config]="item.newsConfig"
@@ -159,9 +191,7 @@
     ></app-news-widget>
   </ng-container>
 
-  <!-- ══════════════════════════════════════════════════════════════════════
-       VIDEO WIDGET — unchanged from v4
-  ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ══ VIDEO WIDGET ════════════════════════════════════════════ -->
   <ng-container *ngIf="item.type === 'video'">
     <app-video-widget
       [config]="item.videoConfig"

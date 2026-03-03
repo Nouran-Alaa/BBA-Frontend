@@ -1,44 +1,104 @@
-<div class="flex h-screen overflow-hidden" [attr.data-theme]="themeService.theme$ | async">
-  <!-- Mobile Backdrop Overlay -->
+<!-- main-layout.component.html -->
+<div class="ml-root" [attr.data-theme]="themeService.theme$ | async">
+  <!-- ══ SPACE BACKGROUND ═════════════════════════════════════════
+       Works in both dark AND light mode.
+       Dark: deep star field + meteor canvas + nebula orbs
+       Light: soft aurora cloud particles
+  ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Star layers (CSS, dark mode only via styles.css) -->
+  <div class="star-field" aria-hidden="true">
+    <div class="star-layer star-layer-1"></div>
+    <div class="star-layer star-layer-2"></div>
+    <div class="star-layer star-layer-3"></div>
+  </div>
+
+  <!-- Meteor shower (Canvas, JS-driven, dark mode only) -->
+  <canvas #meteorCanvas class="meteor-canvas" aria-hidden="true"></canvas>
+
+  <!-- Nebula orbs (CSS, both modes with different colors) -->
+  <div class="ml-nebula ml-nebula-1" aria-hidden="true"></div>
+  <div class="ml-nebula ml-nebula-2" aria-hidden="true"></div>
+  <div class="ml-nebula ml-nebula-3" aria-hidden="true"></div>
+
+  <!-- Aurora shimmer (light mode only) -->
+  <div class="aurora-band aurora-1" aria-hidden="true"></div>
+  <div class="aurora-band aurora-2" aria-hidden="true"></div>
+
+  <!-- Mobile backdrop -->
   <div
     *ngIf="isSideNavOpen && isMobileView"
     (click)="toggleSideNav()"
-    class="fixed inset-0 z-40 lg:hidden animate-fadeIn"
-    style="
-      background-color: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-    "
+    class="fixed inset-0 z-40 animate-fadeIn"
+    style="background: rgba(2, 8, 20, 0.65); backdrop-filter: blur(6px)"
+    aria-hidden="true"
   ></div>
 
-  <!-- Sidebar - Mobile & Desktop -->
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════════
+       Mobile  (<lg): fixed overlay, w-64 (NOT full-width), z-50
+       Desktop (lg+): inline flex-shrink-0, collapsible
+  ═══════════════════════════════════════════════════════════════ -->
   <aside
     *ngIf="isSideNavOpen || !isMobileView"
+    class="glass-sidebar transition-all duration-300 ease-in-out"
     [ngClass]="{
-      'fixed top-0 left-0 h-screen w-64 z-50 lg:relative lg:z-auto': isMobileView,
+      'fixed top-0 left-0 h-screen z-50 w-64': isMobileView,
       'relative h-full flex-shrink-0': !isMobileView,
-      'w-full': isSmallScreen,
-      'w-20': isSideNavCollapsed && !isMobileView,
-      'w-64': !isSideNavCollapsed || isMobileView,
+      'ml-collapsed': isSideNavCollapsed && !isMobileView,
+      'ml-expanded': !isSideNavCollapsed && !isMobileView,
     }"
-    class="glass-sidebar transition-all duration-300 ease-in-out overflow-visible"
+    style="overflow: visible"
   >
-    <app-side-nav [collapsed]="isSideNavCollapsed && !isMobileView" (toggle)="toggleSideNav()">
-    </app-side-nav>
+    <app-side-nav
+      [collapsed]="isSideNavCollapsed && !isMobileView"
+      (toggle)="toggleSideNav()"
+    ></app-side-nav>
+
+    <!-- Desktop collapse toggle — z-index BELOW modals (z-45 < z-1000) -->
+    <button
+      *ngIf="!isMobileView"
+      (click)="toggleSideNav()"
+      class="ml-sidebar-toggle"
+      [attr.title]="isSideNavCollapsed ? 'Expand' : 'Collapse'"
+    >
+      <svg
+        *ngIf="!isSideNavCollapsed"
+        width="11"
+        height="11"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2.5"
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+      <svg
+        *ngIf="isSideNavCollapsed"
+        width="11"
+        height="11"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
   </aside>
 
-  <!-- Main Content Area -->
-  <div class="flex flex-col flex-1 overflow-hidden min-w-0">
-    <!-- Top Navigation -->
-    <header class="glass-topnav z-30 flex-shrink-0">
+  <!-- ══ MAIN CONTENT ═════════════════════════════════════════════ -->
+  <div class="ml-content-area">
+    <header style="flex-shrink: 0; overflow: visible; position: relative; z-index: 30">
       <app-top-nav (menuToggle)="toggleSideNav()"></app-top-nav>
     </header>
-
-    <!-- Main Dashboard Content -->
-    <main class="flex-1 overflow-hidden" style="background: transparent">
+    <div class="accent-line"></div>
+    <main style="flex: 1; overflow: hidden; background: transparent; min-height: 0">
       <router-outlet></router-outlet>
     </main>
   </div>
-  <!-- Toast Notifications -->
+
   <app-toast></app-toast>
 </div>

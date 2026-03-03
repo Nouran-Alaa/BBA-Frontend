@@ -1,32 +1,32 @@
 :host {
   display: block;
   position: relative;
-  /* Force it to escape stacking context */
   isolation: isolate;
 }
 
-.animate-slideDown {
-  animation: slideDown 0.3s ease-out;
+.drp-panel {
+  background: var(--bg-modal);
+  border: 1px solid var(--border-glass);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 255, 0.08),
+    0 16px 40px rgba(0, 0, 0, 0.3);
+  animation: drpIn 0.2s ease-out both;
 }
-
-@keyframes slideDown {
+@keyframes drpIn {
   from {
     opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
-    max-height: 300px;
     transform: translateY(0);
   }
 }
 
-/* Custom date input styles */
 input[type='date'] {
   cursor: pointer;
 }
-
 input[type='date']::-webkit-calendar-picker-indicator {
   cursor: pointer;
+  opacity: 0.5;
 }

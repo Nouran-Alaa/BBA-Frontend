@@ -1,222 +1,325 @@
-<div class="flex flex-col h-screen overflow-visible" style="color: var(--text-primary)">
-  <!-- Logo Section -->
+<!-- side-nav.component.html  ─ v3 FINAL
+     ✓ NO X close button anywhere
+     ✓ NO collapse toggle inside the sidebar (hamburger in top-nav handles this)
+     ✓ Collapsed state = icon-only (like reference image 2)
+     ✓ All original logic/bindings/modals unchanged
+     Place at: src/app/shared/components/layout/side-nav/side-nav.component.html
+-->
+<div
+  style="
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    color: var(--text-primary);
+  "
+>
+  <!-- Scan-line animation (dark mode only, CSS-driven) -->
+  <div class="sn-scanline" aria-hidden="true"></div>
+
+  <!-- ════ HEADER ═══════════════════════════════════════════════ -->
   <div
-    class="flex items-center justify-between p-4 flex-shrink-0"
-    style="border-bottom: 1px solid var(--border-glass)"
-    [class.px-2]="collapsed"
+    style="
+      display: flex;
+      align-items: center;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border-glass);
+      flex-shrink: 0;
+      min-height: 56px;
+    "
+    [style.justify-content]="collapsed ? 'center' : 'flex-start'"
+    [style.gap]="collapsed ? '0' : '10px'"
   >
-    <!-- Logo and Company Name -->
-    <div class="flex items-center gap-3 overflow-hidden">
-      <!-- Logo Image -->
-      <div class="relative flex-shrink-0">
-        <img
-          [src]="companyLogo || fallbackLogo"
-          alt="Company Logo"
-          class="w-10 h-10 rounded-lg object-cover border-2 transition-transform duration-200 hover:scale-105"
-          style="border-color: var(--border-glass)"
-          [class.w-8]="collapsed"
-          [class.h-8]="collapsed"
-        />
-
-        <!-- Upload Button (Super Admin Only) -->
-        <button
-          *ngIf="isSuperAdmin() && !collapsed"
-          (click)="logoInput.click()"
-          class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-colors"
-          style="background: var(--accent-primary)"
-          title="Upload Logo"
-        >
-          <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            ></path>
-          </svg>
-        </button>
-
-        <input
-          #logoInput
-          type="file"
-          accept="image/*"
-          (change)="uploadLogo($event)"
-          class="hidden"
-        />
+    <!-- Logo with glow ring -->
+    <div style="position: relative; flex-shrink: 0">
+      <div class="sn-logo-ring"></div>
+      <img
+        [src]="companyLogo || fallbackLogo"
+        alt="Logo"
+        [style.width]="collapsed ? '32px' : '36px'"
+        [style.height]="collapsed ? '32px' : '36px'"
+        style="
+          border-radius: 9px;
+          border: 1.5px solid rgba(0, 200, 255, 0.22);
+          object-fit: cover;
+          position: relative;
+          z-index: 1;
+          display: block;
+          transition: all 0.3s;
+        "
+      />
+      <!-- Upload button — super admin + expanded only -->
+      <div
+        *ngIf="isSuperAdmin() && !collapsed"
+        (click)="logoInput.click()"
+        style="
+          position: absolute;
+          bottom: -3px;
+          right: -3px;
+          width: 15px;
+          height: 15px;
+          border-radius: 50%;
+          background: var(--accent-primary);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 2;
+          box-shadow: 0 0 8px rgba(0, 200, 255, 0.6);
+        "
+        title="Upload Logo"
+      >
+        <svg width="8" height="8" fill="none" stroke="white" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="3"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
       </div>
-
-      <!-- Company Name -->
-      <div *ngIf="!collapsed" class="transition-all duration-300">
-        <h1 class="text-lg font-bold" style="color: var(--text-primary)">My Company</h1>
-        <p class="text-xs" style="color: var(--text-muted)">Analytics</p>
-      </div>
+      <input
+        #logoInput
+        type="file"
+        accept="image/*"
+        (change)="uploadLogo($event)"
+        style="display: none"
+      />
     </div>
 
-    <!-- Close Button (Mobile Only) -->
-    <button
-      (click)="toggleSidebar()"
-      class="p-2 rounded-lg transition-colors lg:hidden cursor-pointer hover-glass"
-      style="color: var(--text-muted)"
-      aria-label="Close Sidebar"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M6 18L18 6M6 6l12 12"
-        ></path>
-      </svg>
-    </button>
+    <!-- Company name — hidden when collapsed -->
+    <div *ngIf="!collapsed" style="overflow: hidden; flex: 1; min-width: 0">
+      <div class="sn-company-name">My Company</div>
+      <div class="sn-company-sub">Analytics</div>
+    </div>
   </div>
+  <!-- ═══════════════════════════════════════════════════════════ -->
 
-  <!-- Dashboards Section - Scrollable -->
-  <div class="flex-1 overflow-y-auto py-4">
-    <!-- Section Title -->
-    <div *ngIf="!collapsed" class="px-4 mb-3">
-      <h2 class="text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">
-        Dashboards
-      </h2>
+  <!-- ════ DASHBOARD LIST ════════════════════════════════════════ -->
+  <div style="flex: 1; overflow-y: auto; padding: 8px 0" class="sn-scroll">
+    <!-- Section label — hidden when collapsed -->
+    <div
+      *ngIf="!collapsed"
+      style="
+        padding: 0 12px 6px;
+        font-size: 0.58rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-muted);
+        font-family: 'Exo 2', system-ui, sans-serif;
+      "
+    >
+      Dashboards
     </div>
 
-    <!-- Dashboard List -->
-    <nav class="space-y-1 px-2">
-      <div *ngFor="let dashboard of dashboards" class="relative group">
-        <button
+    <div style="padding: 0 6px; display: flex; flex-direction: column; gap: 1px">
+      <!-- Dashboard items -->
+      <div *ngFor="let dashboard of dashboards" style="position: relative" class="sn-group">
+        <div
           (click)="selectDashboard(dashboard.id)"
-          [style.background]="
-            activeDashboardId === dashboard.id ? 'var(--accent-gradient)' : 'transparent'
+          class="sn-nav-item"
+          [class.sn-nav-item-active]="activeDashboardId === dashboard.id"
+          [style.padding]="collapsed ? '9px 6px' : '7px 8px'"
+          [style.justify-content]="collapsed ? 'center' : 'flex-start'"
+          [attr.title]="collapsed ? dashboard.name : null"
+          style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 9px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+            transition: all 0.2s;
           "
-          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 relative cursor-pointer"
-          [style.boxShadow]="activeDashboardId === dashboard.id ? 'var(--shadow-sm)' : 'none'"
-          [class.hover-glass]="activeDashboardId !== dashboard.id"
-          [class.justify-center]="collapsed"
-          [title]="collapsed ? dashboard.name : ''"
         >
-          <!-- Dashboard Icon -->
-          <lucide-icon
-            *ngIf="getDashboardIcon(dashboard.iconId) as icon"
-            [img]="icon"
-            [size]="collapsed ? 20 : 18"
-            class="flex-shrink-0"
-            [style.color]="
-              activeDashboardId === dashboard.id ? 'var(--text-on-accent)' : 'var(--text-primary)'
+          <div *ngIf="activeDashboardId === dashboard.id" class="sn-active-bar"></div>
+
+          <!-- Icon -->
+          <div
+            style="
+              width: 28px;
+              height: 28px;
+              border-radius: 7px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+              transition: all 0.18s;
+            "
+            [style.background]="
+              activeDashboardId === dashboard.id ? 'rgba(0,200,255,0.12)' : 'transparent'
             "
           >
-          </lucide-icon>
+            <lucide-icon
+              *ngIf="getDashboardIcon(dashboard.iconId) as icon"
+              [img]="icon"
+              [size]="collapsed ? 18 : 16"
+              [style.color]="
+                activeDashboardId === dashboard.id
+                  ? 'var(--accent-primary)'
+                  : 'var(--text-secondary)'
+              "
+            ></lucide-icon>
+          </div>
 
-          <!-- Dashboard Name -->
+          <!-- Label -->
           <span
             *ngIf="!collapsed"
-            class="text-sm font-medium text-left flex-1 truncate"
-            [style.color]="
-              activeDashboardId === dashboard.id ? 'var(--text-on-accent)' : 'var(--text-primary)'
+            style="
+              font-family: 'Exo 2', system-ui, sans-serif;
+              font-size: 0.82rem;
+              flex: 1;
+              text-align: left;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             "
+            [style.color]="
+              activeDashboardId === dashboard.id ? 'var(--accent-primary)' : 'var(--text-secondary)'
+            "
+            [style.font-weight]="activeDashboardId === dashboard.id ? '600' : '500'"
           >
             {{ dashboard.name }}
           </span>
 
-          <!-- Context Menu Button (Super Admin Only) -->
-          <button
+          <!-- Default badge -->
+          <span
+            *ngIf="dashboard.isDefault && !collapsed"
+            style="
+              font-size: 0.55rem;
+              font-weight: 700;
+              padding: 2px 6px;
+              border-radius: 99px;
+              background: var(--accent-tertiary);
+              color: #fff;
+              flex-shrink: 0;
+              white-space: nowrap;
+            "
+          >
+            Default
+          </span>
+
+          <!-- 3-dot menu (super admin, expanded only) — span NOT button -->
+          <span
             *ngIf="isSuperAdmin() && !collapsed"
             (click)="openDashboardMenu(dashboard, $event)"
-            class="opacity-0 group-hover:opacity-100 p-1 rounded transition-all cursor-pointer hover-glass"
-            title="Dashboard options"
+            class="sn-dot-menu"
+            title="Options"
           >
-            <svg
-              class="w-4 h-4"
-              style="color: var(--text-primary)"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-              ></path>
+              />
             </svg>
-          </button>
-
-          <!-- Default Badge -->
-          <span
-            *ngIf="dashboard.isDefault && !collapsed"
-            class="px-2 py-0.5 text-white text-xs rounded-full"
-            style="background: var(--accent-tertiary)"
-          >
-            Default
           </span>
-
-          <!-- Active Indicator (when collapsed) -->
-          <div
-            *ngIf="collapsed && activeDashboardId === dashboard.id"
-            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full"
-            style="background: var(--accent-primary)"
-          ></div>
-        </button>
+        </div>
       </div>
 
-      <!-- Add New Dashboard Button (Super Admin Only) -->
-      <button
+      <!-- Add dashboard (super admin only) -->
+      <div
         *ngIf="isSuperAdmin()"
         (click)="addNewDashboard()"
-        class="group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 border-2 border-dashed cursor-pointer hover-glass justify-center"
-        style="border-color: var(--border-glass); color: var(--text-muted)"
-        [title]="collapsed ? 'Add New Dashboard' : ''"
+        class="sn-add-btn"
+        [style.justify-content]="collapsed ? 'center' : 'flex-start'"
+        [style.padding]="collapsed ? '9px 6px' : '7px 8px'"
+        [attr.title]="collapsed ? 'Add Dashboard' : null"
+        style="
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          border-radius: 9px;
+          cursor: pointer;
+          border: 1px dashed var(--border-glass);
+          color: var(--text-muted);
+          margin-top: 4px;
+          transition: all 0.2s;
+        "
       >
-        <!-- Plus Icon -->
         <div
-          class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-110"
-          style="background: var(--accent-gradient); box-shadow: var(--shadow-md)"
+          style="
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            box-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          "
         >
-          <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="12" height="12" fill="none" stroke="white" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
+              stroke-width="3"
               d="M12 4v16m8-8H4"
-            ></path>
+            />
           </svg>
         </div>
-
-        <!-- Add Text -->
-        <span *ngIf="!collapsed" class="text-sm font-medium"> Add Dashboard </span>
-      </button>
-    </nav>
+        <span *ngIf="!collapsed" style="font-size: 0.82rem; font-weight: 500">Add Dashboard</span>
+      </div>
+    </div>
   </div>
+  <!-- ═══════════════════════════════════════════════════════════ -->
 
-  <!-- Footer Section - Fixed at Bottom -->
-  <div
-    class="p-4 flex-shrink-0 mt-auto"
-    style="border-top: 1px solid var(--border-glass)"
-    [class.px-2]="collapsed"
-  >
-    <button
-      class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer hover:glass"
-      [class.justify-center]="collapsed"
-      style="color: var(--text-muted)"
-      [title]="collapsed ? 'Settings' : ''"
+  <!-- ════ FOOTER ════════════════════════════════════════════════ -->
+  <div style="padding: 6px; border-top: 1px solid var(--border-glass); flex-shrink: 0">
+    <div
+      class="sn-nav-item"
+      [style.padding]="collapsed ? '9px 6px' : '7px 8px'"
+      [style.justify-content]="collapsed ? 'center' : 'flex-start'"
+      [attr.title]="collapsed ? 'Settings' : null"
+      style="
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 9px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.2s;
+        color: var(--text-muted);
+      "
     >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-        ></path>
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-        ></path>
-      </svg>
-      <span *ngIf="!collapsed" class="text-sm"> Settings </span>
-    </button>
+      <div
+        style="
+          width: 28px;
+          height: 28px;
+          border-radius: 7px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        "
+      >
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+        </svg>
+      </div>
+      <span *ngIf="!collapsed" style="font-size: 0.82rem">Settings</span>
+    </div>
   </div>
+  <!-- ═══════════════════════════════════════════════════════════ -->
 
-  <!-- MODALS - rendered here (at component root, not inside the scroll nav) -->
+  <!-- MODALS — logic completely unchanged -->
   <app-dashboard-templates-modal
     *ngIf="showTemplatesModal"
     (close)="showTemplatesModal = false"
